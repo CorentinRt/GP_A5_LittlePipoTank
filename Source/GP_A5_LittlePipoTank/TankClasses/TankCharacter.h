@@ -6,12 +6,26 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Camera/CameraComponent.h"
 #include "TankCharacter.generated.h"
 
 UCLASS()
 class GP_A5_LITTLEPIPOTANK_API ATankCharacter : public ACharacter
 {
 	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* Camera;
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputMappingContext* InputMapping;
+
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputAction* LookAction;
 
 public:
 	// Sets default values for this character's properties
@@ -28,12 +42,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
-	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
-	class UInputMappingContext* InputMapping;
-
-	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
-	class UInputAction* TestAction;
-
-	void TestInput();
+protected:
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
 };

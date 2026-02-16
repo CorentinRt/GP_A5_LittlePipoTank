@@ -9,6 +9,10 @@ ATankCharacter::ATankCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(GetRootComponent());
+	Camera->bUsePawnControlRotation = true;
+
 }
 
 // Called when the game starts or when spawned
@@ -38,12 +42,8 @@ void ATankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 
 	if (UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-		Input->BindAction(TestAction, ETriggerEvent::Triggered, this, &ATankCharacter::TestInput);
+		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATankCharacter::Move);
+		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATankCharacter::Look);
 	}
-}
-
-void ATankCharacter::TestInput()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "PressedInput");
 }
 
