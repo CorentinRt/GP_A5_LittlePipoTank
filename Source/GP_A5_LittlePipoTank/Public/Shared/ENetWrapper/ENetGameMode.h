@@ -26,6 +26,13 @@ public:
 	virtual void FinalizeNetwork();
 	
 	virtual void RunNetwork();
+
+protected:
+	
+	virtual void OnNetworkEventConnect(const ENetEvent& event);
+	virtual void OnNetworkEventDisconnect(const ENetEvent& event);
+	virtual void OnNetworkEventDisconnectTimeout(const ENetEvent& event);
+	virtual void OnNetworkEventReceive(const ENetEvent& event);
 	
 protected:
 	ENetHost* Host;

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+#include "ENetGameMode.h"
 #include "enet6/enet.h"
 #include "ENetServerGameMode.generated.h"
 
@@ -11,10 +11,20 @@
  * 
  */
 UCLASS()
-class GP_A5_LITTLEPIPOTANK_API AENetServerGameMode : public AGameModeBase
+class GP_A5_LITTLEPIPOTANK_API AENetServerGameMode : public AENetGameMode
 {
 	GENERATED_BODY()
 
-private:
-	ENetHost* ServerHost;
+protected:
+	virtual void Tick(float DeltaSeconds) override;
+public:
+	
+	virtual void InitializeNetwork() override;
+
+protected:
+	virtual void OnNetworkEventConnect(const ENetEvent& event) override;
+	virtual void OnNetworkEventDisconnect(const ENetEvent& event) override;
+	virtual void OnNetworkEventDisconnectTimeout(const ENetEvent& event) override;
+	virtual void OnNetworkEventReceive(const ENetEvent& event) override;
+	
 };
