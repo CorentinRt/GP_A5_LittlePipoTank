@@ -5,6 +5,7 @@
 //#include <string>
 
 #include "GP_A5_LittlePipoTank.h"
+#include "Shared/NetworkProtocolHelpers.h"
 #include "Shared/ENetWrapper/ENetHost.h"
 #include "Shared/ENetWrapper/ENetPeer.h"
 
@@ -163,7 +164,14 @@ void AENetGameModeTest::ClientTick(float DeltaSeconds)
 		if (!NetHost || !NetPeer) return;
 
 		FString message("Hello World!");
-		ENetPacket* packet = enet_packet_create(TCHAR_TO_UTF8(*message), message.GetAllocatedSize(), ENET_PACKET_FLAG_RELIABLE);
+
+		TArray<BYTE> ByteArray;
+
+		float test = 32.32f;
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, test);
+		
+		//ENetPacket* packet = enet_packet_create(TCHAR_TO_UTF8(*message), message.GetAllocatedSize(), ENET_PACKET_FLAG_RELIABLE);
+		ENetPacket* packet = enet_packet_create(ByteArray.GetData(), ByteArray.GetAllocatedSize(), ENET_PACKET_FLAG_RELIABLE);
 
 		enet_peer_send(NetPeer, 0, packet);
 	
