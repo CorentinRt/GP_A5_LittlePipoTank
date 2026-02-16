@@ -3,8 +3,13 @@
 
 #include "Server/Game/GameModeTankServer.h"
 
-#include "Kismet/GameplayStatics.h"
 #include "Shared/Game/GamePhaseListener.h"
+
+AGameModeTankServer::AGameModeTankServer()
+{
+	PrimaryActorTick.bCanEverTick = true;
+	
+}
 
 void AGameModeTankServer::BeginPlay()
 {
@@ -12,37 +17,13 @@ void AGameModeTankServer::BeginPlay()
 
 	InitGameServer();
 
-	SetGamePhase(ETankGamePhase::WAITING_PLAYER);
+	SetServerGamePhase(ETankGamePhase::WAITING_PLAYER);
 }
 
 void AGameModeTankServer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	UpdateCheckTickPhysics(DeltaSeconds);
-	UpdateCheckTickNetwork(DeltaSeconds);
-}
-
-void AGameModeTankServer::UpdateCheckTickPhysics(float DeltaTime)
-{
-	CurrentAccumulatedPhysicsTickTime += DeltaTime;
-
-	while (CurrentAccumulatedPhysicsTickTime >= TickDelayPhysics)
-	{
-		GamePhysicsTick(TickDelayPhysics);
-		CurrentAccumulatedPhysicsTickTime -= TickDelayPhysics;
-	}
-}
-
-void AGameModeTankServer::UpdateCheckTickNetwork(float DeltaTime)
-{
-	CurrentAccumulatedNetworkTickTime += DeltaTime;
-
-	while (CurrentAccumulatedNetworkTickTime >= TickDelayNetwork)
-	{
-		GameNetworkTick(TickDelayNetwork);
-		CurrentAccumulatedNetworkTickTime -= TickDelayNetwork;
-	}
 }
 
 void AGameModeTankServer::InitGameServer()
@@ -54,85 +35,139 @@ void AGameModeTankServer::InitGameServer()
 
 void AGameModeTankServer::GamePhysicsTick(float DeltaTime)
 {
+	/*
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		5.f,
 		FColor::Yellow,
 		TEXT("Tick Physics")
 	);
+	*/
+
+	UpdateCurrentGamePhase(DeltaTime);
 }
 
 void AGameModeTankServer::GameNetworkTick(float DeltaTime)
 {
+	/*
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		5.f,
 		FColor::Blue,
 		TEXT("Tick Network")
 	);
+	*/
 }
 
-void AGameModeTankServer::SetGamePhase(ETankGamePhase GamePhase)
+ETankGamePhase AGameModeTankServer::GetCurrentGamePhase()
 {
-	CurrentTankGamePhase = GamePhase;
-	ReactChangeGamePhase(CurrentTankGamePhase);
+	return GameStateServer.CurrentGamePhase;
+}
+
+void AGameModeTankServer::SetServerGamePhase(ETankGamePhase NewGamePhase)
+{
+	SetGamePhase(GameStateServer.CurrentGamePhase, NewGamePhase);
 }
 
 void AGameModeTankServer::NextGamePhase()
 {
-	switch (CurrentTankGamePhase)
+	switch (GameStateServer.CurrentGamePhase)
 	{
 	case ETankGamePhase::WAITING_PLAYER:
-		SetGamePhase(ETankGamePhase::PRE_GAME);
-		CurrentTankGamePhase = ETankGamePhase::PRE_GAME;
+		SetServerGamePhase(ETankGamePhase::PRE_GAME);
 		break;
 	case ETankGamePhase::PRE_GAME:
-		SetGamePhase(ETankGamePhase::IN_GAME);
+		SetServerGamePhase(ETankGamePhase::IN_GAME);
 		break;
 	case ETankGamePhase::IN_GAME:
-		SetGamePhase(ETankGamePhase::POST_GAME);
+		SetServerGamePhase(ETankGamePhase::POST_GAME);
 		break;
 	case ETankGamePhase::POST_GAME:
-		SetGamePhase(ETankGamePhase::PRE_GAME);
+		SetServerGamePhase(ETankGamePhase::PRE_GAME);
 		break;
 	default:
 		break;
 	}
 }
 
-void AGameModeTankServer::ReactChangeGamePhase(ETankGamePhase InGamePhase)
+void AGameModeTankServer::UpdateCurrentGamePhase(float DeltaTime)
 {
-	if (CurrentTankGamePhase == ETankGamePhase::PRE_GAME)
+	switch (GameStateServer.CurrentGamePhase)
 	{
-		CollectAllGamePhasesListeners();
+	case ETankGamePhase::WAITING_PLAYER:
+		break;
+	case ETankGamePhase::PRE_GAME:
+	case ETankGamePhase::IN_GAME:
+	case ETankGamePhase::POST_GAME:
+		{
+			while (CurrentAccumulatedGamePhaseTime >= GetGamePhaseDuration(GameStateServer.CurrentGamePhase))
+			{
+				CurrentAccumulatedGamePhaseTime -= GetGamePhaseDuration(GameStateServer.CurrentGamePhase);
+				NextGamePhase();
+			}
+
+			CurrentAccumulatedGamePhaseTime += DeltaTime;
+		}
+		break;
+	case ETankGamePhase::NONE:
+		break;
+	default:
+		break;
+	}
+}
+
+float AGameModeTankServer::GetGamePhaseDuration(ETankGamePhase InGamePhase)
+{
+	if (!GamePhasesData)
+		return 0.f;
+
+	float Duration = 0.f;
+	
+	switch (InGamePhase)
+	{
+	case ETankGamePhase::WAITING_PLAYER:
+		break;
+	case ETankGamePhase::PRE_GAME:
+		{
+			Duration = GamePhasesData->PreGameDuration;
+		}
+		break;
+	case ETankGamePhase::IN_GAME:
+		{
+			Duration = GamePhasesData->InGameDuration;
+		}
+		break;
+	case ETankGamePhase::POST_GAME:
+		{
+			Duration = GamePhasesData->PostGameDuration;
+		}
+		break;
+	case ETankGamePhase::NONE:
+		break;
+	default:
+		break;
 	}
 
-	for (AActor* GamePhaseListener : GamePhaseListeners)
-	{
-		if (!GamePhaseListener || !GamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
-			continue;
-
-	
-		
-		//IGamePhaseListener::Execute_ReactOnGamePhaseChanged(GamePhaseListener, InGamePhase);
-	}
-	
-	ReactChangeGamePhase_Blueprint(InGamePhase);
+	return Duration;
 }
 
 void AGameModeTankServer::PlayerJoined()
 {
-	++PlayerCount;
-	
+	++GameStateServer.PlayerCount;
+
+
+	FPlayerData NewPlayerData
+	{
+		.PlayerIndex = GameStateServer.NextPlayerIndex++,
+		.PlayerName = "NULL_NAME"
+	};
+
+	GameStateServer.Players.Add(NewPlayerData);
 }
 
 void AGameModeTankServer::PlayerLeft()
 {
-	--PlayerCount;
-	
-}
+	--GameStateServer.PlayerCount;
 
-void AGameModeTankServer::CollectAllGamePhasesListeners()
-{
-	UGameplayStatics::GetAllActorsWithInterface(this, UGamePhaseListener::StaticClass(), GamePhaseListeners);
+	// Remove player on leave using its connexion peer enet
 }

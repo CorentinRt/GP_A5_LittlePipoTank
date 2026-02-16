@@ -3,68 +3,57 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
-#include "Shared/TankGamePhase.h"
+#include "GamePhasesData.h"
+#include "GameStateTankServer.h"
+#include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankServer.generated.h"
 
-class IGamePhaseListener;
 /**
  * 
  */
 UCLASS()
-class GP_A5_LITTLEPIPOTANK_API AGameModeTankServer : public AGameModeBase
+class GP_A5_LITTLEPIPOTANK_API AGameModeTankServer : public AGameModeTankShared
 {
 	GENERATED_BODY()
 
 public:
+
+	AGameModeTankServer();
 	
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaSeconds) override;
-
-	void UpdateCheckTickPhysics(float DeltaTime);
-	void UpdateCheckTickNetwork(float DeltaTime);
 	
 	void InitGameServer();
 
+	virtual void GamePhysicsTick(float DeltaTime) override;
+	virtual void GameNetworkTick(float DeltaTime) override;
 
-	void GamePhysicsTick(float DeltaTime);
-	void GameNetworkTick(float DeltaTime);
-	
+	virtual ETankGamePhase GetCurrentGamePhase() override;
+
 	UFUNCTION(BlueprintCallable)
-	void SetGamePhase(ETankGamePhase GamePhase);
-
+	void SetServerGamePhase(ETankGamePhase NewGamePhase);
+	
 	UFUNCTION(BlueprintCallable)
 	void NextGamePhase();
 
+	void UpdateCurrentGamePhase(float DeltaTime);
 
-	void ReactChangeGamePhase(ETankGamePhase InGamePhase);
+	UFUNCTION(BlueprintCallable)
+	float GetGamePhaseDuration(ETankGamePhase InGamePhase);
 	
-	UFUNCTION(BlueprintImplementableEvent)
-	void ReactChangeGamePhase_Blueprint(ETankGamePhase InGamePhase);	// Blueprint implementable to handle timer in BP
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	ETankGamePhase CurrentTankGamePhase = ETankGamePhase::NONE;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	int PlayerCount = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FGameStateTankServer GameStateServer;
 
 	bool IsServerInitialized = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UGamePhasesData> GamePhasesData;
+	
 private:
 	void PlayerJoined();
 
 	void PlayerLeft();
 
-	void CollectAllGamePhasesListeners();
-	
-	float TickDelayPhysics = 1/60.0f;
-
-	float TickDelayNetwork = 1/30.f;
-
-	float CurrentAccumulatedPhysicsTickTime = 0.f;
-	float CurrentAccumulatedNetworkTickTime = 0.f;
-
-	UPROPERTY()
-	TArray<AActor*> GamePhaseListeners;
+	float CurrentAccumulatedGamePhaseTime = 0.f;
 };
