@@ -23,6 +23,7 @@ public:
 	static void SerializeArithmetic(TArray<BYTE>& ByteArray, T Value);
 	template<typename T> requires std::is_arithmetic_v<T>
 	static T DeserializeArithmetic(TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+
 	
 };
 
