@@ -14,7 +14,18 @@ class GP_A5_LITTLEPIPOTANK_API UNetworkProtocolHelpers : public UBlueprintFuncti
 {
 	GENERATED_BODY()
 
+public:
 
-	//UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Serialization")
-	//void SerializeI32(TArray<UINT8>& ByteArray, INT32 value);
+	template<typename T> requires std::is_arithmetic_v<T>
+	static T ByteSwap(T Value);
+	
+	template<typename T> requires std::is_arithmetic_v<T>
+	static void SerializeArithmetic(TArray<BYTE>& ByteArray, T Value);
+	template<typename T> requires std::is_arithmetic_v<T>
+	static T DeserializeArithmetic(TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+	
 };
+
+#if CPP
+	#include "NetworkProtocolHelpers.inl"
+#endif
