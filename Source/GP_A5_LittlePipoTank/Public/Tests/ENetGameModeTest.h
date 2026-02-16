@@ -7,6 +7,7 @@
 #include "enet6/enet.h"
 #include "ENetGameModeTest.generated.h"
 
+class UENetPeer;
 class UENetHost;
 /**
  * 
@@ -26,8 +27,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool isClient = true;
 
+	UPROPERTY()
 	TObjectPtr<UENetHost> Host;
+	UPROPERTY()
+	TObjectPtr<UENetPeer> Peer;
 
 	ENetHost* NetHost;
-	ENetPeer* Peer;
+	ENetPeer* NetPeer;
 };
