@@ -3,7 +3,9 @@
 
 #include "Shared/Game/GameModeTankShared.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "Shared/Game/GamePhaseListener.h"
+#include "Shared/Game/PhysicsTickableShared.h"
 
 AGameModeTankShared::AGameModeTankShared()
 {
@@ -15,7 +17,7 @@ void AGameModeTankShared::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	UGameplayStatics::GetAllActorsWithInterface(this, UPhysicsTickableShared::StaticClass(), PhysicsTickables);
 }
 
 void AGameModeTankShared::Tick(float DeltaSeconds)
@@ -50,7 +52,13 @@ void AGameModeTankShared::UpdateCheckTickNetwork(float DeltaTime)
 
 void AGameModeTankShared::GamePhysicsTick(float DeltaTime)
 {
-	
+	for (AActor* Tickable : PhysicsTickables)
+	{
+		if (!Tickable || !Tickable->GetClass()->ImplementsInterface(UPhysicsTickableShared::StaticClass()))
+			continue;
+
+		IPhysicsTickableShared::Execute_OnTickPhysics_Blueprint(Tickable, DeltaTime);
+	}
 }
 
 void AGameModeTankShared::GameNetworkTick(float DeltaTime)
@@ -80,4 +88,36 @@ void AGameModeTankShared::ReactChangeGamePhase(ETankGamePhase InGamePhase)
 	}
 	
 	ReactChangeGamePhase_Implementation(InGamePhase);
+}
+
+void AGameModeTankShared::RegisterListener(AActor* InGamePhaseListener)
+{
+	if (!InGamePhaseListener || !InGamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
+		return;
+
+	GamePhaseListeners.AddUnique(InGamePhaseListener);
+}
+
+void AGameModeTankShared::UnregisterListener(AActor* InGamePhaseListener)
+{
+	if (!InGamePhaseListener || !InGamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
+		return;
+
+	GamePhaseListeners.Remove(InGamePhaseListener);
+}
+
+void AGameModeTankShared::RegisterPhysicsTickable(AActor* InPhysicsTickable)
+{
+	if (!InPhysicsTickable || !InPhysicsTickable->GetClass()->ImplementsInterface(UPhysicsTickableShared::StaticClass()))
+		return;
+
+	PhysicsTickables.AddUnique(InPhysicsTickable);
+}
+
+void AGameModeTankShared::UnregisterPhysicsTickable(AActor* InPhysicsTickable)
+{
+	if (!InPhysicsTickable || !InPhysicsTickable->GetClass()->ImplementsInterface(UPhysicsTickableShared::StaticClass()))
+		return;
+
+	PhysicsTickables.Remove(InPhysicsTickable);
 }

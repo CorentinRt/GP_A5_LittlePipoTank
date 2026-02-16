@@ -47,11 +47,6 @@ public:
 
 	bool IsServerInitialized = false;
 
-	UFUNCTION(BlueprintCallable)
-	void RegisterListener(AActor* InGamePhaseListener);
-	UFUNCTION(BlueprintCallable)
-	void UnregisterListener(AActor* InGamePhaseListener);
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UGamePhasesData> GamePhasesData;
 	

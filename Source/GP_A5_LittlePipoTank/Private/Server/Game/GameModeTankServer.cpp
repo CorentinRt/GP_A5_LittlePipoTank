@@ -151,22 +151,6 @@ float AGameModeTankServer::GetGamePhaseDuration(ETankGamePhase InGamePhase)
 	return Duration;
 }
 
-void AGameModeTankServer::RegisterListener(AActor* InGamePhaseListener)
-{
-	if (!InGamePhaseListener || !InGamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
-		return;
-
-	GamePhaseListeners.AddUnique(InGamePhaseListener);
-}
-
-void AGameModeTankServer::UnregisterListener(AActor* InGamePhaseListener)
-{
-	if (!InGamePhaseListener || !InGamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
-		return;
-
-	GamePhaseListeners.Remove(InGamePhaseListener);
-}
-
 void AGameModeTankServer::PlayerJoined()
 {
 	++GameStateServer.PlayerCount;
