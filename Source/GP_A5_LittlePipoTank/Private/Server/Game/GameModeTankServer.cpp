@@ -6,6 +6,12 @@
 #include "Kismet/GameplayStatics.h"
 #include "Shared/Game/GamePhaseListener.h"
 
+AGameModeTankServer::AGameModeTankServer()
+{
+	PrimaryActorTick.bCanEverTick = true;
+	
+}
+
 void AGameModeTankServer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -54,22 +60,26 @@ void AGameModeTankServer::InitGameServer()
 
 void AGameModeTankServer::GamePhysicsTick(float DeltaTime)
 {
+	/*
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		5.f,
 		FColor::Yellow,
 		TEXT("Tick Physics")
 	);
+	*/
 }
 
 void AGameModeTankServer::GameNetworkTick(float DeltaTime)
 {
+	/*
 	GEngine->AddOnScreenDebugMessage(
 		-1,
 		5.f,
 		FColor::Blue,
 		TEXT("Tick Network")
 	);
+	*/
 }
 
 void AGameModeTankServer::SetGamePhase(ETankGamePhase GamePhase)
@@ -84,7 +94,6 @@ void AGameModeTankServer::NextGamePhase()
 	{
 	case ETankGamePhase::WAITING_PLAYER:
 		SetGamePhase(ETankGamePhase::PRE_GAME);
-		CurrentTankGamePhase = ETankGamePhase::PRE_GAME;
 		break;
 	case ETankGamePhase::PRE_GAME:
 		SetGamePhase(ETankGamePhase::IN_GAME);
@@ -102,22 +111,31 @@ void AGameModeTankServer::NextGamePhase()
 
 void AGameModeTankServer::ReactChangeGamePhase(ETankGamePhase InGamePhase)
 {
-	if (CurrentTankGamePhase == ETankGamePhase::PRE_GAME)
-	{
-		CollectAllGamePhasesListeners();
-	}
-
 	for (AActor* GamePhaseListener : GamePhaseListeners)
 	{
 		if (!GamePhaseListener || !GamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
 			continue;
 
-	
-		
-		//IGamePhaseListener::Execute_ReactOnGamePhaseChanged(GamePhaseListener, InGamePhase);
+		IGamePhaseListener::Execute_ReactOnGamePhaseChanged(GamePhaseListener, InGamePhase);
 	}
 	
-	ReactChangeGamePhase_Blueprint(InGamePhase);
+	ReactChangeGamePhase_Implementation(InGamePhase);
+}
+
+void AGameModeTankServer::RegisterListener(AActor* InGamePhaseListener)
+{
+	if (!InGamePhaseListener || !InGamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
+		return;
+
+	GamePhaseListeners.AddUnique(InGamePhaseListener);
+}
+
+void AGameModeTankServer::UnregisterListener(AActor* InGamePhaseListener)
+{
+	if (!InGamePhaseListener || !InGamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
+		return;
+
+	GamePhaseListeners.Remove(InGamePhaseListener);
 }
 
 void AGameModeTankServer::PlayerJoined()
@@ -130,9 +148,4 @@ void AGameModeTankServer::PlayerLeft()
 {
 	--PlayerCount;
 	
-}
-
-void AGameModeTankServer::CollectAllGamePhasesListeners()
-{
-	UGameplayStatics::GetAllActorsWithInterface(this, UGamePhaseListener::StaticClass(), GamePhaseListeners);
 }

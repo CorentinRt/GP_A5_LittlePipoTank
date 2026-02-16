@@ -10,7 +10,7 @@
 /**
  * 
  */
-UINTERFACE()
+UINTERFACE(Blueprintable)
 class GP_A5_LITTLEPIPOTANK_API UGamePhaseListener : public UInterface
 {
 	GENERATED_BODY()
@@ -22,5 +22,9 @@ class GP_A5_LITTLEPIPOTANK_API IGamePhaseListener
 
 public:
 
-	virtual void ReactOnGamePhaseChanged(ETankGamePhase InGamePhase) = 0;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ReactOnGamePhaseChanged(ETankGamePhase InGamePhase);
+
+	virtual void RegisterListener() = 0;
+	virtual void UnregisterListener() = 0;
 };
