@@ -53,6 +53,13 @@ Plugins/**/Binaries/*
 # Builds
 Build/*
 
+!Binaries/Win64
+Binaries/Win64/*
+!Binaries/Win64/*.target
+!Binaries/Win64/*.modules
+!Binaries/Win64/*.dll
+
+
 # Whitelist PakBlacklist-<BuildConfiguration>.txt files
 !Build/*/
 Build/*/**
@@ -73,3 +80,4 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+.idea
