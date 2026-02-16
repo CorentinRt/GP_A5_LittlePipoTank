@@ -1,0 +1,39 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Character.h"
+#include "InputMappingContext.h"
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
+#include "TankCharacter.generated.h"
+
+UCLASS()
+class GP_A5_LITTLEPIPOTANK_API ATankCharacter : public ACharacter
+{
+	GENERATED_BODY()
+
+public:
+	// Sets default values for this character's properties
+	ATankCharacter();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputMappingContext* InputMapping;
+
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputAction* TestAction;
+
+	void TestInput();
+};
