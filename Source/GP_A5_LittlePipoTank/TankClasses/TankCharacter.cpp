@@ -47,3 +47,12 @@ void ATankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	}
 }
 
+void ATankCharacter::Move(const FInputActionValue& Value) {
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	if (IsValid(Controller)) {
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	}
+}
