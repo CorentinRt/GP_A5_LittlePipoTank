@@ -3,6 +3,9 @@
 
 #include "Server/Game/GameModeTankServer.h"
 
+#include "Kismet/GameplayStatics.h"
+#include "Shared/Game/GamePhaseListener.h"
+
 void AGameModeTankServer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -97,6 +100,26 @@ void AGameModeTankServer::NextGamePhase()
 	}
 }
 
+void AGameModeTankServer::ReactChangeGamePhase(ETankGamePhase InGamePhase)
+{
+	if (CurrentTankGamePhase == ETankGamePhase::PRE_GAME)
+	{
+		CollectAllGamePhasesListeners();
+	}
+
+	for (AActor* GamePhaseListener : GamePhaseListeners)
+	{
+		if (!GamePhaseListener || !GamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
+			continue;
+
+	
+		
+		//IGamePhaseListener::Execute_ReactOnGamePhaseChanged(GamePhaseListener, InGamePhase);
+	}
+	
+	ReactChangeGamePhase_Blueprint(InGamePhase);
+}
+
 void AGameModeTankServer::PlayerJoined()
 {
 	++PlayerCount;
@@ -107,4 +130,9 @@ void AGameModeTankServer::PlayerLeft()
 {
 	--PlayerCount;
 	
+}
+
+void AGameModeTankServer::CollectAllGamePhasesListeners()
+{
+	UGameplayStatics::GetAllActorsWithInterface(this, UGamePhaseListener::StaticClass(), GamePhaseListeners);
 }

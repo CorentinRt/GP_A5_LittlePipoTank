@@ -7,6 +7,7 @@
 #include "Shared/TankGamePhase.h"
 #include "GameModeTankServer.generated.h"
 
+class IGamePhaseListener;
 /**
  * 
  */
@@ -26,6 +27,7 @@ public:
 	
 	void InitGameServer();
 
+
 	void GamePhysicsTick(float DeltaTime);
 	void GameNetworkTick(float DeltaTime);
 	
@@ -36,8 +38,10 @@ public:
 	void NextGamePhase();
 
 
+	void ReactChangeGamePhase(ETankGamePhase InGamePhase);
+	
 	UFUNCTION(BlueprintImplementableEvent)
-	void ReactChangeGamePhase(ETankGamePhase InGamePhase);	// Blueprint implementable to handle timer in BP
+	void ReactChangeGamePhase_Blueprint(ETankGamePhase InGamePhase);	// Blueprint implementable to handle timer in BP
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	ETankGamePhase CurrentTankGamePhase = ETankGamePhase::NONE;
@@ -52,11 +56,15 @@ private:
 
 	void PlayerLeft();
 
+	void CollectAllGamePhasesListeners();
+	
 	float TickDelayPhysics = 1/60.0f;
 
 	float TickDelayNetwork = 1/30.f;
 
 	float CurrentAccumulatedPhysicsTickTime = 0.f;
 	float CurrentAccumulatedNetworkTickTime = 0.f;
-	
+
+	UPROPERTY()
+	TArray<AActor*> GamePhaseListeners;
 };
