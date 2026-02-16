@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameStateTankServer.h"
 #include "GameFramework/GameModeBase.h"
-#include "Shared/TankGamePhase.h"
 #include "GameModeTankServer.generated.h"
 
 class IGamePhaseListener;
@@ -45,8 +45,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReactChangeGamePhase_Implementation(ETankGamePhase InGamePhase);	// Blueprint implementable to handle timer in BP
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	ETankGamePhase CurrentTankGamePhase = ETankGamePhase::NONE;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FGameStateTankServer GameStateServer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int PlayerCount = 0;

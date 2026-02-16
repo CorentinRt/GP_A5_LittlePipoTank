@@ -84,13 +84,13 @@ void AGameModeTankServer::GameNetworkTick(float DeltaTime)
 
 void AGameModeTankServer::SetGamePhase(ETankGamePhase GamePhase)
 {
-	CurrentTankGamePhase = GamePhase;
-	ReactChangeGamePhase(CurrentTankGamePhase);
+	GameStateServer.CurrentGamePhase = GamePhase;
+	ReactChangeGamePhase(GameStateServer.CurrentGamePhase);
 }
 
 void AGameModeTankServer::NextGamePhase()
 {
-	switch (CurrentTankGamePhase)
+	switch (GameStateServer.CurrentGamePhase)
 	{
 	case ETankGamePhase::WAITING_PLAYER:
 		SetGamePhase(ETankGamePhase::PRE_GAME);
