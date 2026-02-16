@@ -3,7 +3,7 @@
 
 #include "Shared/ENetWrapper/ENetGameInstanceSubsystem.h"
 #include "GP_A5_LittlePipoTank.h"
-#include "ENet6/enet.h"
+#include "enet6/enet.h"
 
 void UENetGameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
