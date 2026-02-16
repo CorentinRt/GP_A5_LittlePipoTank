@@ -5,11 +5,9 @@
 #include "CoreMinimal.h"
 #include "GamePhasesData.h"
 #include "GameStateTankServer.h"
-#include "GameFramework/GameModeBase.h"
 #include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankServer.generated.h"
 
-class IGamePhaseListener;
 /**
  * 
  */
