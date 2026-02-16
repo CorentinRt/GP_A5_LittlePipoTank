@@ -16,10 +16,10 @@ struct GP_A5_LITTLEPIPOTANK_API FPlayerTankInputs
 
 public:
 	UPROPERTY(BlueprintReadWrite)
-	float MovementsInputs;
+	float MovementsInputs = 0.f;
 
 	UPROPERTY(BlueprintReadWrite)
-	float LookDirInputs;
+	float LookDirInputs = 0.f;
 	
 	
 };

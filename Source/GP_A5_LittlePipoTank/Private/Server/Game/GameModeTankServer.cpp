@@ -3,7 +3,6 @@
 
 #include "Server/Game/GameModeTankServer.h"
 
-#include "Kismet/GameplayStatics.h"
 #include "Shared/Game/GamePhaseListener.h"
 
 AGameModeTankServer::AGameModeTankServer()
@@ -141,7 +140,15 @@ void AGameModeTankServer::UnregisterListener(AActor* InGamePhaseListener)
 void AGameModeTankServer::PlayerJoined()
 {
 	++PlayerCount;
-	
+
+
+	FPlayerData NewPlayerData
+	{
+		.PlayerIndex = NextPlayerIndex++,
+		.PlayerName = "NULL_NAME"
+	};
+
+	GameStateServer.Players.Add(NewPlayerData);
 }
 
 void AGameModeTankServer::PlayerLeft()

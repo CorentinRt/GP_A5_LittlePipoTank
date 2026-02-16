@@ -20,6 +20,9 @@ public:
 	int PlayerIndex;
 
 	UPROPERTY(BlueprintReadWrite)
+	FString PlayerName = "NULL_NAME";
+
+	UPROPERTY(BlueprintReadWrite)
 	FPlayerTankInputs PlayerInputs;
 	
 };

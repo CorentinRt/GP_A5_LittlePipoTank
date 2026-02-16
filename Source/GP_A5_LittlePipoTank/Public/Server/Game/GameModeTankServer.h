@@ -72,4 +72,6 @@ private:
 
 	UPROPERTY()
 	TArray<AActor*> GamePhaseListeners;
+
+	int NextPlayerIndex = 0;
 };
