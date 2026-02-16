@@ -19,9 +19,16 @@ public:
 	
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaSeconds) override;
 
+	void UpdateCheckTickPhysics(float DeltaTime);
+	void UpdateCheckTickNetwork(float DeltaTime);
+	
 	void InitGameServer();
 
+	void GamePhysicsTick(float DeltaTime);
+	void GameNetworkTick(float DeltaTime);
+	
 	UFUNCTION(BlueprintCallable)
 	void SetGamePhase(ETankGamePhase GamePhase);
 
@@ -33,7 +40,7 @@ public:
 	void ReactChangeGamePhase(ETankGamePhase InGamePhase);	// Blueprint implementable to handle timer in BP
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	ETankGamePhase CurrentTankGamePhase;
+	ETankGamePhase CurrentTankGamePhase = ETankGamePhase::NONE;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int PlayerCount = 0;
@@ -44,5 +51,12 @@ private:
 	void PlayerJoined();
 
 	void PlayerLeft();
+
+	float TickDelayPhysics = 1/60.0f;
+
+	float TickDelayNetwork = 1/30.f;
+
+	float CurrentAccumulatedPhysicsTickTime = 0.f;
+	float CurrentAccumulatedNetworkTickTime = 0.f;
 	
 };

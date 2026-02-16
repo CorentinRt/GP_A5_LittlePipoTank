@@ -16,5 +16,6 @@ enum class ETankGamePhase : uint8
 	PRE_GAME = 1,
 	IN_GAME = 2,
 	POST_GAME = 3,
+	NONE = 4
 };
 
