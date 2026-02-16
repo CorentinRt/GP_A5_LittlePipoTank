@@ -122,7 +122,7 @@ void AENetClientGameMode::RunNetwork()
 
 	// Unwrap test
 	{
-		if (!Host || !ServerPeer) return;
+		if (!ServerPeer) return;
 
 		TArray<BYTE> ByteArray;
 
@@ -132,49 +132,32 @@ void AENetClientGameMode::RunNetwork()
 		ENetPacket* packet = enet_packet_create(ByteArray.GetData(), ByteArray.GetAllocatedSize(), ENET_PACKET_FLAG_RELIABLE);
 
 		enet_peer_send(ServerPeer, 0, packet);
-	
-		ENetEvent event;
-		if (enet_host_service(Host, &event, 0) > 0)
-		{
-			do
-			{
-				switch (event.type)
-				{
-				case ENET_EVENT_TYPE_CONNECT:
-					{
-						UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Unexpected connect event!");
-						break;
-					}
-
-				case ENET_EVENT_TYPE_RECEIVE:
-					{
-						//std::cout << "Content: " << std::string(reinterpret_cast<const char*>(event.packet->data), event.packet->dataLength) << std::endl;
-						UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received {0} from client # {1}", event.packet->dataLength, event.peer->incomingPeerID);
-						UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Content: ");
-
-						enet_packet_destroy(event.packet);
-						break;
-					}
-
-				case ENET_EVENT_TYPE_DISCONNECT:
-					{
-						UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Client #{0} disconnected", event.peer->incomingPeerID);
-				
-						break;
-					}
-
-				case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
-					{
-						UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Client #{0} timed out", event.peer->incomingPeerID);
-						break;
-					}
-
-				case ENET_EVENT_TYPE_NONE:
-					UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Unexpected event none");
-					break;
-				}
-			}
-			while (enet_host_check_events(Host, &event) > 0);	
-		}
 	}
+}
+
+void AENetClientGameMode::OnNetworkEventConnect(const ENetEvent& event)
+{
+	Super::OnNetworkEventConnect(event);
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Unexpected connect event!");
+}
+
+void AENetClientGameMode::OnNetworkEventDisconnect(const ENetEvent& event)
+{
+	Super::OnNetworkEventDisconnect(event);
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Client #{0} disconnected", event.peer->incomingPeerID);
+}
+
+void AENetClientGameMode::OnNetworkEventDisconnectTimeout(const ENetEvent& event)
+{
+	Super::OnNetworkEventDisconnectTimeout(event);
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Client #{0} timed out", event.peer->incomingPeerID);
+}
+
+void AENetClientGameMode::OnNetworkEventReceive(const ENetEvent& event)
+{
+	Super::OnNetworkEventReceive(event);
+	
+	//std::cout << "Content: " << std::string(reinterpret_cast<const char*>(event.packet->data), event.packet->dataLength) << std::endl;
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received {0} from server # {1}", event.packet->dataLength, event.peer->incomingPeerID);
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Content: ");
 }
