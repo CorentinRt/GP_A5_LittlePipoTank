@@ -16,13 +16,13 @@ struct GP_A5_LITTLEPIPOTANK_API FPlayerData
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int PlayerIndex;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FString PlayerName = "NULL_NAME";
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FPlayerTankInputs PlayerInputs;
 	
 };

@@ -67,6 +67,8 @@ void AGameModeTankServer::GamePhysicsTick(float DeltaTime)
 		TEXT("Tick Physics")
 	);
 	*/
+
+	UpdateCurrentGamePhase(DeltaTime);
 }
 
 void AGameModeTankServer::GameNetworkTick(float DeltaTime)
@@ -121,6 +123,67 @@ void AGameModeTankServer::ReactChangeGamePhase(ETankGamePhase InGamePhase)
 	ReactChangeGamePhase_Implementation(InGamePhase);
 }
 
+void AGameModeTankServer::UpdateCurrentGamePhase(float DeltaTime)
+{
+	switch (GameStateServer.CurrentGamePhase)
+	{
+	case ETankGamePhase::WAITING_PLAYER:
+		break;
+	case ETankGamePhase::PRE_GAME:
+	case ETankGamePhase::IN_GAME:
+	case ETankGamePhase::POST_GAME:
+		{
+			while (CurrentAccumulatedGamePhaseTime >= GetGamePhaseDuration(GameStateServer.CurrentGamePhase))
+			{
+				CurrentAccumulatedGamePhaseTime -= GetGamePhaseDuration(GameStateServer.CurrentGamePhase);
+				NextGamePhase();
+			}
+
+			CurrentAccumulatedGamePhaseTime += DeltaTime;
+		}
+		break;
+	case ETankGamePhase::NONE:
+		break;
+	default:
+		break;
+	}
+}
+
+float AGameModeTankServer::GetGamePhaseDuration(ETankGamePhase InGamePhase)
+{
+	if (!GamePhasesData)
+		return 0.f;
+
+	float Duration = 0.f;
+	
+	switch (InGamePhase)
+	{
+	case ETankGamePhase::WAITING_PLAYER:
+		break;
+	case ETankGamePhase::PRE_GAME:
+		{
+			Duration = GamePhasesData->PreGameDuration;
+		}
+		break;
+	case ETankGamePhase::IN_GAME:
+		{
+			Duration = GamePhasesData->InGameDuration;
+		}
+		break;
+	case ETankGamePhase::POST_GAME:
+		{
+			Duration = GamePhasesData->PostGameDuration;
+		}
+		break;
+	case ETankGamePhase::NONE:
+		break;
+	default:
+		break;
+	}
+
+	return Duration;
+}
+
 void AGameModeTankServer::RegisterListener(AActor* InGamePhaseListener)
 {
 	if (!InGamePhaseListener || !InGamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
@@ -139,12 +202,12 @@ void AGameModeTankServer::UnregisterListener(AActor* InGamePhaseListener)
 
 void AGameModeTankServer::PlayerJoined()
 {
-	++PlayerCount;
+	++GameStateServer.PlayerCount;
 
 
 	FPlayerData NewPlayerData
 	{
-		.PlayerIndex = NextPlayerIndex++,
+		.PlayerIndex = GameStateServer.NextPlayerIndex++,
 		.PlayerName = "NULL_NAME"
 	};
 
@@ -153,6 +216,7 @@ void AGameModeTankServer::PlayerJoined()
 
 void AGameModeTankServer::PlayerLeft()
 {
-	--PlayerCount;
-	
+	--GameStateServer.PlayerCount;
+
+	// Remove player on leave using its connexion peer enet
 }

@@ -18,10 +18,15 @@ struct GP_A5_LITTLEPIPOTANK_API FGameStateTankServer
 
 public:
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	ETankGamePhase CurrentGamePhase = ETankGamePhase::NONE;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	TArray<FPlayerData> Players;
-	
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	int NextPlayerIndex = 0;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	int PlayerCount = 0;
 };

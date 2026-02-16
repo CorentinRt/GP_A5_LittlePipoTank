@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GamePhasesData.h"
 #include "GameStateTankServer.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameModeTankServer.generated.h"
@@ -39,17 +40,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void NextGamePhase();
 
-
 	void ReactChangeGamePhase(ETankGamePhase InGamePhase);
-	
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReactChangeGamePhase_Implementation(ETankGamePhase InGamePhase);	// Blueprint implementable to handle timer in BP
+
+	void UpdateCurrentGamePhase(float DeltaTime);
+
+	float GetGamePhaseDuration(ETankGamePhase InGamePhase);
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FGameStateTankServer GameStateServer;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	int PlayerCount = 0;
 
 	bool IsServerInitialized = false;
 
@@ -58,20 +59,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UnregisterListener(AActor* InGamePhaseListener);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UGamePhasesData> GamePhasesData;
+	
 private:
 	void PlayerJoined();
 
 	void PlayerLeft();
 	
 	float TickDelayPhysics = 1/30.0f;
-
 	float TickDelayNetwork = 1/10.f;
 
 	float CurrentAccumulatedPhysicsTickTime = 0.f;
 	float CurrentAccumulatedNetworkTickTime = 0.f;
 
+	float CurrentAccumulatedGamePhaseTime = 0.f;
+	
 	UPROPERTY()
 	TArray<AActor*> GamePhaseListeners;
-
-	int NextPlayerIndex = 0;
 };
