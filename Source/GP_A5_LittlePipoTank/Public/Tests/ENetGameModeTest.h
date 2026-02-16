@@ -20,8 +20,14 @@ class GP_A5_LITTLEPIPOTANK_API AENetGameModeTest : public AGameModeBase
 	AENetGameModeTest();
 	
 	virtual void BeginPlay() override;
+	
+	void ClientBegin();
+	void ServerBegin();
 
 	virtual void Tick(float DeltaSeconds) override;
+
+	void ClientTick(float DeltaSeconds);
+	void ServerTick(float DeltaSeconds);
 	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
