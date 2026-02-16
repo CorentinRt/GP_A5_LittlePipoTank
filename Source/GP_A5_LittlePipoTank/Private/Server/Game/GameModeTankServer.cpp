@@ -17,7 +17,7 @@ void AGameModeTankServer::BeginPlay()
 
 	InitGameServer();
 
-	SetGamePhase(GameStateServer.CurrentGamePhase, ETankGamePhase::WAITING_PLAYER);
+	SetServerGamePhase(ETankGamePhase::WAITING_PLAYER);
 }
 
 void AGameModeTankServer::Tick(float DeltaSeconds)
@@ -59,21 +59,31 @@ void AGameModeTankServer::GameNetworkTick(float DeltaTime)
 	*/
 }
 
+ETankGamePhase AGameModeTankServer::GetCurrentGamePhase()
+{
+	return GameStateServer.CurrentGamePhase;
+}
+
+void AGameModeTankServer::SetServerGamePhase(ETankGamePhase NewGamePhase)
+{
+	SetGamePhase(GameStateServer.CurrentGamePhase, NewGamePhase);
+}
+
 void AGameModeTankServer::NextGamePhase()
 {
 	switch (GameStateServer.CurrentGamePhase)
 	{
 	case ETankGamePhase::WAITING_PLAYER:
-		SetGamePhase(GameStateServer.CurrentGamePhase, ETankGamePhase::PRE_GAME);
+		SetServerGamePhase(ETankGamePhase::PRE_GAME);
 		break;
 	case ETankGamePhase::PRE_GAME:
-		SetGamePhase(GameStateServer.CurrentGamePhase, ETankGamePhase::IN_GAME);
+		SetServerGamePhase(ETankGamePhase::IN_GAME);
 		break;
 	case ETankGamePhase::IN_GAME:
-		SetGamePhase(GameStateServer.CurrentGamePhase, ETankGamePhase::POST_GAME);
+		SetServerGamePhase(ETankGamePhase::POST_GAME);
 		break;
 	case ETankGamePhase::POST_GAME:
-		SetGamePhase(GameStateServer.CurrentGamePhase, ETankGamePhase::PRE_GAME);
+		SetServerGamePhase(ETankGamePhase::PRE_GAME);
 		break;
 	default:
 		break;

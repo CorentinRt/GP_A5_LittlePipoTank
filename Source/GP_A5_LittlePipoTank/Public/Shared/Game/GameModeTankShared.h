@@ -32,15 +32,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual ETankGamePhase GetCurrentGamePhase();
 
-	UFUNCTION(BlueprintCallable)
-	virtual void SetGamePhase(ETankGamePhase& CurrentGamePhase, ETankGamePhase NewGamePhase);
-
 	virtual void ReactChangeGamePhase(ETankGamePhase InGamePhase);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReactChangeGamePhase_Implementation(ETankGamePhase InGamePhase);	// Blueprint implementable to handle timer in BP
 
 protected:
+	virtual void SetGamePhase(ETankGamePhase& CurrentGamePhase, ETankGamePhase NewGamePhase);
 	
 	float TickDelayPhysics = 1/30.0f;
 	float TickDelayNetwork = 1/10.f;

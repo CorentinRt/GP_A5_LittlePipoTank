@@ -28,12 +28,18 @@ public:
 
 	virtual void GamePhysicsTick(float DeltaTime) override;
 	virtual void GameNetworkTick(float DeltaTime) override;
+
+	virtual ETankGamePhase GetCurrentGamePhase() override;
+
+	UFUNCTION(BlueprintCallable)
+	void SetServerGamePhase(ETankGamePhase NewGamePhase);
 	
 	UFUNCTION(BlueprintCallable)
 	void NextGamePhase();
 
 	void UpdateCurrentGamePhase(float DeltaTime);
 
+	UFUNCTION(BlueprintCallable)
 	float GetGamePhaseDuration(ETankGamePhase InGamePhase);
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

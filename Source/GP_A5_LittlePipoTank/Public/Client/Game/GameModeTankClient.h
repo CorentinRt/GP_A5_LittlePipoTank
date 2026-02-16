@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameStateTankClient.h"
 #include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankClient.generated.h"
 
@@ -26,4 +27,11 @@ public:
 
 	virtual void GamePhysicsTick(float DeltaTime) override;
 	virtual void GameNetworkTick(float DeltaTime) override;
+
+	virtual ETankGamePhase GetCurrentGamePhase() override;
+
+	UFUNCTION(BlueprintCallable)
+	void SetClientGamePhase(ETankGamePhase NewGamePhase);
+	
+	FGameStateTankClient GameStateClient;
 };

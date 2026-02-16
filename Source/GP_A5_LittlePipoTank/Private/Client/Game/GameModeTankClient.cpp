@@ -41,3 +41,13 @@ void AGameModeTankClient::GameNetworkTick(float DeltaTime)
 
 	
 }
+
+ETankGamePhase AGameModeTankClient::GetCurrentGamePhase()
+{
+	return GameStateClient.CurrentGamePhase;
+}
+
+void AGameModeTankClient::SetClientGamePhase(ETankGamePhase NewGamePhase)
+{
+	SetGamePhase(GameStateClient.CurrentGamePhase, NewGamePhase);
+}
