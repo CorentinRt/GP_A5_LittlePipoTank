@@ -17,37 +17,13 @@ void AGameModeTankServer::BeginPlay()
 
 	InitGameServer();
 
-	SetGamePhase(ETankGamePhase::WAITING_PLAYER);
+	SetGamePhase(GameStateServer.CurrentGamePhase, ETankGamePhase::WAITING_PLAYER);
 }
 
 void AGameModeTankServer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	UpdateCheckTickPhysics(DeltaSeconds);
-	UpdateCheckTickNetwork(DeltaSeconds);
-}
-
-void AGameModeTankServer::UpdateCheckTickPhysics(float DeltaTime)
-{
-	CurrentAccumulatedPhysicsTickTime += DeltaTime;
-
-	while (CurrentAccumulatedPhysicsTickTime >= TickDelayPhysics)
-	{
-		GamePhysicsTick(TickDelayPhysics);
-		CurrentAccumulatedPhysicsTickTime -= TickDelayPhysics;
-	}
-}
-
-void AGameModeTankServer::UpdateCheckTickNetwork(float DeltaTime)
-{
-	CurrentAccumulatedNetworkTickTime += DeltaTime;
-
-	while (CurrentAccumulatedNetworkTickTime >= TickDelayNetwork)
-	{
-		GameNetworkTick(TickDelayNetwork);
-		CurrentAccumulatedNetworkTickTime -= TickDelayNetwork;
-	}
 }
 
 void AGameModeTankServer::InitGameServer()
@@ -83,44 +59,25 @@ void AGameModeTankServer::GameNetworkTick(float DeltaTime)
 	*/
 }
 
-void AGameModeTankServer::SetGamePhase(ETankGamePhase GamePhase)
-{
-	GameStateServer.CurrentGamePhase = GamePhase;
-	ReactChangeGamePhase(GameStateServer.CurrentGamePhase);
-}
-
 void AGameModeTankServer::NextGamePhase()
 {
 	switch (GameStateServer.CurrentGamePhase)
 	{
 	case ETankGamePhase::WAITING_PLAYER:
-		SetGamePhase(ETankGamePhase::PRE_GAME);
+		SetGamePhase(GameStateServer.CurrentGamePhase, ETankGamePhase::PRE_GAME);
 		break;
 	case ETankGamePhase::PRE_GAME:
-		SetGamePhase(ETankGamePhase::IN_GAME);
+		SetGamePhase(GameStateServer.CurrentGamePhase, ETankGamePhase::IN_GAME);
 		break;
 	case ETankGamePhase::IN_GAME:
-		SetGamePhase(ETankGamePhase::POST_GAME);
+		SetGamePhase(GameStateServer.CurrentGamePhase, ETankGamePhase::POST_GAME);
 		break;
 	case ETankGamePhase::POST_GAME:
-		SetGamePhase(ETankGamePhase::PRE_GAME);
+		SetGamePhase(GameStateServer.CurrentGamePhase, ETankGamePhase::PRE_GAME);
 		break;
 	default:
 		break;
 	}
-}
-
-void AGameModeTankServer::ReactChangeGamePhase(ETankGamePhase InGamePhase)
-{
-	for (AActor* GamePhaseListener : GamePhaseListeners)
-	{
-		if (!GamePhaseListener || !GamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
-			continue;
-
-		IGamePhaseListener::Execute_ReactOnGamePhaseChanged(GamePhaseListener, InGamePhase);
-	}
-	
-	ReactChangeGamePhase_Implementation(InGamePhase);
 }
 
 void AGameModeTankServer::UpdateCurrentGamePhase(float DeltaTime)

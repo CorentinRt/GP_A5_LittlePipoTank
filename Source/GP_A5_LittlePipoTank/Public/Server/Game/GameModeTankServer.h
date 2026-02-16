@@ -6,6 +6,7 @@
 #include "GamePhasesData.h"
 #include "GameStateTankServer.h"
 #include "GameFramework/GameModeBase.h"
+#include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankServer.generated.h"
 
 class IGamePhaseListener;
@@ -13,7 +14,7 @@ class IGamePhaseListener;
  * 
  */
 UCLASS()
-class GP_A5_LITTLEPIPOTANK_API AGameModeTankServer : public AGameModeBase
+class GP_A5_LITTLEPIPOTANK_API AGameModeTankServer : public AGameModeTankShared
 {
 	GENERATED_BODY()
 
@@ -24,26 +25,14 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaSeconds) override;
-
-	void UpdateCheckTickPhysics(float DeltaTime);
-	void UpdateCheckTickNetwork(float DeltaTime);
 	
 	void InitGameServer();
 
-
-	void GamePhysicsTick(float DeltaTime);
-	void GameNetworkTick(float DeltaTime);
+	virtual void GamePhysicsTick(float DeltaTime) override;
+	virtual void GameNetworkTick(float DeltaTime) override;
 	
 	UFUNCTION(BlueprintCallable)
-	void SetGamePhase(ETankGamePhase GamePhase);
-
-	UFUNCTION(BlueprintCallable)
 	void NextGamePhase();
-
-	void ReactChangeGamePhase(ETankGamePhase InGamePhase);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void ReactChangeGamePhase_Implementation(ETankGamePhase InGamePhase);	// Blueprint implementable to handle timer in BP
 
 	void UpdateCurrentGamePhase(float DeltaTime);
 
@@ -66,15 +55,6 @@ private:
 	void PlayerJoined();
 
 	void PlayerLeft();
-	
-	float TickDelayPhysics = 1/30.0f;
-	float TickDelayNetwork = 1/10.f;
-
-	float CurrentAccumulatedPhysicsTickTime = 0.f;
-	float CurrentAccumulatedNetworkTickTime = 0.f;
 
 	float CurrentAccumulatedGamePhaseTime = 0.f;
-	
-	UPROPERTY()
-	TArray<AActor*> GamePhaseListeners;
 };
