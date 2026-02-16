@@ -15,6 +15,6 @@ class GP_A5_LITTLEPIPOTANK_API UNetworkProtocolHelpers : public UBlueprintFuncti
 	GENERATED_BODY()
 
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Serialization")
-	void SerializeI32(TArray<UINT8>& ByteArray, INT32 value);
+	//UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Serialization")
+	//void SerializeI32(TArray<UINT8>& ByteArray, INT32 value);
 };
