@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "TankBullet.generated.h"
 
 UCLASS()
@@ -15,10 +16,16 @@ class GP_A5_LITTLEPIPOTANK_API ATankBullet : public AActor
 	UPROPERTY(EditAnywhere, Category= "Bullet")
 	UStaticMeshComponent* BulletMesh;
 
-	UPROPERTY(EditAnywhere, Category= "Bullet")
+	UPROPERTY(VisibleAnywhere, Category= "Bullet")
 	UBoxComponent* BoxComponent;
 	
-public:	
+	UPROPERTY(EditAnywhere, Category= "Bullet")
+	float BulletSpeed;
+	
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category= "Bullet")
+	UProjectileMovementComponent* ProjectileMovement;
+	
 	// Sets default values for this actor's properties
 	ATankBullet();
 
@@ -29,5 +36,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	FVector CalculateBulletImpact(FVector BulletDirection, FVector ImpactPoint);
 
 };
