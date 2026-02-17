@@ -167,6 +167,13 @@ void AGameModeTankServer::HandleConnection(const ENetEvent& event)
 	if (event.peer == nullptr)
 		return;
 
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		10.f,
+		FColor::Yellow,
+		TEXT("Client try connect to server !")
+		);
+	
 	bool PlayerPeerAlreadyExists = false;
 	
 	for (const FPlayerData& LocalPlayer : GameStateServer.Players)
@@ -221,6 +228,13 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 		.Peer = event.peer
 	};
 
+	GEngine->AddOnScreenDebugMessage(
+			-1,
+			10.f,
+			FColor::Yellow,
+			TEXT("Success Player created !")
+			);
+	
 	GameStateServer.Players.Add(std::move(NewPlayerData));
 }
 
