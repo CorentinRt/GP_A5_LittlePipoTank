@@ -100,6 +100,7 @@ void AENetGameMode::HandleTimeout(const ENetEvent& event)
 
 void AENetGameMode::HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
 {
+	
 }
 
 void AENetGameMode::OnNetworkEventConnect(const ENetEvent& event)

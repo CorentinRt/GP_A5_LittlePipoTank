@@ -71,3 +71,9 @@ ENetPacket* UNetworkProtocolHelpers::BuildENetPacket(const T& ProtocolPacket, UI
 	return enet_packet_create(ByteArray.GetData(), ByteArray.GetAllocatedSize(), flags);
 }
 	
+template<typename T>
+void UNetworkProtocolHelpers::SendPacket(ENetPeer& peer, const T& ProtocolPacket, UINT32 flags)
+{
+	ENetPacket* packet = BuildENetPacket(ProtocolPacket, flags);
+	enet_peer_send(&peer, 0, packet);
+}

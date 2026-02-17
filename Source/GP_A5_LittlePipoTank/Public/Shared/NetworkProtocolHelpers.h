@@ -25,7 +25,9 @@ public:
 	template<typename T> requires std::is_arithmetic_v<T>
 	static T DeserializeArithmetic(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
 
-	template<typename T> static ENetPacket* BuildENetPacket(const T& ProtocolPacket, UINT32 flags); 
+	template<typename T> static ENetPacket* BuildENetPacket(const T& ProtocolPacket, UINT32 flags);
+
+	template<typename T> static void SendPacket(ENetPeer& peer, const T& ProtocolPacket, UINT32 flags);
 };
 
 #if CPP
