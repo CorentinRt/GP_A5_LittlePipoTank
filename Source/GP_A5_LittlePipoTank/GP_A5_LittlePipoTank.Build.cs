@@ -8,6 +8,9 @@ public class GP_A5_LittlePipoTank : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+		PublicDefinitions.Add("NOMINMAX");
+		PublicDefinitions.Add("WIN32_LEAN_AND_MEAN");
+		
 		PublicDependencyModuleNames.AddRange(new string[] {
 			"Core",
 			"CoreUObject",
