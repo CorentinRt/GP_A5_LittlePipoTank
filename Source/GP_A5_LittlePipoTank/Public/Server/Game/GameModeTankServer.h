@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GamePhasesData.h"
 #include "GameStateTankServer.h"
+#include "Shared/ENetWrapper/ENetServerGameMode.h"
 #include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankServer.generated.h"
 
@@ -12,7 +13,7 @@
  * 
  */
 UCLASS()
-class GP_A5_LITTLEPIPOTANK_API AGameModeTankServer : public AGameModeTankShared
+class GP_A5_LITTLEPIPOTANK_API AGameModeTankServer : public AENetServerGameMode
 {
 	GENERATED_BODY()
 
@@ -49,11 +50,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UGamePhasesData> GamePhasesData;
+
+protected:
+	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset) override;
+	
+	virtual void HandleConnection(const ENetEvent& event) override;
+
+	virtual void HandleDisconnection(const ENetEvent& event) override;
 	
 private:
-	void PlayerJoined();
+	void PlayerJoined(const ENetEvent& event);
 
-	void PlayerLeft();
+	void PlayerLeft(const ENetEvent& event, int IndexToRemove);
 
 	float CurrentAccumulatedGamePhaseTime = 0.f;
 };

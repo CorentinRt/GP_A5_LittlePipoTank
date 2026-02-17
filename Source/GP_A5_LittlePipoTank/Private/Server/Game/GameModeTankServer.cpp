@@ -24,11 +24,12 @@ void AGameModeTankServer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	RunNetwork();
 }
 
 void AGameModeTankServer::InitGameServer()
 {
-
+	InitializeNetwork();
 
 	IsServerInitialized = true;
 }
@@ -151,23 +152,95 @@ float AGameModeTankServer::GetGamePhaseDuration(ETankGamePhase InGamePhase)
 	return Duration;
 }
 
-void AGameModeTankServer::PlayerJoined()
+void AGameModeTankServer::HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray,
+	TArray<BYTE>::SizeType& Offset)
+{
+	Super::HandleMessage(OpCode, ByteArray, Offset);
+
+	
+}
+
+void AGameModeTankServer::HandleConnection(const ENetEvent& event)
+{
+	Super::HandleConnection(event);
+
+	if (event.peer == nullptr)
+		return;
+
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		10.f,
+		FColor::Yellow,
+		TEXT("Client try connect to server !")
+		);
+	
+	bool PlayerPeerAlreadyExists = false;
+	
+	for (const FPlayerData& LocalPlayer : GameStateServer.Players)
+	{
+		if (LocalPlayer.Peer == event.peer)
+		{
+			PlayerPeerAlreadyExists = true;
+			break;
+		}
+	}
+
+	if (!PlayerPeerAlreadyExists)
+		return;
+
+	PlayerJoined(event);
+}
+
+void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
+{
+	Super::HandleDisconnection(event);
+
+	if (event.peer == nullptr)
+		return;
+
+	for (int i = 0; i < GameStateServer.Players.Num(); ++i)
+	{
+		FPlayerData& LocalPlayer = GameStateServer.Players[i];
+
+		if (LocalPlayer.Peer == event.peer)
+		{
+			PlayerLeft(event, i);
+			return;
+		}
+	}
+}
+
+void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 {
 	++GameStateServer.PlayerCount;
 
+	FPlayerTankInputs PlayerInputs
+	{
+		.MovementsInputs = 0.f,
+		.LookDirInputs = 0.f
+	};
 
 	FPlayerData NewPlayerData
 	{
 		.PlayerIndex = GameStateServer.NextPlayerIndex++,
-		.PlayerName = "NULL_NAME"
+		.PlayerName = "NULL_NAME",
+		.PlayerInputs = PlayerInputs,
+		.Peer = event.peer
 	};
 
-	GameStateServer.Players.Add(NewPlayerData);
+	GEngine->AddOnScreenDebugMessage(
+			-1,
+			10.f,
+			FColor::Yellow,
+			TEXT("Success Player created !")
+			);
+	
+	GameStateServer.Players.Add(std::move(NewPlayerData));
 }
 
-void AGameModeTankServer::PlayerLeft()
+void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 {
 	--GameStateServer.PlayerCount;
 
-	// Remove player on leave using its connexion peer enet
+	GameStateServer.Players.RemoveAt(IndexToRemove);
 }

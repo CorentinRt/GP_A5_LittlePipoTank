@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlayerTankInputs.h"
+#include "Shared/ENetWrapper/ENetPeer.h"
 #include "UObject/Object.h"
 #include "PlayerData.generated.h"
 
@@ -17,12 +18,14 @@ struct GP_A5_LITTLEPIPOTANK_API FPlayerData
 
 public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	int PlayerIndex;
+	int PlayerIndex = 0;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FString PlayerName = "NULL_NAME";
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FPlayerTankInputs PlayerInputs;
+
+	ENetPeer* Peer = nullptr;
 	
 };
