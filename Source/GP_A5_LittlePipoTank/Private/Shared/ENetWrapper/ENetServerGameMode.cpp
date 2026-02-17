@@ -14,8 +14,6 @@ void AENetServerGameMode::Tick(float DeltaSeconds)
 
 void AENetServerGameMode::InitializeNetwork()
 {
-	Super::InitializeNetwork();
-
 	//Unwrapped test
 	{
 		ENetAddress address;
@@ -31,5 +29,7 @@ void AENetServerGameMode::InitializeNetwork()
 
 		UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Successfully created ENet host");
 	}
+
+	IsNetworkInitialized = true;
 }
 

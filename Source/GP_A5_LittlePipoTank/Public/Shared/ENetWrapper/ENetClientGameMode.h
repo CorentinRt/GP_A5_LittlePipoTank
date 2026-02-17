@@ -20,7 +20,7 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 public:
-	virtual void InitializeNetwork() override;
+	virtual void InitializeNetwork(const FString& HostName = "localhost");
 	virtual void FinalizeNetwork() override;
 	
 	virtual void RunNetwork() override;
