@@ -12,23 +12,11 @@ AENetGameMode::AENetGameMode()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void AENetGameMode::BeginPlay()
-{
-	Super::BeginPlay();
-
-	InitializeNetwork();
-}
-
 void AENetGameMode::BeginDestroy()
 {
 	Super::BeginDestroy();
 
 	FinalizeNetwork();
-}
-
-void AENetGameMode::InitializeNetwork()
-{
-	// Empty
 }
 
 void AENetGameMode::FinalizeNetwork()
@@ -42,7 +30,7 @@ void AENetGameMode::FinalizeNetwork()
 
 void AENetGameMode::RunNetwork()
 {
-	if (!Host) return;
+	if (!Host || !IsNetworkInitialized) return;
 		
 	ENetEvent event;
 	if (enet_host_service(Host, &event, 1) > 0)

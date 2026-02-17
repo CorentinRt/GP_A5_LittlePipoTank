@@ -14,14 +14,12 @@ void AENetClientGameMode::Tick(float DeltaSeconds)
 	RunNetwork();
 }
 
-void AENetClientGameMode::InitializeNetwork()
+void AENetClientGameMode::InitializeNetwork(const FString& HostName)
 {
-	Super::InitializeNetwork();
-
 	// Unwrapped test
 	{
 		ENetAddress serverAddress;
-		if (enet_address_set_host(&serverAddress, ENET_ADDRESS_TYPE_ANY, "localhost") != 0)
+		if (enet_address_set_host(&serverAddress, ENET_ADDRESS_TYPE_ANY, TCHAR_TO_UTF8(*HostName)) != 0)
 		{
 			UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to resolve address");
 			return;
@@ -58,6 +56,8 @@ void AENetClientGameMode::InitializeNetwork()
 			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Connected!");
 		}
 	}
+	
+	IsNetworkInitialized = true;
 }
 
 void AENetClientGameMode::FinalizeNetwork()

@@ -20,11 +20,9 @@ class GP_A5_LITTLEPIPOTANK_API AENetGameMode : public AGameModeBase
 protected:
 	AENetGameMode();
 	
-	virtual void BeginPlay() override;
 	virtual void BeginDestroy() override;
 	
 public:
-	virtual void InitializeNetwork();
 	virtual void FinalizeNetwork();
 	
 	virtual void RunNetwork();
@@ -42,5 +40,6 @@ private:
 	void OnNetworkEventReceive(const ENetEvent& event);
 	
 protected:
+	bool IsNetworkInitialized = false;
 	ENetHost* Host;
 };
