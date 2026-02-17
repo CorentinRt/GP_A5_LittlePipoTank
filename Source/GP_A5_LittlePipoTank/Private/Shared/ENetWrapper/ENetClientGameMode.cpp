@@ -26,6 +26,20 @@ void AENetClientGameMode::InitializeNetwork(const FString& HostName)
 		}
 		serverAddress.port = 10001;
 
+		
+		if(serverAddress.type == ENET_ADDRESS_TYPE_IPV4)
+		{
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Server Addres is: Ipv4");
+		}
+		else if(serverAddress.type == ENET_ADDRESS_TYPE_IPV6)
+		{
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Server Addres is: Ipv6");
+		}
+		else
+		{
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Server Addres is: Any");
+		}
+
 		Host = enet_host_create(serverAddress.type, nullptr, 1, 0, 0, 0);
 		if (!Host)
 		{
@@ -35,8 +49,14 @@ void AENetClientGameMode::InitializeNetwork(const FString& HostName)
 		
 
 		ServerPeer = enet_host_connect(Host, &serverAddress, 0, 0);
+		if (!ServerPeer)
 		{
-			for (std::size_t i = 0; i < 100; ++i)
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Host Connect Failed");
+			return;	
+		}
+		
+		{
+			for (std::size_t i = 0; i < 40; ++i)
 			{
 				ENetEvent event;
 				if (enet_host_service(Host, &event, 100) > 0)
