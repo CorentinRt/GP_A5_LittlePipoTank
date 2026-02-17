@@ -38,7 +38,6 @@ void ATankPawn::Tick(float DeltaTime)
 		DeltaTime,
 		HeadRotationSpeed
 	);
-
 	
 	TankHeadMesh->SetWorldRotation(SmoothedRot);
 }
