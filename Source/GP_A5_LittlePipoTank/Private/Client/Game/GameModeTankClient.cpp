@@ -25,7 +25,9 @@ void AGameModeTankClient::Tick(float DeltaSeconds)
 
 void AGameModeTankClient::InitGameClient()
 {
+	InitializeNetwork();
 	
+	GameStateClient.ServerPeer = ServerPeer;
 }
 
 void AGameModeTankClient::GamePhysicsTick(float DeltaTime)
@@ -49,4 +51,26 @@ ETankGamePhase AGameModeTankClient::GetCurrentGamePhase()
 void AGameModeTankClient::SetClientGamePhase(ETankGamePhase NewGamePhase)
 {
 	SetGamePhase(GameStateClient.CurrentGamePhase, NewGamePhase);
+}
+
+void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray,
+	TArray<BYTE>::SizeType& Offset)
+{
+	Super::HandleMessage(OpCode, ByteArray, Offset);
+
+	
+}
+
+void AGameModeTankClient::HandleConnection(const ENetEvent& event)
+{
+	Super::HandleConnection(event);
+
+	
+}
+
+void AGameModeTankClient::HandleDisconnection(const ENetEvent& event)
+{
+	Super::HandleDisconnection(event);
+
+	
 }

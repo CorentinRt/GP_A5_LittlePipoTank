@@ -24,11 +24,12 @@ void AGameModeTankServer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	RunNetwork();
 }
 
 void AGameModeTankServer::InitGameServer()
 {
-
+	InitializeNetwork();
 
 	IsServerInitialized = true;
 }
@@ -149,6 +150,38 @@ float AGameModeTankServer::GetGamePhaseDuration(ETankGamePhase InGamePhase)
 	}
 
 	return Duration;
+}
+
+void AGameModeTankServer::HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray,
+	TArray<BYTE>::SizeType& Offset)
+{
+	Super::HandleMessage(OpCode, ByteArray, Offset);
+
+	
+}
+
+void AGameModeTankServer::HandleConnection(const ENetEvent& event)
+{
+	Super::HandleConnection(event);
+
+	if (event.peer == nullptr)
+		return;
+
+	auto itPlayerPeer = std::find_if(GameStateServer.Players.begin(),
+		GameStateServer.Players.end(),
+		[&](const FPlayerData& LocalPlayerData)
+	{
+		return LocalPlayerData.Peer == event.peer;
+	});
+
+	if (itPlayerPeer == GameStateServer.Players.end())
+		return;
+}
+
+void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
+{
+	Super::HandleDisconnection(event);
+	
 }
 
 void AGameModeTankServer::PlayerJoined()

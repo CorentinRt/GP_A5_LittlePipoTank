@@ -28,6 +28,5 @@ public:
 protected:
 	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset) override;
 	
-private:
 	ENetPeer* ServerPeer;
 };

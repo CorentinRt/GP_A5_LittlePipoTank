@@ -28,4 +28,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int OwnPlayerIndex;
+
+	ENetPeer* ServerPeer;
 };

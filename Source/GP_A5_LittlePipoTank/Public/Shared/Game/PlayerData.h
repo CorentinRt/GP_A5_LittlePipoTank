@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlayerTankInputs.h"
+#include "Shared/ENetWrapper/ENetPeer.h"
 #include "UObject/Object.h"
 #include "PlayerData.generated.h"
 
@@ -24,5 +25,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FPlayerTankInputs PlayerInputs;
+
+	ENetPeer* Peer;
 	
 };

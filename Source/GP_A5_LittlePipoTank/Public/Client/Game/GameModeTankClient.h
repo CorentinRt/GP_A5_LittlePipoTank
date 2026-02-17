@@ -35,4 +35,11 @@ public:
 	void SetClientGamePhase(ETankGamePhase NewGamePhase);
 	
 	FGameStateTankClient GameStateClient;
+
+protected:
+	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset) override;
+
+	virtual void HandleConnection(const ENetEvent& event) override;
+
+	virtual void HandleDisconnection(const ENetEvent& event) override;
 };
