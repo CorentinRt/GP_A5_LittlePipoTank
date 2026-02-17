@@ -190,12 +190,14 @@ void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
 
 	if (event.peer == nullptr)
 		return;
-	
-	for (const FPlayerData& LocalPlayer : GameStateServer.Players)
+
+	for (int i = 0; i < GameStateServer.Players.Num(); ++i)
 	{
+		FPlayerData& LocalPlayer = GameStateServer.Players[i];
+
 		if (LocalPlayer.Peer == event.peer)
 		{
-			PlayerLeft(event, LocalPlayer);
+			PlayerLeft(event, i);
 			return;
 		}
 	}
@@ -219,12 +221,12 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 		.Peer = event.peer
 	};
 
-	GameStateServer.Players.Add(NewPlayerData);
+	GameStateServer.Players.Add(std::move(NewPlayerData));
 }
 
-void AGameModeTankServer::PlayerLeft(const ENetEvent& event, const FPlayerData& PlayerLeave)
+void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 {
 	--GameStateServer.PlayerCount;
 
-	GameStateServer.Players.Remove(PlayerLeave);
+	GameStateServer.Players.RemoveAt(IndexToRemove);
 }

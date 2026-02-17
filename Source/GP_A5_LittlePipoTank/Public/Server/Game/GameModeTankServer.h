@@ -61,7 +61,7 @@ protected:
 private:
 	void PlayerJoined(const ENetEvent& event);
 
-	void PlayerLeft(const ENetEvent& event, const FPlayerData& PlayerLeave);
+	void PlayerLeft(const ENetEvent& event, int IndexToRemove);
 
 	float CurrentAccumulatedGamePhaseTime = 0.f;
 };
