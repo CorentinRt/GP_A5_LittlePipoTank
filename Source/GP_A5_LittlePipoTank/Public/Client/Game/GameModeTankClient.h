@@ -41,6 +41,9 @@ public:
 	void ReceivePlayerLeaveGame();
 	
 protected:
+
+	FString GetServerAdressIp() const;
+
 	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset) override;
 
 	virtual void HandleConnection(const ENetEvent& event) override;

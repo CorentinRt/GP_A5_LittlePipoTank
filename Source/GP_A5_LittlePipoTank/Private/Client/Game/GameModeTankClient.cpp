@@ -5,6 +5,7 @@
 
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Kismet/GameplayStatics.h"
+#include "Shared/LittlePipoTankGameInstance.h"
 
 AGameModeTankClient::AGameModeTankClient()
 {
@@ -28,7 +29,7 @@ void AGameModeTankClient::Tick(float DeltaSeconds)
 
 void AGameModeTankClient::InitGameClient()
 {
-	InitializeNetwork();
+	InitializeNetwork(GetServerAdressIp());
 	
 	GameStateClient.ServerPeer = ServerPeer;
 }
@@ -109,6 +110,15 @@ void AGameModeTankClient::ReceivePlayerLeaveGame()
 			return;
 		}
 	}
+}
+
+FString AGameModeTankClient::GetServerAdressIp() const
+{
+	ULittlePipoTankGameInstance* TankGameInstance = Cast<ULittlePipoTankGameInstance>(UGameplayStatics::GetGameInstance(this));
+	if(!TankGameInstance)
+		return "localhost";
+	
+	return TankGameInstance->GetServerIp();
 }
 
 void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray,
