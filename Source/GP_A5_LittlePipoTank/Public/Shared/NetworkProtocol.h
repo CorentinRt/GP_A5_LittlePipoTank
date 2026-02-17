@@ -16,11 +16,10 @@ enum class OpCode : UINT8
 	S_ExempleCode = 0,
 	S_PlayerJoined = 1,
 	S_PlayerLeft = 2,
-	S_PlayerName = 3,
-	S_OwnPlayerState = 4,
-	S_PlayerVisual = 5,
-	S_BulletsState = 6,
-	S_GamePhase = 7,
+	S_OwnPlayerState = 3,
+	S_PlayerVisual = 4,
+	S_BulletsState = 5,
+	S_GamePhase = 6,
 
 	C_PlayerInputs = 126,
 	C_PlayerName = 127,
@@ -38,6 +37,59 @@ struct FExemplePacket
 	static constexpr OpCode OpCode = OpCode::S_ExempleCode;
 	
 	float X;
+
+	void Serialize(TArray<BYTE>& ByteArray) const;
+	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+};
+
+USTRUCT()
+struct FPlayerJoinedPacket
+{
+	GENERATED_BODY()
+
+	~FPlayerJoinedPacket() = default;
+
+	static constexpr OpCode OpCode = OpCode::S_PlayerJoined;
+	
+	int PlayerIndex = -1;
+
+	void Serialize(TArray<BYTE>& ByteArray) const;
+	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+};
+
+USTRUCT()
+struct FPlayerLeftPacket
+{
+	GENERATED_BODY()
+
+	~FPlayerLeftPacket() = default;
+
+	static constexpr OpCode OpCode = OpCode::S_PlayerLeft;
+	
+	int PlayerIndex = -1;
+
+	void Serialize(TArray<BYTE>& ByteArray) const;
+	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+};
+
+USTRUCT()
+struct FOwnPlayerStatePacket
+{
+	GENERATED_BODY()
+
+	~FOwnPlayerStatePacket() = default;
+
+	static constexpr OpCode OpCode = OpCode::S_OwnPlayerState;
+	
+	struct PlayerData
+	{
+		int PlayerIndex = -1;
+		FVector2D PlayerLocation = FVector2D::ZeroVector;
+		float PlayerRotation = 0.f;
+		float AimRotation = 0.f;
+	};
+
+	TArray<PlayerData> PlayersData;
 
 	void Serialize(TArray<BYTE>& ByteArray) const;
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
