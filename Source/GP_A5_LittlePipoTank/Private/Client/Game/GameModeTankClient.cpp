@@ -3,6 +3,9 @@
 
 #include "Client/Game/GameModeTankClient.h"
 
+#include "BehaviorTree/BehaviorTreeTypes.h"
+#include "Kismet/GameplayStatics.h"
+
 AGameModeTankClient::AGameModeTankClient()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -92,22 +95,20 @@ void AGameModeTankClient::ReceivePlayerJoinedGame()
 
 void AGameModeTankClient::ReceivePlayerLeaveGame()
 {
-	/*
 	int PlayerIndex = 0;
 	FString PlayerName = "NULL_NAME";
 	ENetPeer* Peer = nullptr;
 
-	for (int)
-	
-	for (const FPlayerData& LocalPlayer : GameStateClient.Players)
+	for (int i = 0; i < GameStateClient.Players.Num(); ++i)
 	{
+		FPlayerData& LocalPlayer = GameStateClient.Players[i];
+
 		if (LocalPlayer.Peer == Peer)
 		{
-			Remove
+			GameStateClient.Players.RemoveAt(i);
 			return;
 		}
 	}
-	*/
 }
 
 void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray,

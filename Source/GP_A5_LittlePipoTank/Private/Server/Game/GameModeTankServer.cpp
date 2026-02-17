@@ -235,7 +235,7 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 			TEXT("Success Player created !")
 			);
 	
-	GameStateServer.Players.Add(std::move(NewPlayerData));
+	GameStateServer.Players.Add(MoveTemp(NewPlayerData));
 }
 
 void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
