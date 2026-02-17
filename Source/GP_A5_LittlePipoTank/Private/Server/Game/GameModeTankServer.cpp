@@ -167,40 +167,64 @@ void AGameModeTankServer::HandleConnection(const ENetEvent& event)
 	if (event.peer == nullptr)
 		return;
 
-	auto itPlayerPeer = std::find_if(GameStateServer.Players.begin(),
-		GameStateServer.Players.end(),
-		[&](const FPlayerData& LocalPlayerData)
+	bool PlayerPeerAlreadyExists = false;
+	
+	for (const FPlayerData& LocalPlayer : GameStateServer.Players)
 	{
-		return LocalPlayerData.Peer == event.peer;
-	});
+		if (LocalPlayer.Peer == event.peer)
+		{
+			PlayerPeerAlreadyExists = true;
+			break;
+		}
+	}
 
-	if (itPlayerPeer == GameStateServer.Players.end())
+	if (!PlayerPeerAlreadyExists)
 		return;
+
+	PlayerJoined(event);
 }
 
 void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
 {
 	Super::HandleDisconnection(event);
+
+	if (event.peer == nullptr)
+		return;
 	
+	for (const FPlayerData& LocalPlayer : GameStateServer.Players)
+	{
+		if (LocalPlayer.Peer == event.peer)
+		{
+			PlayerLeft(event, LocalPlayer);
+			return;
+		}
+	}
 }
 
-void AGameModeTankServer::PlayerJoined()
+void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 {
 	++GameStateServer.PlayerCount;
 
+	FPlayerTankInputs PlayerInputs
+	{
+		.MovementsInputs = 0.f,
+		.LookDirInputs = 0.f
+	};
 
 	FPlayerData NewPlayerData
 	{
 		.PlayerIndex = GameStateServer.NextPlayerIndex++,
-		.PlayerName = "NULL_NAME"
+		.PlayerName = "NULL_NAME",
+		.PlayerInputs = PlayerInputs,
+		.Peer = event.peer
 	};
 
 	GameStateServer.Players.Add(NewPlayerData);
 }
 
-void AGameModeTankServer::PlayerLeft()
+void AGameModeTankServer::PlayerLeft(const ENetEvent& event, const FPlayerData& PlayerLeave)
 {
 	--GameStateServer.PlayerCount;
 
-	// Remove player on leave using its connexion peer enet
+	GameStateServer.Players.Remove(PlayerLeave);
 }

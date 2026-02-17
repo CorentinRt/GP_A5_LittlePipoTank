@@ -27,7 +27,7 @@ public:
 	FPlayerTankInputs OwnPlayerInputs;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	int OwnPlayerIndex;
+	int OwnPlayerIndex = 0;
 
-	ENetPeer* ServerPeer;
+	ENetPeer* ServerPeer = nullptr;
 };

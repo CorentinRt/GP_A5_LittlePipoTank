@@ -59,9 +59,9 @@ protected:
 	virtual void HandleDisconnection(const ENetEvent& event) override;
 	
 private:
-	void PlayerJoined();
+	void PlayerJoined(const ENetEvent& event);
 
-	void PlayerLeft();
+	void PlayerLeft(const ENetEvent& event, const FPlayerData& PlayerLeave);
 
 	float CurrentAccumulatedGamePhaseTime = 0.f;
 };
