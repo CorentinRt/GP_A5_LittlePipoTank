@@ -157,6 +157,28 @@ struct FGamePhasePacket
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
 };
 
+USTRUCT()
+struct FPlayerInputsPacket
+{
+	GENERATED_BODY()
+
+	~FPlayerInputsPacket() = default;
+
+	static constexpr OpCode OpCode = OpCode::C_PlayerInputs;
+
+	struct PlayerInputsData
+	{
+		FVector2D MoveInput = FVector2D::ZeroVector;
+		FVector2D AimInput = FVector2D::ZeroVector;
+		bool FireInput = false;
+	};
+
+	PlayerInputsData PlayerInputs;
+
+	void Serialize(TArray<BYTE>& ByteArray) const;
+	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+};
+
 UCLASS()
 class GP_A5_LITTLEPIPOTANK_API UNetworkProtocol : public UObject
 {

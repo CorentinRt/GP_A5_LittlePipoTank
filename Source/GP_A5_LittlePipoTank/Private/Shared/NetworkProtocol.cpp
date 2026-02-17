@@ -169,3 +169,21 @@ void FGamePhasePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::
 	uint8 GamePhaseByte = UNetworkProtocolHelpers::DeserializeArithmetic<uint8>(ByteArray, Offset);
 	GamePhase = static_cast<ETankGamePhase>(GamePhaseByte);
 }
+
+void FPlayerInputsPacket::Serialize(TArray<BYTE>& ByteArray) const
+{
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerInputs.MoveInput.X);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerInputs.MoveInput.Y);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerInputs.AimInput.X);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerInputs.AimInput.Y);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerInputs.FireInput);
+}
+
+void FPlayerInputsPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
+{
+	PlayerInputs.MoveInput.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+	PlayerInputs.MoveInput.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+	PlayerInputs.AimInput.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+	PlayerInputs.AimInput.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+	bool ByteFireInput = UNetworkProtocolHelpers::DeserializeArithmetic<bool>(ByteArray, Offset);
+}
