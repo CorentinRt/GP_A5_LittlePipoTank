@@ -13,7 +13,19 @@
 UENUM()
 enum class OpCode : UINT8
 {
-	S_ExempleCode,
+	S_ExempleCode = 0,
+	S_PlayerJoined = 1,
+	S_PlayerLeft = 2,
+	S_PlayerName = 3,
+	S_OwnPlayerState = 4,
+	S_PlayerVisual = 5,
+	S_BulletsState = 6,
+	S_GamePhase = 7,
+
+	C_PlayerInputs = 126,
+	C_PlayerName = 127,
+	
+	
 };
 
 USTRUCT()
