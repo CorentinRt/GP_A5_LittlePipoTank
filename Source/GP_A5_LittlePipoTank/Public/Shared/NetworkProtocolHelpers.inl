@@ -1,4 +1,5 @@
 #pragma once
+#include "enet6/enet.h"
 
 template<typename T> requires std::is_arithmetic_v<T>
 T UNetworkProtocolHelpers::ByteSwap(T Value)
@@ -46,7 +47,7 @@ void UNetworkProtocolHelpers::SerializeArithmetic(TArray<BYTE>& ByteArray, T Val
 }
 
 template<typename T> requires std::is_arithmetic_v<T>
-T UNetworkProtocolHelpers::DeserializeArithmetic(TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
+T UNetworkProtocolHelpers::DeserializeArithmetic(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
 {
 	T Value = T(0);
 
@@ -57,3 +58,16 @@ T UNetworkProtocolHelpers::DeserializeArithmetic(TArray<BYTE>& ByteArray, TArray
 	
 	return Value;
 }
+
+
+template<typename T>
+ENetPacket* UNetworkProtocolHelpers::BuildENetPacket(const T& ProtocolPacket, UINT32 flags)
+{
+	TArray<BYTE> ByteArray;
+
+	SerializeArithmetic(ByteArray, static_cast<BYTE>(T::OpCode));
+	ProtocolPacket.Serialize(ByteArray);
+
+	return enet_packet_create(ByteArray.GetData(), ByteArray.GetAllocatedSize(), flags);
+}
+	

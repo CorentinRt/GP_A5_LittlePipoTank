@@ -4,6 +4,7 @@
 #include "Shared/ENetWrapper/ENetClientGameMode.h"
 
 #include "GP_A5_LittlePipoTank.h"
+#include "Shared/NetworkProtocol.h"
 #include "Shared/NetworkProtocolHelpers.h"
 
 void AENetClientGameMode::Tick(float DeltaSeconds)
@@ -124,14 +125,10 @@ void AENetClientGameMode::RunNetwork()
 	{
 		if (!ServerPeer) return;
 
-		TArray<BYTE> ByteArray;
+		FExemplePacket Packet = {};
+		Packet.X = 32.32f;
 
-		float test = 32.32f;
-		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, test);
-		
-		ENetPacket* packet = enet_packet_create(ByteArray.GetData(), ByteArray.GetAllocatedSize(), ENET_PACKET_FLAG_RELIABLE);
-
-		enet_peer_send(ServerPeer, 0, packet);
+		enet_peer_send(ServerPeer, 0, UNetworkProtocolHelpers::BuildENetPacket(Packet, ENET_PACKET_FLAG_RELIABLE));
 	}
 }
 
@@ -160,4 +157,21 @@ void AENetClientGameMode::OnNetworkEventReceive(const ENetEvent& event)
 	//std::cout << "Content: " << std::string(reinterpret_cast<const char*>(event.packet->data), event.packet->dataLength) << std::endl;
 	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received {0} from server # {1}", event.packet->dataLength, event.peer->incomingPeerID);
 	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Content: ");
+
+	TArray<BYTE> ByteArray(event.packet->data, event.packet->dataLength);
+
+	TArray<BYTE>::SizeType Offset = 0;
+
+	OpCode MessageOpCode = static_cast<OpCode>(UNetworkProtocolHelpers::DeserializeArithmetic<BYTE>(ByteArray, Offset));
+
+	switch (MessageOpCode)
+	{
+	case OpCode::S_ExempleCode:
+		{
+			FExemplePacket Packet = {};
+			Packet.Deserialize(ByteArray, Offset);
+
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Receive exemple packet with x value of: {0}", Packet.X);
+		}
+	}
 }
