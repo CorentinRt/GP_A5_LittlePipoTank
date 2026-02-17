@@ -22,9 +22,5 @@ public:
 	virtual void InitializeNetwork() override;
 
 protected:
-	virtual void OnNetworkEventConnect(const ENetEvent& event) override;
-	virtual void OnNetworkEventDisconnect(const ENetEvent& event) override;
-	virtual void OnNetworkEventDisconnectTimeout(const ENetEvent& event) override;
-	virtual void OnNetworkEventReceive(const ENetEvent& event) override;
 	
 };

@@ -25,10 +25,7 @@ public:
 	virtual void RunNetwork() override;
 
 protected:
-	virtual void OnNetworkEventConnect(const ENetEvent& event) override;
-	virtual void OnNetworkEventDisconnect(const ENetEvent& event) override;
-	virtual void OnNetworkEventDisconnectTimeout(const ENetEvent& event) override;
-	virtual void OnNetworkEventReceive(const ENetEvent& event) override;
+	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset) override;
 	
 private:
 	ENetPeer* ServerPeer;

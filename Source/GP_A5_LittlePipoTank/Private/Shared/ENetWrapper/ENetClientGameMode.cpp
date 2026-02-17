@@ -17,41 +17,6 @@ void AENetClientGameMode::Tick(float DeltaSeconds)
 void AENetClientGameMode::InitializeNetwork()
 {
 	Super::InitializeNetwork();
-	
-	//Wrapped test
-	{
-		// FENetAddress ServerAddress = {};
-		//
-		// if (!ServerAddress.SetHost(EENetAddressType::Any, FString("localhost")))
-		// 	return;
-		//
-		// ServerAddress.SetPort(10001);
-		//
-		// Host = NewObject<UENetHost>(this);
-		// Host->Create(ServerAddress.GetAddressType(), &ServerAddress);
-		//
-		// Peer = NewObject<UENetPeer>(this);
-		// Host->Connect(ServerAddress, *Peer);
-		// {
-		// 	for (SIZE_T i = 0; i < 50; ++i)
-		// 	{
-		// 		if (Host->Service(100))
-		// 		{
-		// 			// Nous avons un événement, la connexion a soit pu s'effectuer (ENET_EVENT_TYPE_CONNECT) soit échoué (ENET_EVENT_TYPE_DISCONNECT)
-		// 			break; //< On sort de la boucle
-		// 		}
-		// 	}
-		//
-		// 	if (!Peer->IsConnected())
-		// 	{
-		// 		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to connect");
-		// 		return;
-		// 	}
-		//
-		// 	// Si on arrive ici, on est connecté !
-		// 	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Connected!");
-		// }
-	}
 
 	// Unwrapped test
 	{
@@ -109,62 +74,23 @@ void AENetClientGameMode::RunNetwork()
 {
 	Super::RunNetwork();
 	
-	//Wrapped test
-	{
-		// if (!Host.GetHandle() || !Peer.GetHandle()) return;
-		//
-		// FString message("Hello World!");
-		// ENetPacket* packet = enet_packet_create(TCHAR_TO_UTF8(*message), message.GetAllocatedSize(), ENET_PACKET_FLAG_RELIABLE);
-		//
-		// Peer->Send(packet);
-		//
-		// Host->ServiceAndCheckEvents();
-	}
-
 	// Unwrap test
-	{
-		if (!ServerPeer) return;
-
-		FExemplePacket Packet = {};
-		Packet.X = 32.32f;
-
-		enet_peer_send(ServerPeer, 0, UNetworkProtocolHelpers::BuildENetPacket(Packet, ENET_PACKET_FLAG_RELIABLE));
-	}
+	// {
+	// 	if (!ServerPeer) return;
+	//
+	// 	FExemplePacket Packet = {};
+	// 	Packet.X = 32.32f;
+	//
+	// 	enet_peer_send(ServerPeer, 0, UNetworkProtocolHelpers::BuildENetPacket(Packet, ENET_PACKET_FLAG_RELIABLE));
+	// }
 }
 
-void AENetClientGameMode::OnNetworkEventConnect(const ENetEvent& event)
+void AENetClientGameMode::HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray,
+	TArray<BYTE>::SizeType& Offset)
 {
-	Super::OnNetworkEventConnect(event);
-	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Unexpected connect event!");
-}
+	Super::HandleMessage(OpCode, ByteArray, Offset);
 
-void AENetClientGameMode::OnNetworkEventDisconnect(const ENetEvent& event)
-{
-	Super::OnNetworkEventDisconnect(event);
-	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Client #{0} disconnected", event.peer->incomingPeerID);
-}
-
-void AENetClientGameMode::OnNetworkEventDisconnectTimeout(const ENetEvent& event)
-{
-	Super::OnNetworkEventDisconnectTimeout(event);
-	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Client #{0} timed out", event.peer->incomingPeerID);
-}
-
-void AENetClientGameMode::OnNetworkEventReceive(const ENetEvent& event)
-{
-	Super::OnNetworkEventReceive(event);
-	
-	//std::cout << "Content: " << std::string(reinterpret_cast<const char*>(event.packet->data), event.packet->dataLength) << std::endl;
-	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received {0} from server # {1}", event.packet->dataLength, event.peer->incomingPeerID);
-	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Content: ");
-
-	TArray<BYTE> ByteArray(event.packet->data, event.packet->dataLength);
-
-	TArray<BYTE>::SizeType Offset = 0;
-
-	OpCode MessageOpCode = static_cast<OpCode>(UNetworkProtocolHelpers::DeserializeArithmetic<BYTE>(ByteArray, Offset));
-
-	switch (MessageOpCode)
+	switch (OpCode)
 	{
 	case OpCode::S_ExempleCode:
 		{

@@ -10,6 +10,8 @@
 /**
  * 
  */
+enum  class OpCode: UINT8;
+
 UCLASS()
 class GP_A5_LITTLEPIPOTANK_API AENetGameMode : public AGameModeBase
 {
@@ -28,11 +30,16 @@ public:
 	virtual void RunNetwork();
 
 protected:
-	
-	virtual void OnNetworkEventConnect(const ENetEvent& event);
-	virtual void OnNetworkEventDisconnect(const ENetEvent& event);
-	virtual void OnNetworkEventDisconnectTimeout(const ENetEvent& event);
-	virtual void OnNetworkEventReceive(const ENetEvent& event);
+	virtual void HandleConnection(const ENetEvent& event);
+	virtual void HandleDisconnection(const ENetEvent& event);
+	virtual void HandleTimeout(const ENetEvent& event);
+	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+
+private:
+	void OnNetworkEventConnect(const ENetEvent& event);
+	void OnNetworkEventDisconnect(const ENetEvent& event);
+	void OnNetworkEventDisconnectTimeout(const ENetEvent& event);
+	void OnNetworkEventReceive(const ENetEvent& event);
 	
 protected:
 	ENetHost* Host;
