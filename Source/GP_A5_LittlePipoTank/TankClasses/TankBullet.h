@@ -15,9 +15,6 @@ class GP_A5_LITTLEPIPOTANK_API ATankBullet : public AActor
 
 	UPROPERTY(EditAnywhere, Category= "Bullet")
 	UStaticMeshComponent* BulletMesh;
-
-	UPROPERTY(VisibleAnywhere, Category= "Bullet")
-	UBoxComponent* BoxComponent;
 	
 	UPROPERTY(EditAnywhere, Category= "Bullet")
 	float BulletSpeed;

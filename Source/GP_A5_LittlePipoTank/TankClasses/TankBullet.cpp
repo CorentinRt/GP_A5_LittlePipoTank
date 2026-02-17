@@ -15,31 +15,25 @@ ATankBullet::ATankBullet()
 	BulletSpeed = 5.0f;
 
 	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletMesh"));
-	BulletMesh->SetupAttachment(GetRootComponent());
-	BulletMesh->SetSimulatePhysics(false);
-	BulletMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	RootComponent = BulletMesh;
-	
-
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
-	BoxComponent->SetupAttachment(BulletMesh);
+	BulletMesh->SetSimulatePhysics(false);
+	BulletMesh->SetUsingAbsoluteRotation(true);
+	//BulletMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComponent"));
-	ProjectileMovement->InitialSpeed = 2000.f;
-	ProjectileMovement->MaxSpeed = 2000.f;
-	ProjectileMovement->bRotationFollowsVelocity = true;
+	ProjectileMovement->InitialSpeed = 50.f;
+	ProjectileMovement->MaxSpeed = 50.f;
 	ProjectileMovement->bShouldBounce = true;
-	ProjectileMovement->ProjectileGravityScale = 0.f;
+	ProjectileMovement->ProjectileGravityScale = 0.0f;
 	ProjectileMovement->SetUpdatedComponent(RootComponent);
 
-	ProjectileMovement->SetVelocityInLocalSpace(FVector::ForwardVector * ProjectileMovement->InitialSpeed);
 }
 
 // Called when the game starts or when spawned
 void ATankBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
 }
 
 // Called every frame
