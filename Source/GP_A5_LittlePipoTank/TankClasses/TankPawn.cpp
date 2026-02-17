@@ -1,36 +1,40 @@
-#include "TankClasses/TankCharacter.h"
+#include "TankClasses/TankPawn.h"
+
+#include "AIHelpers.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
-ATankCharacter::ATankCharacter()
+ATankPawn::ATankPawn()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(GetRootComponent());
-	Camera->bUsePawnControlRotation = true;
-
+	
+	TankBodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyOfTank"));
+	TankBodyMesh->SetupAttachment(GetRootComponent());
+	TankHeadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HeadOfTank"));
+	TankHeadMesh->SetupAttachment(TankBodyMesh);
+	TankHeadMesh->SetUsingAbsoluteRotation(true);
 }
 
 // Called when the game starts or when spawned
-void ATankCharacter::BeginPlay()
+void ATankPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void ATankCharacter::Tick(float DeltaTime)
+void ATankPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
 // Called to bind functionality to input
-void ATankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ATankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
@@ -42,12 +46,12 @@ void ATankCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 
 	if (UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATankCharacter::Move);
-		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATankCharacter::Look);
+		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATankPawn::Move);
+		Input->BindAction(AimAction, ETriggerEvent::Triggered, this, &ATankPawn::Aim);
 	}
 }
 
-void ATankCharacter::Move(const FInputActionValue& Value) {
+void ATankPawn::Move(const FInputActionValue& Value) {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (IsValid(Controller)) {
@@ -55,8 +59,18 @@ void ATankCharacter::Move(const FInputActionValue& Value) {
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
 		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+		AddControllerYawInput(MovementVector.X);
+	}
+}
+
+void ATankPawn::Aim(const FInputActionValue& Value)
+{
+	FVector2D AimVector = Value.Get<FVector2D>();
+	if (IsValid(Controller))
+	{
+		FVector AimFVector {AimVector.X, AimVector.Y, 0.0f};
+		const FRotator Rotation = FRotationMatrix::MakeFromX(AimFVector).Rotator();
+		TankHeadMesh->SetWorldRotation(Rotation);
 	}
 }

@@ -7,29 +7,31 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
-#include "TankCharacter.generated.h"
+#include "TankPawn.generated.h"
 
 UCLASS()
-class GP_A5_LITTLEPIPOTANK_API ATankCharacter : public ACharacter
+class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* Camera;
-
+public:
+	UPROPERTY(EditAnywhere, Category= "EnhancedInput")
+	UStaticMeshComponent* TankHeadMesh;
+	UPROPERTY(EditAnywhere, Category= "EnhancedInput")
+	UStaticMeshComponent* TankBodyMesh;
+	
 protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputMappingContext* InputMapping;
 
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputAction* MoveAction;
-
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
-	class UInputAction* LookAction;
+	class UInputAction* AimAction;
 
 public:
 	// Sets default values for this character's properties
-	ATankCharacter();
+	ATankPawn();
 
 protected:
 	// Called when the game starts or when spawned
@@ -44,5 +46,5 @@ public:
 
 protected:
 	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
+	void Aim(const FInputActionValue& Value);
 };
