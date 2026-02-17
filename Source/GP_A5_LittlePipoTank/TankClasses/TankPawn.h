@@ -29,6 +29,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputAction* AimAction;
 
+	UPROPERTY(EditAnywhere, Category = "TankHead")
+	float HeadRotationSpeed = 20.f;
+	
+	FRotator TargetWorldRotation;
+
 public:
 	// Sets default values for this character's properties
 	ATankPawn();

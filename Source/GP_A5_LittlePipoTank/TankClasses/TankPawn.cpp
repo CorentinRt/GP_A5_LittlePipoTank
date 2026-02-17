@@ -31,6 +31,16 @@ void ATankPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FRotator CurrentWorldRot = TankHeadMesh->GetComponentRotation();
+	FRotator SmoothedRot = FMath::RInterpTo(
+		CurrentWorldRot,
+		TargetWorldRotation,
+		DeltaTime,
+		HeadRotationSpeed
+	);
+
+	
+	TankHeadMesh->SetWorldRotation(SmoothedRot);
 }
 
 // Called to bind functionality to input
@@ -70,7 +80,6 @@ void ATankPawn::Aim(const FInputActionValue& Value)
 	if (IsValid(Controller))
 	{
 		FVector AimFVector {AimVector.X, AimVector.Y, 0.0f};
-		const FRotator Rotation = FRotationMatrix::MakeFromX(AimFVector).Rotator();
-		TankHeadMesh->SetWorldRotation(Rotation);
+		TargetWorldRotation = FRotationMatrix::MakeFromX(AimFVector).Rotator();
 	}
 }
