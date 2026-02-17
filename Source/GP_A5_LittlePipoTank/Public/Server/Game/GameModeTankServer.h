@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GamePhasesData.h"
 #include "GameStateTankServer.h"
+#include "Shared/ENetWrapper/ENetServerGameMode.h"
 #include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankServer.generated.h"
 
@@ -12,7 +13,7 @@
  * 
  */
 UCLASS()
-class GP_A5_LITTLEPIPOTANK_API AGameModeTankServer : public AGameModeTankShared
+class GP_A5_LITTLEPIPOTANK_API AGameModeTankServer : public AENetServerGameMode
 {
 	GENERATED_BODY()
 

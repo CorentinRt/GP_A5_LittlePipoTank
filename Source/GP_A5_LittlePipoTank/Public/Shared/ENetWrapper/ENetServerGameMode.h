@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "ENetGameMode.h"
 #include "enet6/enet.h"
+#include "Shared/Game/GameModeTankShared.h"
 #include "ENetServerGameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GP_A5_LITTLEPIPOTANK_API AENetServerGameMode : public AENetGameMode
+class GP_A5_LITTLEPIPOTANK_API AENetServerGameMode : public AGameModeTankShared
 {
 	GENERATED_BODY()
 

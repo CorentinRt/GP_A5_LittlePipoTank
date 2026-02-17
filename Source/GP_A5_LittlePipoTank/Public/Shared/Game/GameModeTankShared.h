@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Shared/TankGamePhase.h"
+#include "Shared/ENetWrapper/ENetGameMode.h"
 #include "GameModeTankShared.generated.h"
 
 /**
  * 
  */
 UCLASS(BlueprintType)
-class GP_A5_LITTLEPIPOTANK_API AGameModeTankShared : public AGameModeBase
+class GP_A5_LITTLEPIPOTANK_API AGameModeTankShared : public AENetGameMode
 {
 	GENERATED_BODY()
 

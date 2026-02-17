@@ -20,7 +20,7 @@ void AGameModeTankClient::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	
+	RunNetwork();
 }
 
 void AGameModeTankClient::InitGameClient()
@@ -38,7 +38,6 @@ void AGameModeTankClient::GamePhysicsTick(float DeltaTime)
 void AGameModeTankClient::GameNetworkTick(float DeltaTime)
 {
 	Super::GameNetworkTick(DeltaTime);
-
 	
 }
 
