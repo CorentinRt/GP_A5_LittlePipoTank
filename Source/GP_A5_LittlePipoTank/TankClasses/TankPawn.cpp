@@ -14,12 +14,20 @@ ATankPawn::ATankPawn()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
+	//Body
 	TankBodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyOfTank"));
 	TankBodyMesh->SetupAttachment(GetRootComponent());
+
+	//Head
 	TankHeadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HeadOfTank"));
 	TankHeadMesh->SetupAttachment(TankBodyMesh);
 	TankHeadMesh->SetUsingAbsoluteRotation(true);
+
+	//Shooting Point
+	TankShootingPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ShootingPoint"));
+	TankShootingPoint->SetupAttachment(TankHeadMesh);
+
 }
 
 // Called when the game starts or when spawned
@@ -34,15 +42,7 @@ void ATankPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FRotator CurrentWorldRot = TankHeadMesh->GetComponentRotation();
-	FRotator SmoothedRot = FMath::RInterpTo(
-		CurrentWorldRot,
-		TargetWorldRotation,
-		DeltaTime,
-		HeadRotationSpeed
-	);
-	
-	TankHeadMesh->SetWorldRotation(SmoothedRot);
+
 }
 
 // Called to bind functionality to input
@@ -70,10 +70,8 @@ void ATankPawn::Move(const FInputActionValue& Value) {
 	if (IsValid(Controller)) {
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddControllerYawInput(MovementVector.X);
+		TankInputs.MoveInput = MovementVector;
 	}
 }
 
@@ -83,7 +81,7 @@ void ATankPawn::Aim(const FInputActionValue& Value)
 	if (IsValid(Controller))
 	{
 		FVector AimFVector {AimVector.X, AimVector.Y, 0.0f};
-		TargetWorldRotation = FRotationMatrix::MakeFromX(AimFVector).Rotator();
+		TargetWorldRotation =  FRotationMatrix::MakeFromX(AimFVector).Rotator();
 	}
 }
 
@@ -92,10 +90,7 @@ void ATankPawn::Shoot(const FInputActionValue& Value)
 	bool shootValue = Value.Get<bool>();
 	if (IsValid(Controller) && shootValue == true)
 	{
-		FVector Location(this->GetTransform().GetLocation());
-		FRotator Rotation(this->GetActorRotation());
-		FActorSpawnParameters SpawnParameters;
-		AActor* Bullet = GetWorld()->SpawnActor<ATankBullet>(Location, Rotation, SpawnParameters);
+		TankInputs.FireInput = true;
 	}
 }
 
@@ -119,4 +114,25 @@ void ATankPawn::UnregisterTickable()
 void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 {
 	IPhysicsTickableShared::OnTickPhysics_Blueprint_Implementation(DeltaTime);
+	AddMovementInput(this->GetActorForwardVector(), TankInputs.MoveInput.Y);
+	AddControllerYawInput(TankInputs.MoveInput.X);
+
+	FRotator CurrentWorldRot = TankHeadMesh->GetComponentRotation();
+	FRotator SmoothedRot = FMath::RInterpTo(
+		CurrentWorldRot,
+		TargetWorldRotation,
+		DeltaTime,
+		HeadRotationSpeed
+	);
+	TankHeadMesh->SetWorldRotation(SmoothedRot);
+
+	if(TankInputs.FireInput == true)
+	{
+		FVector Location(TankShootingPoint->GetComponentLocation());
+		FRotator Rotation(TankShootingPoint->GetComponentRotation());
+		FActorSpawnParameters SpawnParameters;
+		AActor* Bullet = GetWorld()->SpawnActor<ATankBullet>(Location, Rotation, SpawnParameters);
+		Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);
+		TankInputs.FireInput = false;
+	}
 }
