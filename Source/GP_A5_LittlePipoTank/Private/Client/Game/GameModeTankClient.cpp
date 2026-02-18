@@ -101,7 +101,6 @@ void AGameModeTankClient::ReceivePlayerJoinedGame()
 	{
 		.PlayerIndex = PlayerIndex,
 		.PlayerName = PlayerName,
-		.PlayerInputs = PlayerInputs
 	};
 
 	
@@ -160,6 +159,54 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 
 			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received InitClientData with OwnPlayerIndex: {0}", Packet.OwnPlayerIndex);
 			GameStateClient.OwnPlayerIndex = Packet.OwnPlayerIndex;
+			break;
+		}
+
+	case OpCode::S_PlayerList:
+		{
+			FPlayerListPacket Packet = {};
+			Packet.Deserialize(ByteArray, Offset);
+
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received S_PlayerList:");
+			
+			// Remove players not here anymore
+			for (auto It = GameStateClient.Players.CreateIterator(); It;)
+			{
+				FPlayerListPacket::Player* Player = Packet.Players.FindByPredicate([&](const FPlayerListPacket::Player& PlayerData)
+				{
+					return PlayerData.Index == It->PlayerIndex;
+				});
+
+				if (!Player)
+				{
+					It.RemoveCurrent();
+					continue;
+				}
+
+				++It;
+			}
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "S_PlayerList: Nb players after removal: {0}", GameStateClient.Players.Num());
+
+			
+			// Add players not present
+			for (auto It = Packet.Players.CreateIterator(); It; ++It)
+			{
+				const FPlayerDataClient* Player =  GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
+				{
+					return PlayerData.PlayerIndex == It->Index;
+				});
+
+				if (!Player)
+				{
+					GameStateClient.Players.Add({
+						.PlayerIndex = It->Index,
+						.PlayerName = It->Name,
+					});
+				}
+			}
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "S_PlayerList: Nb players after add: {0}", GameStateClient.Players.Num());
+			
+			break;
 		}
 	}
 }
