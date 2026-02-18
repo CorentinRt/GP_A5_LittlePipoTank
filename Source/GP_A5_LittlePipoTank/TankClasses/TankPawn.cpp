@@ -146,3 +146,9 @@ const FPlayerTankInputs& ATankPawn::GetTankInputs() const
 {
 	return TankInputs;
 }
+
+void ATankPawn::TankGetShoot()
+{
+	//Rien a mettre pour le moment donc on le détruit
+	this->Destroy();
+}

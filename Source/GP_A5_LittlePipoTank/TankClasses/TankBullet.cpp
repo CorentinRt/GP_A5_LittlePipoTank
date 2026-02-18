@@ -50,7 +50,7 @@ void ATankBullet::OnBounce(const FHitResult& ImpactResult, const FVector& Impact
 	ATankPawn* HitPawn = Cast<ATankPawn>(HitActor);
 	if (HitPawn)
 	{
-		HitPawn->Destroy();
+		HitPawn->TankGetShoot();
 	}
 	ATankBullet* HitBulletPawn = Cast<ATankBullet>(HitActor);
 	if (HitBulletPawn)

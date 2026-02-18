@@ -77,4 +77,6 @@ public:
 	virtual void OnTickPhysics_Blueprint_Implementation(float DeltaTime) override;
 
 	const FPlayerTankInputs& GetTankInputs() const;
+	
+	void TankGetShoot();
 };
