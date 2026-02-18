@@ -30,7 +30,7 @@ public:
 	
 	template<typename T> static ENetPacket* BuildENetPacket(const T& ProtocolPacket, UINT32 flags);
 
-	template<typename T> static void SendPacket(ENetPeer& peer, const T& ProtocolPacket, UINT32 flags);
+	template<typename T> static void SendPacket(ENetPeer* peer, const T& ProtocolPacket, UINT32 flags);
 };
 
 #if CPP

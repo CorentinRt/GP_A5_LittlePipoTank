@@ -3,11 +3,13 @@
 
 #include "Client/Game/GameModeTankClient.h"
 
+#include "GP_A5_LittlePipoTank.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Kismet/GameplayStatics.h"
 #include "Shared/LittlePipoTankGameInstance.h"
 #include "Shared/NetworkProtocol.h"
 #include "Shared/NetworkProtocolHelpers.h"
+#include "TankClasses/TankPawn.h"
 
 AGameModeTankClient::AGameModeTankClient()
 {
@@ -27,6 +29,30 @@ void AGameModeTankClient::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	RunNetwork();
+
+	// Send player inputs every ticks
+
+	// TODO Get Client Pawn And Possess it on receive player tank, so we don't cast every frame
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	if (!PlayerController)
+	{
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player controller is null.");
+		return;
+	}
+	
+	ATankPawn* PlayerTank = Cast<ATankPawn>(PlayerController->GetPawn());
+
+	if (!PlayerTank)
+	{
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player Tank is null.");
+		return;
+	}
+	
+	FPlayerInputsPacket InputsPacket = {.PlayerInputs = PlayerTank->GetTankInputs()};
+
+	UNetworkProtocolHelpers::SendPacket(ServerPeer, InputsPacket, ENET_PACKET_FLAG_RELIABLE);
 }
 
 void AGameModeTankClient::InitGameClient()
@@ -38,7 +64,7 @@ void AGameModeTankClient::InitGameClient()
 	ULittlePipoTankGameInstance* GameInstance = Cast<ULittlePipoTankGameInstance>(GetGameInstance());
 
 	FPlayerNamePacket Packet = {.Name = GameInstance->GetPlayerName()};
-	UNetworkProtocolHelpers::SendPacket(*ServerPeer, Packet, ENET_PACKET_FLAG_RELIABLE);
+	UNetworkProtocolHelpers::SendPacket(ServerPeer, Packet, ENET_PACKET_FLAG_RELIABLE);
 }
 
 void AGameModeTankClient::GamePhysicsTick(float DeltaTime)

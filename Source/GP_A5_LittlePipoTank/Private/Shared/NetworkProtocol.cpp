@@ -181,5 +181,5 @@ void FPlayerInputsPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE
 	PlayerInputs.MoveInput.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 	PlayerInputs.AimInput.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 	PlayerInputs.AimInput.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
-	bool ByteFireInput = UNetworkProtocolHelpers::DeserializeArithmetic<bool>(ByteArray, Offset);
+	PlayerInputs.FireInput = UNetworkProtocolHelpers::DeserializeArithmetic<bool>(ByteArray, Offset);
 }
