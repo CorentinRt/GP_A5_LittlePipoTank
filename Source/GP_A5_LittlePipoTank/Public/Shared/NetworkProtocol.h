@@ -21,6 +21,7 @@ enum class OpCode : UINT8
 	S_PlayersState = 3,
 	S_BulletsState = 4,
 	S_GamePhase = 5,
+	S_InitClientData = 6,
 
 	C_PlayerInputs = 126,
 	C_PlayerName = 127,
@@ -38,6 +39,21 @@ struct FExemplePacket
 	static constexpr OpCode OpCode = OpCode::S_ExempleCode;
 	
 	float X;
+
+	void Serialize(TArray<BYTE>& ByteArray) const;
+	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+};
+
+USTRUCT()
+struct FInitClientDataPacket
+{
+	GENERATED_BODY()
+
+	~FInitClientDataPacket() = default;
+
+	static constexpr OpCode OpCode = OpCode::S_InitClientData;
+	
+	int OwnPlayerIndex = -1;
 
 	void Serialize(TArray<BYTE>& ByteArray) const;
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);

@@ -3,7 +3,10 @@
 
 #include "Server/Game/GameModeTankServer.h"
 
+#include "Kismet/GameplayStatics.h"
+#include "Shared/NetworkProtocol.h"
 #include "Shared/Game/GamePhaseListener.h"
+#include "TankClasses/TankPawn.h"
 
 AGameModeTankServer::AGameModeTankServer()
 {
@@ -29,6 +32,8 @@ void AGameModeTankServer::Tick(float DeltaSeconds)
 
 void AGameModeTankServer::InitGameServer()
 {
+	GetAllPlayerSpawnPoints();
+	
 	InitializeNetwork();
 
 	IsServerInitialized = true;
@@ -157,7 +162,22 @@ void AGameModeTankServer::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 {
 	Super::HandleMessage(OpCode, ByteArray, Offset);
 
-	
+	switch (OpCode)
+	{
+	case OpCode::C_PlayerName:
+		{
+			FPlayerNamePacket PlayerNamePacket;
+
+			PlayerNamePacket.Deserialize(ByteArray, Offset);
+			
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				10.f,
+				FColor::Red,
+				FString::Printf(TEXT("Receive msg name: %s"), *PlayerNamePacket.Name));
+			break;
+		}
+	}
 }
 
 void AGameModeTankServer::HandleConnection(const ENetEvent& event)
@@ -210,10 +230,58 @@ void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
 	}
 }
 
+void AGameModeTankServer::GetAllPlayerSpawnPoints()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(this, APlayerTankSpawnPoint::StaticClass(), FoundActors);
+
+	for (AActor* Actor : FoundActors)
+	{
+		APlayerTankSpawnPoint* SpawnPoint = Cast<APlayerTankSpawnPoint>(Actor);
+
+		if (SpawnPoint)
+			PlayersSpawnPoints.Add(SpawnPoint);
+	}
+}
+
+void AGameModeTankServer::SetupGame()
+{
+	int SpawnPointIndex = 0;
+	
+	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	{
+		if (LocalPlayer.PlayerIndex >= 2)
+			continue;
+
+		if (SpawnPointIndex >= PlayersSpawnPoints.Num())
+			continue;
+		
+		SpawnTankPlayer(LocalPlayer, PlayersSpawnPoints[SpawnPointIndex]);
+		++SpawnPointIndex;
+	}
+}
+
+void AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint* InSpawnPoint)
+{
+	if (!InPlayer.PlayerTanks)
+		return;
+
+	if (!InSpawnPoint)
+		return;
+	
+	InPlayer.PlayerTanks->SetActorHiddenInGame(true);
+	InPlayer.PlayerTanks->SetActorEnableCollision(true);
+	InPlayer.PlayerTanks->SetActorLocation(InSpawnPoint->GetActorLocation());
+	InPlayer.PlayerTanks->SetActorRotation(InSpawnPoint->GetActorRotation());
+}
+
 void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 {
 	++GameStateServer.PlayerCount;
 
+	if (GameStateServer.PlayerCount >= 2)
+		return;
+	
 	FPlayerTankInputs PlayerInputs
 	{
 		.MoveInput = FVector2D::ZeroVector,

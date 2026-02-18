@@ -5,12 +5,15 @@
 #include "CoreMinimal.h"
 #include "Shared/ENetWrapper/ENetPeer.h"
 #include "Shared/Game/PlayerTankInputs.h"
-#include "UObject/Object.h"
+//#include "TankClasses/TankPawn.h"
 #include "PlayerDataServer.generated.h"
 
 /**
  * 
  */
+
+class ATankPawn;
+
 USTRUCT(BlueprintType)
 struct GP_A5_LITTLEPIPOTANK_API FPlayerDataServer
 {
@@ -26,6 +29,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FPlayerTankInputs PlayerInputs;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<ATankPawn> PlayerTanks = nullptr;
+	
 	ENetPeer* Peer = nullptr;
 	
 };
