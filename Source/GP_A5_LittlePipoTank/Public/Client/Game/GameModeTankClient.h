@@ -8,6 +8,7 @@
 #include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankClient.generated.h"
 
+class AClientTankPawn;
 /**
  * 
  */
@@ -56,4 +57,7 @@ private:
 	void PredictClient(float DeltaTime);
 	void SendClientPrediction();
 	void ReconciliateClient(const FGameStatePacket::OwnPlayerStateData& OwnPlayerData);
+
+	UPROPERTY(EditAnywhere, meta=(AllowPrivateAccess = "true"))
+	TSubclassOf<AClientTankPawn> BlueprintClientTankClass;
 };
