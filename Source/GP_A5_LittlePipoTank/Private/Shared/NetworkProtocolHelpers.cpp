@@ -18,6 +18,7 @@ void UNetworkProtocolHelpers::SerializeString(TArray<BYTE>& ByteArray, const FSt
 
 FString UNetworkProtocolHelpers::DeserializeString(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
 {
+	/*
 	SIZE_T size = DeserializeArithmetic<SIZE_T>(ByteArray, Offset);
 
 	char Utf8String[size];
@@ -28,4 +29,6 @@ FString UNetworkProtocolHelpers::DeserializeString(const TArray<BYTE>& ByteArray
 	}
 
 	return FString(UTF8_TO_TCHAR(&Utf8String[0]));
+*/
+	return "";
 }
