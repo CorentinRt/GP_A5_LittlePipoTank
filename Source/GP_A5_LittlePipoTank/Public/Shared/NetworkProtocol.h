@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TankGamePhase.h"
+#include "Game/PlayerTankInputs.h"
 #include "UObject/Object.h"
 #include "NetworkProtocol.generated.h"
 
@@ -37,6 +38,21 @@ struct FExemplePacket
 	static constexpr OpCode OpCode = OpCode::S_ExempleCode;
 	
 	float X;
+
+	void Serialize(TArray<BYTE>& ByteArray) const;
+	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+};
+
+USTRUCT()
+struct FPlayerNamePacket
+{
+	GENERATED_BODY()
+	
+	~FPlayerNamePacket() = default;
+
+	static constexpr OpCode OpCode = OpCode::C_PlayerName;
+
+	FString Name;
 
 	void Serialize(TArray<BYTE>& ByteArray) const;
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
@@ -151,14 +167,7 @@ struct FPlayerInputsPacket
 
 	static constexpr OpCode OpCode = OpCode::C_PlayerInputs;
 
-	struct PlayerInputsData
-	{
-		FVector2D MoveInput = FVector2D::ZeroVector;
-		FVector2D AimInput = FVector2D::ZeroVector;
-		bool FireInput = false;
-	};
-
-	PlayerInputsData PlayerInputs;
+	FPlayerTankInputs PlayerInputs;
 
 	void Serialize(TArray<BYTE>& ByteArray) const;
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);

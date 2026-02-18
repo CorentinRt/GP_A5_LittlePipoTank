@@ -6,6 +6,8 @@
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Kismet/GameplayStatics.h"
 #include "Shared/LittlePipoTankGameInstance.h"
+#include "Shared/NetworkProtocol.h"
+#include "Shared/NetworkProtocolHelpers.h"
 
 AGameModeTankClient::AGameModeTankClient()
 {
@@ -32,6 +34,11 @@ void AGameModeTankClient::InitGameClient()
 	InitializeNetwork(GetServerAdressIp());
 	
 	GameStateClient.ServerPeer = ServerPeer;
+
+	ULittlePipoTankGameInstance* GameInstance = Cast<ULittlePipoTankGameInstance>(GetGameInstance());
+
+	FPlayerNamePacket Packet = {.Name = GameInstance->GetPlayerName()};
+	UNetworkProtocolHelpers::SendPacket(*ServerPeer, Packet, ENET_PACKET_FLAG_RELIABLE);
 }
 
 void AGameModeTankClient::GamePhysicsTick(float DeltaTime)
@@ -79,8 +86,9 @@ void AGameModeTankClient::ReceivePlayerJoinedGame()
 	
 	FPlayerTankInputs PlayerInputs
 	{
-		.MovementsInputs = 0.f,
-		.LookDirInputs = 0.f
+		.MoveInput = FVector2D::ZeroVector,
+		.AimInput = FVector2D::ZeroVector,
+		.FireInput = false
 	};
 	
 	FPlayerDataClient NewPlayerData

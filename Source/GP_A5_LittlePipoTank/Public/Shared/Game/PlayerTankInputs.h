@@ -15,11 +15,12 @@ struct GP_A5_LITTLEPIPOTANK_API FPlayerTankInputs
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite)
-	float MovementsInputs = 0.f;
-
-	UPROPERTY(BlueprintReadWrite)
-	float LookDirInputs = 0.f;
+	UPROPERTY(EditAnywhere, Category= "PlayerTankInputStruct")
+	FVector2D MoveInput = FVector2D::ZeroVector;
 	
+	UPROPERTY(EditAnywhere, Category= "PlayerTankInputStruct")
+	FVector2D AimInput = FVector2D::ZeroVector;
 	
+	UPROPERTY(EditAnywhere, Category= "PlayerTankInputStruct")
+	bool FireInput = false;	
 };
