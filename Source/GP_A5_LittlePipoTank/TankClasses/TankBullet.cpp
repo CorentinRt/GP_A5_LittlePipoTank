@@ -37,6 +37,10 @@ void ATankBullet::BeginPlay()
 {
 	Super::BeginPlay();
 	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
+	if (GetInstigator())
+	{
+		BulletMesh->IgnoreActorWhenMoving(GetInstigator(), true); //Ignore le big tank 
+	}
 }
 
 void ATankBullet::OnBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
@@ -48,7 +52,13 @@ void ATankBullet::OnBounce(const FHitResult& ImpactResult, const FVector& Impact
 	{
 		HitPawn->Destroy();
 	}
-	if (numberOfBouncesLeft == 0)
+	ATankBullet* HitBulletPawn = Cast<ATankBullet>(HitActor);
+	if (HitBulletPawn)
+	{
+		HitBulletPawn->Destroy();
+		this->Destroy();
+	}
+	if (this && numberOfBouncesLeft == 0)
 	{
 		this->Destroy();
 	}
