@@ -60,6 +60,9 @@ protected:
 	virtual void HandleDisconnection(const ENetEvent& event) override;
 
 	void GetAllPlayerSpawnPoints();
+
+	UFUNCTION(BlueprintCallable)
+	void SetupGame();
 	
 	UFUNCTION(BlueprintCallable)
 	void SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint* InSpawnPoint);

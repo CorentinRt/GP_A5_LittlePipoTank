@@ -244,12 +244,33 @@ void AGameModeTankServer::GetAllPlayerSpawnPoints()
 	}
 }
 
+void AGameModeTankServer::SetupGame()
+{
+	int SpawnPointIndex = 0;
+	
+	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	{
+		if (LocalPlayer.PlayerIndex >= 2)
+			continue;
+
+		if (SpawnPointIndex >= PlayersSpawnPoints.Num())
+			continue;
+		
+		SpawnTankPlayer(LocalPlayer, PlayersSpawnPoints[SpawnPointIndex]);
+		++SpawnPointIndex;
+	}
+}
+
 void AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint* InSpawnPoint)
 {
 	if (!InPlayer.PlayerTanks)
 		return;
 
+	if (!InSpawnPoint)
+		return;
+	
 	InPlayer.PlayerTanks->SetActorHiddenInGame(true);
+	InPlayer.PlayerTanks->SetActorEnableCollision(true);
 	InPlayer.PlayerTanks->SetActorLocation(InSpawnPoint->GetActorLocation());
 	InPlayer.PlayerTanks->SetActorRotation(InSpawnPoint->GetActorRotation());
 }
@@ -258,6 +279,9 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 {
 	++GameStateServer.PlayerCount;
 
+	if (GameStateServer.PlayerCount >= 2)
+		return;
+	
 	FPlayerTankInputs PlayerInputs
 	{
 		.MoveInput = FVector2D::ZeroVector,
