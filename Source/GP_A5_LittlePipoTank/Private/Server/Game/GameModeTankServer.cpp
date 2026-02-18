@@ -295,7 +295,7 @@ void AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer, const APl
 	InPlayer.PlayerTanks->SetActorRotation(InSpawnPoint->GetActorRotation());
 }
 
-void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, FString InPlayerName)
+void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayerName)
 {
 	++GameStateServer.PlayerCount;
 
