@@ -13,13 +13,13 @@ class GP_A5_LITTLEPIPOTANK_API ATankBullet : public AActor
 {
 	GENERATED_BODY()
 
+public:
 	UPROPERTY(EditAnywhere, Category= "Bullet")
 	UStaticMeshComponent* BulletMesh;
 	
 	UPROPERTY(EditAnywhere, Category= "Bullet")
 	float BulletSpeed;
 	
-public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category= "Bullet")
 	UProjectileMovementComponent* ProjectileMovement;
 	

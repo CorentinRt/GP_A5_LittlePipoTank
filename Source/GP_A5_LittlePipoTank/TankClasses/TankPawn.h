@@ -17,10 +17,14 @@ class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn, public IPhysicsTickable
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Category= "EnhancedInput")
+	UPROPERTY(EditAnywhere, Category= "Tank")
 	UStaticMeshComponent* TankHeadMesh;
-	UPROPERTY(EditAnywhere, Category= "EnhancedInput")
+	UPROPERTY(EditAnywhere, Category= "Tank")
 	UStaticMeshComponent* TankBodyMesh;
+	UPROPERTY(EditAnywhere, Category= "Tank")
+	USceneComponent* TankShootingPoint;
+	UPROPERTY(EditAnywhere, Category= "Tank")
+	UStaticMesh* BulletMesh;
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
@@ -41,6 +45,9 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, Category="Tank")
 	AGameModeTankServer* GameMode;
+
+	UPROPERTY(VisibleAnywhere)
+	FPlayerTankInputs TankInputs;
 
 public:
 	// Sets default values for this character's properties
