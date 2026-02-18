@@ -133,8 +133,13 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 		Rotation.Yaw += 90;
 		FActorSpawnParameters SpawnParameters;
 		AActor* Bullet = GetWorld()->SpawnActor<ATankBullet>(Location, Rotation, SpawnParameters);
-		Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);
-		Bullet->SetActorScale3D(Bullet->GetActorScale() * sizeOfBullet);
+		if (Bullet)
+		{
+			Bullet->SetInstigator(this);
+			Bullet->SetActorScale3D(Bullet->GetActorScale() * sizeOfBullet);
+			Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);	
+		}
+		
 		TankInputs.FireInput = false;
 	}
 }
