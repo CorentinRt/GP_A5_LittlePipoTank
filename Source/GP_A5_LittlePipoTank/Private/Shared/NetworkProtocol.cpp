@@ -3,6 +3,7 @@
 
 #include "Shared/NetworkProtocol.h"
 
+#include "Sections/MovieScene3DPathSection.h"
 #include "Shared/NetworkProtocolHelpers.h"
 
 void FExemplePacket::Serialize(TArray<BYTE>& ByteArray) const
@@ -13,6 +14,16 @@ void FExemplePacket::Serialize(TArray<BYTE>& ByteArray) const
 void FExemplePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
 {
 	X = UNetworkProtocolHelpers::DeserializeArithmetic<float>(ByteArray, Offset);
+}
+
+void FPlayerNamePacket::Serialize(TArray<BYTE>& ByteArray) const
+{
+	UNetworkProtocolHelpers::SerializeString(ByteArray, Name);
+}
+
+void FPlayerNamePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
+{
+	Name = UNetworkProtocolHelpers::DeserializeString(ByteArray, Offset);
 }
 
 void FPlayerJoinedPacket::Serialize(TArray<BYTE>& ByteArray) const

@@ -43,6 +43,21 @@ struct FExemplePacket
 };
 
 USTRUCT()
+struct FPlayerNamePacket
+{
+	GENERATED_BODY()
+	
+	~FPlayerNamePacket() = default;
+
+	static constexpr OpCode OpCode = OpCode::C_PlayerName;
+
+	FString Name;
+
+	void Serialize(TArray<BYTE>& ByteArray) const;
+	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+};
+
+USTRUCT()
 struct FPlayerJoinedPacket
 {
 	GENERATED_BODY()

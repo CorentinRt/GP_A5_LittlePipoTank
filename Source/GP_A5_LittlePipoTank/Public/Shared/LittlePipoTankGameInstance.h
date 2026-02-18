@@ -17,9 +17,14 @@ class GP_A5_LITTLEPIPOTANK_API ULittlePipoTankGameInstance : public UGameInstanc
 public:
 	UFUNCTION(BlueprintCallable)
 	const FString& GetServerIp() const;
-
+	UFUNCTION(BlueprintCallable)
+	const FString& GetPlayerName() const;
+	
 	UFUNCTION(BlueprintCallable)
 	void SetServerIp(FString NewIp);
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerName(FString NewPlayerName);
 private:
 	FString ServerIp = "localhost";
+	FString PlayerName = "DefaultName";
 };
