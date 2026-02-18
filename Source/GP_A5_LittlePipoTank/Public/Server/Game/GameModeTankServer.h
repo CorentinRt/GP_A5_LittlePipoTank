@@ -76,6 +76,4 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	TArray<APlayerTankSpawnPoint*> PlayersSpawnPoints;
-	
-	int NextSpawnPointIndex = 0; 
 };

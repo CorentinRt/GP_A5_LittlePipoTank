@@ -266,10 +266,10 @@ void AGameModeTankServer::GetAllPlayerSpawnPoints()
 
 bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 {
-	if (NextSpawnPointIndex >= PlayersSpawnPoints.Num())
+	if (InPlayer.PlayerIndex >= PlayersSpawnPoints.Num())
 		return false;
 
-	APlayerTankSpawnPoint* SpawnPoint = PlayersSpawnPoints[NextSpawnPointIndex++];
+	APlayerTankSpawnPoint* SpawnPoint = PlayersSpawnPoints[InPlayer.PlayerIndex];
 
 	if (!SpawnPoint)
 		return false;
