@@ -52,7 +52,7 @@ public:
 protected:
 	virtual void SetGamePhase(ETankGamePhase& CurrentGamePhase, ETankGamePhase NewGamePhase);
 	
-	float TickDelayPhysics = 1/30.0f;
+	float TickDelayPhysics = 1/60.0f;
 	float TickDelayNetwork = 1/10.f;
 
 	float CurrentAccumulatedPhysicsTickTime = 0.f;

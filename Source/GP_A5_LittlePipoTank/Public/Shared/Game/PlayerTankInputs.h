@@ -22,5 +22,5 @@ public:
 	FVector2D AimInput = FVector2D::ZeroVector;
 	
 	UPROPERTY(EditAnywhere, Category= "PlayerTankInputStruct")
-	bool FireInput = false;	
+	bool FireInput = false;
 };

@@ -34,15 +34,12 @@ ATankPawn::ATankPawn()
 void ATankPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void ATankPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
 }
 
 // Called to bind functionality to input
@@ -56,9 +53,9 @@ void ATankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		}
 	}
 
-
 	if (UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATankPawn::Move);
+		Input->BindAction(MoveAction, ETriggerEvent::Completed, this, &ATankPawn::Move);
 		Input->BindAction(AimAction, ETriggerEvent::Triggered, this, &ATankPawn::Aim);
 		Input->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ATankPawn::Shoot);
 	}
@@ -80,8 +77,7 @@ void ATankPawn::Aim(const FInputActionValue& Value)
 	FVector2D AimVector = Value.Get<FVector2D>();
 	if (IsValid(Controller))
 	{
-		FVector AimFVector {AimVector.X, AimVector.Y, 0.0f};
-		TargetWorldRotation =  FRotationMatrix::MakeFromX(AimFVector).Rotator();
+		TankInputs.AimInput = AimVector;
 	}
 }
 
@@ -114,10 +110,17 @@ void ATankPawn::UnregisterTickable()
 void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 {
 	IPhysicsTickableShared::OnTickPhysics_Blueprint_Implementation(DeltaTime);
+
+	//Move
 	AddMovementInput(this->GetActorForwardVector(), TankInputs.MoveInput.Y);
 	AddControllerYawInput(TankInputs.MoveInput.X);
+	FString text = TankInputs.MoveInput.ToString();
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, text);
 
+	//Aim Rotation
 	FRotator CurrentWorldRot = TankHeadMesh->GetComponentRotation();
+	FVector AimFVector {TankInputs.AimInput.X, TankInputs.AimInput.Y, 0.0f};
+	TargetWorldRotation =  FRotationMatrix::MakeFromX(AimFVector).Rotator();
 	FRotator SmoothedRot = FMath::RInterpTo(
 		CurrentWorldRot,
 		TargetWorldRotation,
@@ -126,6 +129,7 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 	);
 	TankHeadMesh->SetWorldRotation(SmoothedRot);
 
+	//Fire Input
 	if(TankInputs.FireInput == true)
 	{
 		FVector Location(TankShootingPoint->GetComponentLocation());
