@@ -7,6 +7,7 @@
 #include "UObject/Object.h"
 #include "PlayerDataClient.generated.h"
 
+class AClientTankPawn;
 /**
  * 
  */
@@ -21,4 +22,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FString PlayerName = "NULL_NAME";
+
+	UPROPERTY()
+	TObjectPtr<AClientTankPawn> Tank;
 };

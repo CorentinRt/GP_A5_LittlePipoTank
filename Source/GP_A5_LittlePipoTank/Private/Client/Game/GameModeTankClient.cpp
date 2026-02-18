@@ -5,6 +5,7 @@
 
 #include "GP_A5_LittlePipoTank.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
+#include "Client/Game/ClientTankPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Shared/LittlePipoTankGameInstance.h"
@@ -198,9 +199,11 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 
 				if (!Player)
 				{
+					AClientTankPawn* PlayerTank = GetWorld()->SpawnActor<AClientTankPawn>(BlueprintClientTankClass);
 					GameStateClient.Players.Add({
 						.PlayerIndex = It->Index,
 						.PlayerName = It->Name,
+						.Tank = PlayerTank
 					});
 				}
 			}
