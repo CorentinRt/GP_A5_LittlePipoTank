@@ -1,4 +1,5 @@
 #pragma once
+#include "GP_A5_LittlePipoTank.h"
 #include "enet6/enet.h"
 
 template<typename T> requires std::is_arithmetic_v<T>
@@ -72,8 +73,14 @@ ENetPacket* UNetworkProtocolHelpers::BuildENetPacket(const T& ProtocolPacket, UI
 }
 	
 template<typename T>
-void UNetworkProtocolHelpers::SendPacket(ENetPeer& peer, const T& ProtocolPacket, UINT32 flags)
+void UNetworkProtocolHelpers::SendPacket(ENetPeer* peer, const T& ProtocolPacket, UINT32 flags)
 {
+	if (!peer)
+	{
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't SendPacket: null peer.");
+		return;
+	}
+	
 	ENetPacket* packet = BuildENetPacket(ProtocolPacket, flags);
-	enet_peer_send(&peer, 0, packet);
+	enet_peer_send(peer, 0, packet);
 }

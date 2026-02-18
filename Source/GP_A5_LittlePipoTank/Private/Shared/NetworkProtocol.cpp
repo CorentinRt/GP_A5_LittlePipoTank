@@ -40,11 +40,13 @@ void FPlayerNamePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>:
 void FPlayerJoinedPacket::Serialize(TArray<BYTE>& ByteArray) const
 {
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerIndex);
+	UNetworkProtocolHelpers::SerializeString(ByteArray, PlayerName);
 }
 
 void FPlayerJoinedPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
 {
 	PlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
+	PlayerName = UNetworkProtocolHelpers::DeserializeString(ByteArray, Offset);
 }
 
 void FPlayerLeftPacket::Serialize(TArray<BYTE>& ByteArray) const
@@ -192,5 +194,5 @@ void FPlayerInputsPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE
 	PlayerInputs.MoveInput.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 	PlayerInputs.AimInput.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 	PlayerInputs.AimInput.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
-	bool ByteFireInput = UNetworkProtocolHelpers::DeserializeArithmetic<bool>(ByteArray, Offset);
+	PlayerInputs.FireInput = UNetworkProtocolHelpers::DeserializeArithmetic<bool>(ByteArray, Offset);
 }

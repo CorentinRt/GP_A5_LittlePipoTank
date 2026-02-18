@@ -49,4 +49,11 @@ protected:
 	virtual void HandleConnection(const ENetEvent& event) override;
 
 	virtual void HandleDisconnection(const ENetEvent& event) override;
+
+private:
+	void InterpolateGame(float DeltaTime);
+	
+	void PredictClient(float DeltaTime);
+	void SendClientPrediction();
+	void ReconciliateClient(const FPlayersStatePacket::OwnPlayerStateData& OwnPlayerData);
 };

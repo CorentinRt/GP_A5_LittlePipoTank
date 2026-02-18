@@ -85,6 +85,8 @@ struct FPlayerJoinedPacket
 	
 	int PlayerIndex = -1;
 
+	FString PlayerName = "";
+
 	void Serialize(TArray<BYTE>& ByteArray) const;
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
 };
@@ -184,6 +186,7 @@ struct FPlayerInputsPacket
 	static constexpr OpCode OpCode = OpCode::C_PlayerInputs;
 
 	FPlayerTankInputs PlayerInputs;
+	UINT8 PredictionIndex = -1;
 
 	void Serialize(TArray<BYTE>& ByteArray) const;
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);

@@ -73,4 +73,6 @@ public:
 	virtual void RegisterTickable() override;
 	virtual void UnregisterTickable() override;
 	virtual void OnTickPhysics_Blueprint_Implementation(float DeltaTime) override;
+
+	const FPlayerTankInputs& GetTankInputs() const;
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlayerDataClient.h"
+#include "Shared/NetworkProtocol.h"
 #include "Shared/TankGamePhase.h"
 #include "Shared/ENetWrapper/ENetPeer.h"
 #include "Shared/Game/PlayerTankInputs.h"
@@ -12,6 +13,29 @@
 /**
  * 
  */
+USTRUCT()
+struct GP_A5_LITTLEPIPOTANK_API FInterpolationSnapshot
+{
+	GENERATED_BODY()
+
+public:
+	TArray<FPlayersStatePacket::PlayerStateData> PlayerStates;
+};
+
+USTRUCT()
+struct GP_A5_LITTLEPIPOTANK_API FPredictionSnapshot
+{
+	GENERATED_BODY()
+
+public:
+	UINT8 PredictionIndex;
+	FPlayerTankInputs Inputs;
+	FVector2D Location;
+	float Rotation;
+	float AimRotation;
+	FVector2D Velocity;
+};
+
 USTRUCT(BlueprintType)
 struct GP_A5_LITTLEPIPOTANK_API FGameStateTankClient
 {
@@ -31,4 +55,13 @@ public:
 	int OwnPlayerIndex = 0;
 
 	ENetPeer* ServerPeer;
+
+	// Client Prediction and Reconciliation
+	TArray<FPredictionSnapshot> Predictions;
+	UINT8 NextPredictionIndex = 0;
+	
+	// Game Interpolation
+	TArray<FInterpolationSnapshot> PlayersStateSnapshots;
+	float SnapshotBufferAccumulator = 0.0f;
+	UINT8 SnapshotBufferTargetSize = 4;
 };
