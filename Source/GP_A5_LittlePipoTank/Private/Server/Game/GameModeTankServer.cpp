@@ -90,7 +90,7 @@ void AGameModeTankServer::NextGamePhase()
 		SetServerGamePhase(ETankGamePhase::POST_GAME);
 		break;
 	case ETankGamePhase::POST_GAME:
-		SetServerGamePhase(ETankGamePhase::PRE_GAME);
+		SetServerGamePhase(ETankGamePhase::WAITING_PLAYER);
 		break;
 	default:
 		break;
@@ -102,6 +102,16 @@ void AGameModeTankServer::UpdateCurrentGamePhase(float DeltaTime)
 	switch (GameStateServer.CurrentGamePhase)
 	{
 	case ETankGamePhase::WAITING_PLAYER:
+		if (GameStateServer.PlayerCount >= 2)
+		{
+			while (CurrentAccumulatedGamePhaseTime >= GetGamePhaseDuration(GameStateServer.CurrentGamePhase))
+			{
+				CurrentAccumulatedGamePhaseTime -= GetGamePhaseDuration(GameStateServer.CurrentGamePhase);
+				NextGamePhase();
+			}
+
+			CurrentAccumulatedGamePhaseTime += DeltaTime;
+		}
 		break;
 	case ETankGamePhase::PRE_GAME:
 	case ETankGamePhase::IN_GAME:
@@ -133,6 +143,9 @@ float AGameModeTankServer::GetGamePhaseDuration(ETankGamePhase InGamePhase)
 	switch (InGamePhase)
 	{
 	case ETankGamePhase::WAITING_PLAYER:
+		{
+			Duration = GamePhasesData->WaitingPlayerDuration;
+		}
 		break;
 	case ETankGamePhase::PRE_GAME:
 		{
@@ -225,6 +238,11 @@ void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
 
 		if (LocalPlayer.Peer == event.peer)
 		{
+			if (LocalPlayer.PlayerTanks)
+			{
+				GetWorld()->DestroyActor(LocalPlayer.PlayerTanks);
+			}
+			
 			PlayerLeft(event, i);
 			return;
 		}
@@ -319,13 +337,9 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 		if (LocalPlayer.PlayerIndex == NewPlayerData.PlayerIndex)
 			return;
 
-		FPlayerJoinedPacket PlayerJoinedPacket
-		{
-			.PlayerIndex = LocalPlayer.PlayerIndex,
-			.PlayerName = LocalPlayer.PlayerName
-		};
+		// Build packet and send it
 		
-		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerJoinedPacket, ENET_PACKET_FLAG_RELIABLE);
+		//UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerJoinedPacket, ENET_PACKET_FLAG_RELIABLE);
 	}
 }
 
@@ -337,11 +351,10 @@ void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 
 	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
-		FPlayerLeftPacket PlayerLeftPacket
-		{
-			.PlayerIndex = LocalPlayer.PlayerIndex,
-		};
+		// Build packet and send it
 
-		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerLeftPacket, ENET_PACKET_FLAG_RELIABLE);
+		//UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerLeftPacket, ENET_PACKET_FLAG_RELIABLE);
 	}
+
+	SetServerGamePhase(ETankGamePhase::WAITING_PLAYER);
 }

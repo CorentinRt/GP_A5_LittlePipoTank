@@ -17,6 +17,9 @@ class GP_A5_LITTLEPIPOTANK_API UGamePhasesData : public UPrimaryDataAsset
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GamePhases")
+	float WaitingPlayerDuration = 1.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GamePhases")
 	float PreGameDuration = 5.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GamePhases")

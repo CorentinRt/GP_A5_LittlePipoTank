@@ -19,7 +19,7 @@ struct GP_A5_LITTLEPIPOTANK_API FInterpolationSnapshot
 	GENERATED_BODY()
 
 public:
-	TArray<FPlayersStatePacket::PlayerStateData> PlayerStates;
+	TArray<FGameStatePacket::PlayerStateData> PlayerStates;
 };
 
 USTRUCT()

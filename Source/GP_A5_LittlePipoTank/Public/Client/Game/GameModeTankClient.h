@@ -55,5 +55,5 @@ private:
 	
 	void PredictClient(float DeltaTime);
 	void SendClientPrediction();
-	void ReconciliateClient(const FPlayersStatePacket::OwnPlayerStateData& OwnPlayerData);
+	void ReconciliateClient(const FGameStatePacket::OwnPlayerStateData& OwnPlayerData);
 };

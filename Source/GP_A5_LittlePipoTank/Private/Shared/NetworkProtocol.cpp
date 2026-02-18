@@ -37,29 +37,38 @@ void FPlayerNamePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>:
 	Name = UNetworkProtocolHelpers::DeserializeString(ByteArray, Offset);
 }
 
-void FPlayerJoinedPacket::Serialize(TArray<BYTE>& ByteArray) const
+void FPlayerListPacket::Serialize(TArray<BYTE>& ByteArray) const
 {
-	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerIndex);
-	UNetworkProtocolHelpers::SerializeString(ByteArray, PlayerName);
+	// Size
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, Players.Num());
+
+	for (int i = 0; i < Players.Num(); ++i)
+	{
+		UNetworkProtocolHelpers::SerializeString(ByteArray, Players[i].Name);
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, Players[i].Index);
+	}
 }
 
-void FPlayerJoinedPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
+void FPlayerListPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
 {
-	PlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
-	PlayerName = UNetworkProtocolHelpers::DeserializeString(ByteArray, Offset);
+	TArray<BYTE>::SizeType Size = UNetworkProtocolHelpers::DeserializeArithmetic<TArray<BYTE>::SizeType>(ByteArray, Offset);
+
+	for (int i = 0; i < Size; ++i)
+	{
+		FString Name = UNetworkProtocolHelpers::DeserializeString(ByteArray, Offset);
+		int Index = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
+		
+		Player NewPlayer
+		{
+			.Name = Name,
+			.Index = Index
+		};
+		
+		Players.Add(MoveTemp(NewPlayer));
+	}
 }
 
-void FPlayerLeftPacket::Serialize(TArray<BYTE>& ByteArray) const
-{
-	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerIndex);
-}
-
-void FPlayerLeftPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
-{
-	PlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
-}
-
-void FPlayersStatePacket::Serialize(TArray<BYTE>& ByteArray) const
+void FGameStatePacket::Serialize(TArray<BYTE>& ByteArray) const
 {
 	// Size Array
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OtherPlayersStateData.Num());
@@ -86,7 +95,7 @@ void FPlayersStatePacket::Serialize(TArray<BYTE>& ByteArray) const
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.Velocity.Y);
 }
 
-void FPlayersStatePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
+void FGameStatePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
 {
 	TArray<BYTE>::SizeType PlayersDataSize = UNetworkProtocolHelpers::DeserializeArithmetic<TArray<BYTE>::SizeType>(ByteArray, Offset);
 

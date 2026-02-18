@@ -141,9 +141,9 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 
 	switch (OpCode)
 	{
-	case OpCode::S_PlayersState:
+	case OpCode::S_GameState:
 		{
-			FPlayersStatePacket Packet = {};
+			FGameStatePacket Packet = {};
 			Packet.Deserialize(ByteArray, Offset);
 
 			// Reconciliation
@@ -197,7 +197,7 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 		{
 
 			// check if To snapshot has a position for the same player
-			const FPlayersStatePacket::PlayerStateData* ToPlayerData = ToSnapshot.PlayerStates.FindByPredicate([&](const FPlayersStatePacket::PlayerStateData& PlayerData)
+			const FGameStatePacket::PlayerStateData* ToPlayerData = ToSnapshot.PlayerStates.FindByPredicate([&](const FGameStatePacket::PlayerStateData& PlayerData)
 			{
 				return PlayerData.Index == FromPlayerData.Index;
 			});
@@ -283,7 +283,7 @@ void AGameModeTankClient::SendClientPrediction()
 	GameStateClient.NextPredictionIndex++;
 }
 
-void AGameModeTankClient::ReconciliateClient(const FPlayersStatePacket::OwnPlayerStateData& OwnPlayerData)
+void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerStateData& OwnPlayerData)
 {
 	// TODO Prep Reconciliation but need Predicted Inputs back in OwnPlayerData
 	//while (!GameStateClient.Predictions.IsEmpty() && GameStateClient.Predictions[0].PredictionIndex < OwnPlayerData)

@@ -16,12 +16,11 @@ UENUM()
 enum class OpCode : UINT8
 {
 	S_ExempleCode = 0,
-	S_PlayerJoined = 1,
-	S_PlayerLeft = 2,
-	S_PlayersState = 3,
-	S_BulletsState = 4,
-	S_GamePhase = 5,
-	S_InitClientData = 6,
+	S_PlayerList = 1,
+	S_GameState = 2,
+	S_BulletsState = 3,
+	S_GamePhase = 4,
+	S_InitClientData = 5,
 
 	C_PlayerInputs = 126,
 	C_PlayerName = 127,
@@ -75,45 +74,34 @@ struct FPlayerNamePacket
 };
 
 USTRUCT()
-struct FPlayerJoinedPacket
+struct FPlayerListPacket
 {
 	GENERATED_BODY()
 
-	~FPlayerJoinedPacket() = default;
+	~FPlayerListPacket() = default;
 
-	static constexpr OpCode OpCode = OpCode::S_PlayerJoined;
+	static constexpr OpCode OpCode = OpCode::S_PlayerList;
+
+	struct Player
+	{
+		FString Name = "";
+		int Index = -1;
+	};
 	
-	int PlayerIndex = -1;
-
-	FString PlayerName = "";
+	TArray<Player> Players;
 
 	void Serialize(TArray<BYTE>& ByteArray) const;
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
 };
 
 USTRUCT()
-struct FPlayerLeftPacket
+struct FGameStatePacket
 {
 	GENERATED_BODY()
 
-	~FPlayerLeftPacket() = default;
+	~FGameStatePacket() = default;
 
-	static constexpr OpCode OpCode = OpCode::S_PlayerLeft;
-	
-	int PlayerIndex = -1;
-
-	void Serialize(TArray<BYTE>& ByteArray) const;
-	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
-};
-
-USTRUCT()
-struct FPlayersStatePacket
-{
-	GENERATED_BODY()
-
-	~FPlayersStatePacket() = default;
-
-	static constexpr OpCode OpCode = OpCode::S_PlayersState;
+	static constexpr OpCode OpCode = OpCode::S_GameState;
 
 	struct OwnPlayerStateData
 	{
