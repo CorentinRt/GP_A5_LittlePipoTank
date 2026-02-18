@@ -25,6 +25,8 @@ public:
 	USceneComponent* TankShootingPoint;
 	UPROPERTY(EditAnywhere, Category= "Tank")
 	UStaticMesh* BulletMesh;
+	UPROPERTY(EditAnywhere, Category= "Tank")
+	uint8 sizeOfBullet = 3;
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
@@ -75,4 +77,6 @@ public:
 	virtual void OnTickPhysics_Blueprint_Implementation(float DeltaTime) override;
 
 	const FPlayerTankInputs& GetTankInputs() const;
+	
+	void TankGetShoot();
 };

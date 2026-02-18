@@ -29,11 +29,17 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	UFUNCTION()
+	void OnBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity);
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-	FVector CalculateBulletImpact(FVector BulletDirection, FVector ImpactPoint);
+	UPROPERTY(EditAnywhere, Category= "Bullet")
+	uint8 numberOfBounces = 3;
+private:
+	int numberOfBouncesLeft;
 
 };
