@@ -63,6 +63,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	bool SpawnTankPlayer(FPlayerDataServer& InPlayer);
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ATankPawn> TankPawnClassBlueprint;
 	
 private:
 	void PlayerJoined(ENetPeer* InPeer, const FString& InPlayerName);

@@ -114,7 +114,6 @@ void AENetGameMode::OnNetworkEventDisconnectTimeout(const ENetEvent& event)
 
 void AENetGameMode::OnNetworkEventReceive(const ENetEvent& event)
 {
-	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Event receive");
 	//std::cout << "Content: " << std::string(reinterpret_cast<const char*>(event.packet->data), event.packet->dataLength) << std::endl;
 	//UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received {0} from server # {1}", event.packet->dataLength, event.peer->incomingPeerID);
 	//UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Content: ");
