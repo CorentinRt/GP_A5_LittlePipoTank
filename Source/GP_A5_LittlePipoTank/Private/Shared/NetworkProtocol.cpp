@@ -40,11 +40,13 @@ void FPlayerNamePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>:
 void FPlayerJoinedPacket::Serialize(TArray<BYTE>& ByteArray) const
 {
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerIndex);
+	UNetworkProtocolHelpers::SerializeString(ByteArray, PlayerName);
 }
 
 void FPlayerJoinedPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
 {
 	PlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
+	PlayerName = UNetworkProtocolHelpers::DeserializeString(ByteArray, Offset);
 }
 
 void FPlayerLeftPacket::Serialize(TArray<BYTE>& ByteArray) const

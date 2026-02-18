@@ -85,6 +85,8 @@ struct FPlayerJoinedPacket
 	
 	int PlayerIndex = -1;
 
+	FString PlayerName = "";
+
 	void Serialize(TArray<BYTE>& ByteArray) const;
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
 };

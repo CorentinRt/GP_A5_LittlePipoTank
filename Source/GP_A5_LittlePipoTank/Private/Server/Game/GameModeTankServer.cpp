@@ -5,6 +5,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Shared/NetworkProtocol.h"
+#include "Shared/NetworkProtocolHelpers.h"
 #include "Shared/Game/GamePhaseListener.h"
 #include "TankClasses/TankPawn.h"
 
@@ -305,11 +306,42 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 			);
 	
 	GameStateServer.Players.Add(MoveTemp(NewPlayerData));
+
+	FInitClientDataPacket NewPlayerInitPacket
+	{
+		.OwnPlayerIndex = NewPlayerData.PlayerIndex
+	};
+
+	UNetworkProtocolHelpers::SendPacket(*NewPlayerData.Peer, NewPlayerInitPacket, ENET_PACKET_FLAG_RELIABLE);
+	
+	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	{
+		if (LocalPlayer.PlayerIndex == NewPlayerData.PlayerIndex)
+			return;
+
+		FPlayerJoinedPacket PlayerJoinedPacket
+		{
+			.PlayerIndex = LocalPlayer.PlayerIndex,
+			.PlayerName = LocalPlayer.PlayerName
+		};
+		
+		UNetworkProtocolHelpers::SendPacket(*LocalPlayer.Peer, PlayerJoinedPacket, ENET_PACKET_FLAG_RELIABLE);
+	}
 }
 
 void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 {
 	--GameStateServer.PlayerCount;
-
+	
 	GameStateServer.Players.RemoveAt(IndexToRemove);
+
+	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	{
+		FPlayerLeftPacket PlayerLeftPacket
+		{
+			.PlayerIndex = LocalPlayer.PlayerIndex,
+		};
+
+		UNetworkProtocolHelpers::SendPacket(*LocalPlayer.Peer, PlayerLeftPacket, ENET_PACKET_FLAG_RELIABLE);
+	}
 }
