@@ -65,9 +65,9 @@ void AGameModeTankClient::ReceivePlayerJoinedGame()
 
 	bool PlayerPeerAlreadyExists = false;
 	
-	for (const FPlayerDataServer& LocalPlayer : GameStateClient.Players)
+	for (const FPlayerDataClient& LocalPlayer : GameStateClient.Players)
 	{
-		if (LocalPlayer.Peer == Peer)
+		if (LocalPlayer.PlayerIndex == PlayerIndex)
 		{
 			PlayerPeerAlreadyExists = true;
 			break;
@@ -83,12 +83,11 @@ void AGameModeTankClient::ReceivePlayerJoinedGame()
 		.LookDirInputs = 0.f
 	};
 	
-	FPlayerDataServer NewPlayerData
+	FPlayerDataClient NewPlayerData
 	{
 		.PlayerIndex = PlayerIndex,
 		.PlayerName = PlayerName,
-		.PlayerInputs = PlayerInputs,
-		.Peer = Peer
+		.PlayerInputs = PlayerInputs
 	};
 
 	
@@ -102,9 +101,9 @@ void AGameModeTankClient::ReceivePlayerLeaveGame()
 
 	for (int i = 0; i < GameStateClient.Players.Num(); ++i)
 	{
-		FPlayerDataServer& LocalPlayer = GameStateClient.Players[i];
+		FPlayerDataClient& LocalPlayer = GameStateClient.Players[i];
 
-		if (LocalPlayer.Peer == Peer)
+		if (LocalPlayer.PlayerIndex == PlayerIndex)
 		{
 			GameStateClient.Players.RemoveAt(i);
 			return;

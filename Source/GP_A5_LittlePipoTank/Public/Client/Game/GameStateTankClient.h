@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PlayerDataClient.h"
 #include "Shared/TankGamePhase.h"
+#include "Shared/ENetWrapper/ENetPeer.h"
 #include "Shared/Game/PlayerTankInputs.h"
-#include "Shared/Game/PlayerDataServer.h"
 #include "GameStateTankClient.generated.h"
 
 /**
@@ -21,7 +22,7 @@ public:
 	ETankGamePhase CurrentGamePhase = ETankGamePhase::NONE;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	TArray<FPlayerDataServer> Players;
+	TArray<FPlayerDataClient> Players;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FPlayerTankInputs OwnPlayerInputs;
@@ -29,5 +30,5 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int OwnPlayerIndex = 0;
 
-	ENetPeer* ServerPeer = nullptr;
+	ENetPeer* ServerPeer;
 };
