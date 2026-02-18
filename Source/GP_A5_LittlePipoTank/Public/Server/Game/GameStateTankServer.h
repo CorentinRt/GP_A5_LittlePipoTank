@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Shared/TankGamePhase.h"
 #include "Server/Game/PlayerDataServer.h"
-#include "UObject/Object.h"
 #include "GameStateTankServer.generated.h"
 
 /**

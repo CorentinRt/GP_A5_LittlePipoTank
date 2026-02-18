@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GamePhasesData.h"
 #include "GameStateTankServer.h"
 #include "PlayerTankSpawnPoint.h"
 #include "Shared/ENetWrapper/ENetServerGameMode.h"
+#include "Server/Game/GamePhasesData.h"
 #include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankServer.generated.h"
 
@@ -62,7 +62,7 @@ protected:
 	void GetAllPlayerSpawnPoints();
 	
 	UFUNCTION(BlueprintCallable)
-	void SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint& InSpawnPoint);
+	void SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint* InSpawnPoint);
 	
 private:
 	void PlayerJoined(const ENetEvent& event);
@@ -71,6 +71,6 @@ private:
 
 	float CurrentAccumulatedGamePhaseTime = 0.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<APlayerTankSpawnPoint> PlayersSpawnPoints;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
+	TArray<APlayerTankSpawnPoint*> PlayersSpawnPoints;
 };

@@ -4,7 +4,9 @@
 #include "Server/Game/GameModeTankServer.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Shared/NetworkProtocol.h"
 #include "Shared/Game/GamePhaseListener.h"
+#include "TankClasses/TankPawn.h"
 
 AGameModeTankServer::AGameModeTankServer()
 {
@@ -160,7 +162,22 @@ void AGameModeTankServer::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 {
 	Super::HandleMessage(OpCode, ByteArray, Offset);
 
-	
+	switch (OpCode)
+	{
+	case OpCode::C_PlayerName:
+		{
+			FPlayerNamePacket PlayerNamePacket;
+
+			PlayerNamePacket.Deserialize(ByteArray, Offset);
+			
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				10.f,
+				FColor::Red,
+				FString::Printf(TEXT("Receive msg name: %s"), *PlayerNamePacket.Name));
+			break;
+		}
+	}
 }
 
 void AGameModeTankServer::HandleConnection(const ENetEvent& event)
@@ -223,18 +240,18 @@ void AGameModeTankServer::GetAllPlayerSpawnPoints()
 		APlayerTankSpawnPoint* SpawnPoint = Cast<APlayerTankSpawnPoint>(Actor);
 
 		if (SpawnPoint)
-			PlayersSpawnPoints.Add(*SpawnPoint);
+			PlayersSpawnPoints.Add(SpawnPoint);
 	}
 }
 
-void AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint& InSpawnPoint)
+void AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint* InSpawnPoint)
 {
 	if (!InPlayer.PlayerTanks)
 		return;
 
 	InPlayer.PlayerTanks->SetActorHiddenInGame(true);
-	InPlayer.PlayerTanks->SetActorLocation(InSpawnPoint.GetActorLocation());
-	InPlayer.PlayerTanks->SetActorRotation(InSpawnPoint.GetActorRotation());
+	InPlayer.PlayerTanks->SetActorLocation(InSpawnPoint->GetActorLocation());
+	InPlayer.PlayerTanks->SetActorRotation(InSpawnPoint->GetActorRotation());
 }
 
 void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
