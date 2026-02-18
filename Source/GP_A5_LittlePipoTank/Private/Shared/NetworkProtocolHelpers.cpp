@@ -1,34 +1,38 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 #include "Public/Shared/NetworkProtocolHelpers.h"
 
+#include <string>
+
 
 void UNetworkProtocolHelpers::SerializeString(TArray<BYTE>& ByteArray, const FString& Value)
 {
-	const char* String = TCHAR_TO_UTF8(*Value);
-	SIZE_T size = strlen(String);
+	std::string StdString(TCHAR_TO_UTF8(*Value));
+	
+	//std::string StdString(reinterpret_cast<const char*>(StringCast<UTF8CHAR>(*Value).Get()));
 
-	SerializeArithmetic(ByteArray, size);
+	size_t Size = StdString.size();
 
-	for (SIZE_T i = 0; i < size; i++)
+	SerializeArithmetic(ByteArray, Size);
+	
+	for (SIZE_T i = 0; i < Size; i++)
 	{
-		SerializeArithmetic(ByteArray, String[i]);
+		SerializeArithmetic(ByteArray, StdString[i]);
 	}
 	
 }
 
 FString UNetworkProtocolHelpers::DeserializeString(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
 {
-	/*
-	SIZE_T size = DeserializeArithmetic<SIZE_T>(ByteArray, Offset);
-
-	char Utf8String[size];
+	size_t size = DeserializeArithmetic<SIZE_T>(ByteArray, Offset);
+	
+	std::string StdString;
+	StdString.resize(size);
 	
 	for (SIZE_T i = 0; i < size; i++)
 	{
-		Utf8String[i] = DeserializeArithmetic<char>(ByteArray, Offset);
+		StdString[i] = DeserializeArithmetic<char>(ByteArray, Offset);
 	}
-
-	return FString(UTF8_TO_TCHAR(&Utf8String[0]));
-*/
-	return "";
+	
+	//return FString(StringCast<TCHAR>(StdString.c_str()));
+	return FString(UTF8_TO_TCHAR(StdString.c_str()));
 }
