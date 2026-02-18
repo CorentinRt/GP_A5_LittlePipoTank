@@ -201,7 +201,7 @@ void AGameModeTankServer::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 				}
 			}
 
-			if (!PlayerPeerAlreadyExists)
+			if (PlayerPeerAlreadyExists)
 				return;
 
 			PlayerJoined(Peer, PlayerNamePacket.Name);
@@ -335,18 +335,20 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 	
 	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
-		if (LocalPlayer.PlayerIndex == NewPlayerData.PlayerIndex)
-			return;
-		
 		FPlayerListPacket PlayerListPacket;
 
 		for (FPlayerDataServer& ListedPlayer : GameStateServer.Players)
 		{
-			//FPlayerListPacket::
-			//PlayerListPacket.Players.Add();
+			FPlayerListPacket::Player PlayerListSingle
+			{
+				.Name = ListedPlayer.PlayerName,
+				.Index = LocalPlayer.PlayerIndex
+			};
+			
+			PlayerListPacket.Players.Add(MoveTemp(PlayerListSingle));
 		}
 		
-		//UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerJoinedPacket, ENET_PACKET_FLAG_RELIABLE);
+		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerListPacket, ENET_PACKET_FLAG_RELIABLE);
 	}
 }
 
