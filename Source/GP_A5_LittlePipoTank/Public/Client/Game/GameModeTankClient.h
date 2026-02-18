@@ -44,7 +44,7 @@ protected:
 
 	FString GetServerAdressIp() const;
 
-	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset) override;
+	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset, ENetPeer* Peer) override;
 
 	virtual void HandleConnection(const ENetEvent& event) override;
 

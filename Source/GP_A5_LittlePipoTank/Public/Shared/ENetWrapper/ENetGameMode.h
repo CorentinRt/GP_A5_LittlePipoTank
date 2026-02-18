@@ -31,7 +31,7 @@ protected:
 	virtual void HandleConnection(const ENetEvent& event);
 	virtual void HandleDisconnection(const ENetEvent& event);
 	virtual void HandleTimeout(const ENetEvent& event);
-	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset, ENetPeer* Peer);
 
 private:
 	void OnNetworkEventConnect(const ENetEvent& event);

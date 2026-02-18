@@ -26,7 +26,7 @@ public:
 	virtual void RunNetwork() override;
 
 protected:
-	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset) override;
+	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset, ENetPeer* Peer) override;
 	
 	ENetPeer* ServerPeer;
 };

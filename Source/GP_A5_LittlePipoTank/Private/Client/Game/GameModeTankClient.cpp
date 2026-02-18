@@ -135,9 +135,9 @@ FString AGameModeTankClient::GetServerAdressIp() const
 }
 
 void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray,
-                                        TArray<BYTE>::SizeType& Offset)
+                                        TArray<BYTE>::SizeType& Offset, ENetPeer* Peer)
 {
-	Super::HandleMessage(OpCode, ByteArray, Offset);
+	Super::HandleMessage(OpCode, ByteArray, Offset, Peer);
 
 	switch (OpCode)
 	{

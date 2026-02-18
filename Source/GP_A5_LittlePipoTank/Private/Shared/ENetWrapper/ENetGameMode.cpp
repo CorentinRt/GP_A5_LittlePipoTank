@@ -86,7 +86,7 @@ void AENetGameMode::HandleTimeout(const ENetEvent& event)
 {
 }
 
-void AENetGameMode::HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
+void AENetGameMode::HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset, ENetPeer* Peer)
 {
 	
 }
@@ -125,7 +125,7 @@ void AENetGameMode::OnNetworkEventReceive(const ENetEvent& event)
 
 	OpCode MessageOpCode = static_cast<OpCode>(UNetworkProtocolHelpers::DeserializeArithmetic<BYTE>(ByteArray, Offset));
 
-	HandleMessage(MessageOpCode, ByteArray, Offset);
+	HandleMessage(MessageOpCode, ByteArray, Offset, event.peer);
 
 	enet_packet_destroy(event.packet);
 }
