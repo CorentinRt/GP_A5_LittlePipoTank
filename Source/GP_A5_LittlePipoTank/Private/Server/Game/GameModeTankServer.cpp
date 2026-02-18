@@ -3,6 +3,7 @@
 
 #include "Server/Game/GameModeTankServer.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "Shared/Game/GamePhaseListener.h"
 
 AGameModeTankServer::AGameModeTankServer()
@@ -29,6 +30,8 @@ void AGameModeTankServer::Tick(float DeltaSeconds)
 
 void AGameModeTankServer::InitGameServer()
 {
+	GetAllPlayerSpawnPoints();
+	
 	InitializeNetwork();
 
 	IsServerInitialized = true;
@@ -208,6 +211,30 @@ void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
 			return;
 		}
 	}
+}
+
+void AGameModeTankServer::GetAllPlayerSpawnPoints()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(this, APlayerTankSpawnPoint::StaticClass(), FoundActors);
+
+	for (AActor* Actor : FoundActors)
+	{
+		APlayerTankSpawnPoint* SpawnPoint = Cast<APlayerTankSpawnPoint>(Actor);
+
+		if (SpawnPoint)
+			PlayersSpawnPoints.Add(*SpawnPoint);
+	}
+}
+
+void AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint& InSpawnPoint)
+{
+	if (!InPlayer.PlayerTanks)
+		return;
+
+	InPlayer.PlayerTanks->SetActorHiddenInGame(true);
+	InPlayer.PlayerTanks->SetActorLocation(InSpawnPoint.GetActorLocation());
+	InPlayer.PlayerTanks->SetActorRotation(InSpawnPoint.GetActorRotation());
 }
 
 void AGameModeTankServer::PlayerJoined(const ENetEvent& event)

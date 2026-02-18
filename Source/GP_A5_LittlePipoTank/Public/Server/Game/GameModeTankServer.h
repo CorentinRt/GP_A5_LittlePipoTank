@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GamePhasesData.h"
 #include "GameStateTankServer.h"
+#include "PlayerTankSpawnPoint.h"
 #include "Shared/ENetWrapper/ENetServerGameMode.h"
 #include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankServer.generated.h"
@@ -57,6 +58,11 @@ protected:
 	virtual void HandleConnection(const ENetEvent& event) override;
 
 	virtual void HandleDisconnection(const ENetEvent& event) override;
+
+	void GetAllPlayerSpawnPoints();
+	
+	UFUNCTION(BlueprintCallable)
+	void SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint& InSpawnPoint);
 	
 private:
 	void PlayerJoined(const ENetEvent& event);
@@ -64,4 +70,7 @@ private:
 	void PlayerLeft(const ENetEvent& event, int IndexToRemove);
 
 	float CurrentAccumulatedGamePhaseTime = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<APlayerTankSpawnPoint> PlayersSpawnPoints;
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Shared/ENetWrapper/ENetPeer.h"
 #include "Shared/Game/PlayerTankInputs.h"
+#include "TankClasses/TankPawn.h"
 #include "UObject/Object.h"
 #include "PlayerDataServer.generated.h"
 
@@ -26,6 +27,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FPlayerTankInputs PlayerInputs;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<ATankPawn> PlayerTanks = nullptr;
+	
 	ENetPeer* Peer = nullptr;
 	
 };
