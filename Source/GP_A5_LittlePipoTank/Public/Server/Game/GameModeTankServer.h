@@ -62,18 +62,17 @@ protected:
 	void GetAllPlayerSpawnPoints();
 
 	UFUNCTION(BlueprintCallable)
-	void SetupGame();
-	
-	UFUNCTION(BlueprintCallable)
-	void SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint* InSpawnPoint);
+	bool SpawnTankPlayer(FPlayerDataServer& InPlayer);
 	
 private:
 	void PlayerJoined(ENetPeer* InPeer, const FString& InPlayerName);
 
 	void PlayerLeft(const ENetEvent& event, int IndexToRemove);
-
+	
 	float CurrentAccumulatedGamePhaseTime = 0.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	TArray<APlayerTankSpawnPoint*> PlayersSpawnPoints;
+	
+	int NextSpawnPointIndex = 0; 
 };
