@@ -281,7 +281,7 @@ bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 		InPlayer.PlayerTanks = GetWorld()->SpawnActor<ATankPawn>(TankPawnClassBlueprint, SpawnParameters);
 	}
 	
-	InPlayer.PlayerTanks->SetActorHiddenInGame(true);
+	InPlayer.PlayerTanks->SetActorHiddenInGame(false);
 	InPlayer.PlayerTanks->SetActorEnableCollision(true);
 	InPlayer.PlayerTanks->SetActorLocation(SpawnPoint->GetActorLocation());
 	InPlayer.PlayerTanks->SetActorRotation(SpawnPoint->GetActorRotation());
