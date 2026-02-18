@@ -3,6 +3,7 @@
 
 #include "TankClasses/TankBullet.h"
 
+#include "TankPawn.h"
 #include "Chaos/Utilities.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -24,7 +25,11 @@ ATankBullet::ATankBullet()
 	ProjectileMovement->bShouldBounce = true;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 	ProjectileMovement->SetUpdatedComponent(RootComponent);
-
+	ProjectileMovement->bRotationFollowsVelocity = true;
+	
+	ProjectileMovement->OnProjectileBounce.AddDynamic(this, &ATankBullet::OnBounce);
+	
+	numberOfBouncesLeft = numberOfBounces;
 }
 
 // Called when the game starts or when spawned
@@ -34,16 +39,23 @@ void ATankBullet::BeginPlay()
 	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
 }
 
+void ATankBullet::OnBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
+{
+	numberOfBouncesLeft--;
+	AActor* HitActor = ImpactResult.GetActor();
+	ATankPawn* HitPawn = Cast<ATankPawn>(HitActor);
+	if (HitPawn)
+	{
+		HitPawn->Destroy();
+	}
+	if (numberOfBouncesLeft == 0)
+	{
+		this->Destroy();
+	}
+}
+
 // Called every frame
 void ATankBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
 }
-
-FVector ATankBullet::CalculateBulletImpact(FVector BulletDirection, FVector ImpactPoint)
-{
-	FVector returnValue = BulletDirection - ImpactPoint * 2 * (BulletDirection | ImpactPoint);
-	return returnValue;
-}
-
