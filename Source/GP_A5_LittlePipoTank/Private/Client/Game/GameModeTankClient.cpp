@@ -152,6 +152,15 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			GameStateClient.PlayersStateSnapshots.Add({.PlayerStates = Packet.OtherPlayersStateData});
 			break;
 		}
+
+	case OpCode::S_InitClientData:
+		{
+			FInitClientDataPacket Packet = {};
+			Packet.Deserialize(ByteArray, Offset);
+
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received InitClientData with OwnPlayerIndex: {0}", Packet.OwnPlayerIndex);
+			GameStateClient.OwnPlayerIndex = Packet.OwnPlayerIndex;
+		}
 	}
 }
 
