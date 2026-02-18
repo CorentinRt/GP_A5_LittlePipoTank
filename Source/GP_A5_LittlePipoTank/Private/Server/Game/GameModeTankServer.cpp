@@ -264,35 +264,29 @@ void AGameModeTankServer::GetAllPlayerSpawnPoints()
 	}
 }
 
-void AGameModeTankServer::SetupGame()
+bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 {
-	int SpawnPointIndex = 0;
+	if (NextSpawnPointIndex >= PlayersSpawnPoints.Num())
+		return false;
+
+	APlayerTankSpawnPoint* SpawnPoint = PlayersSpawnPoints[NextSpawnPointIndex++];
+
+	if (!SpawnPoint)
+		return false;
 	
-	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
-	{
-		if (LocalPlayer.PlayerIndex >= 2)
-			continue;
-
-		if (SpawnPointIndex >= PlayersSpawnPoints.Num())
-			continue;
-		
-		SpawnTankPlayer(LocalPlayer, PlayersSpawnPoints[SpawnPointIndex]);
-		++SpawnPointIndex;
-	}
-}
-
-void AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint* InSpawnPoint)
-{
 	if (!InPlayer.PlayerTanks)
-		return;
-
-	if (!InSpawnPoint)
-		return;
+	{
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		InPlayer.PlayerTanks = GetWorld()->SpawnActor<ATankPawn>(ATankPawn::StaticClass(), SpawnParameters);
+	}
 	
 	InPlayer.PlayerTanks->SetActorHiddenInGame(true);
 	InPlayer.PlayerTanks->SetActorEnableCollision(true);
-	InPlayer.PlayerTanks->SetActorLocation(InSpawnPoint->GetActorLocation());
-	InPlayer.PlayerTanks->SetActorRotation(InSpawnPoint->GetActorRotation());
+	InPlayer.PlayerTanks->SetActorLocation(SpawnPoint->GetActorLocation());
+	InPlayer.PlayerTanks->SetActorRotation(SpawnPoint->GetActorRotation());
+
+	return true;
 }
 
 void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayerName)
@@ -316,6 +310,11 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 		.PlayerInputs = PlayerInputs,
 		.Peer = InPeer
 	};
+	
+	if (!SpawnTankPlayer(NewPlayerData))
+	{
+		return;
+	}
 
 	GEngine->AddOnScreenDebugMessage(
 			-1,
