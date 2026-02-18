@@ -216,8 +216,9 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 
 	FPlayerTankInputs PlayerInputs
 	{
-		.MovementsInputs = 0.f,
-		.LookDirInputs = 0.f
+		.MoveInput = FVector2D::ZeroVector,
+		.AimInput = FVector2D::ZeroVector,
+		.FireInput = false
 	};
 
 	FPlayerData NewPlayerData

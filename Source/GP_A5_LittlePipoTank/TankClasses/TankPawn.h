@@ -7,10 +7,12 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Server/Game/GameModeTankServer.h"
+#include "Shared/Game/PhysicsTickableShared.h"
 #include "TankPawn.generated.h"
 
 UCLASS()
-class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn
+class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn, public IPhysicsTickableShared
 {
 	GENERATED_BODY()
 
@@ -28,11 +30,17 @@ protected:
 	class UInputAction* MoveAction;
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputAction* AimAction;
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputAction* ShootAction;
 
 	UPROPERTY(EditAnywhere, Category = "TankHead")
 	float HeadRotationSpeed = 20.f;
 	
 	FRotator TargetWorldRotation;
+
+private:
+	UPROPERTY(VisibleAnywhere, Category="Tank")
+	AGameModeTankServer* GameMode;
 
 public:
 	// Sets default values for this character's properties
@@ -52,4 +60,10 @@ public:
 protected:
 	void Move(const FInputActionValue& Value);
 	void Aim(const FInputActionValue& Value);
+	void Shoot(const FInputActionValue& Value);
+
+public:
+	virtual void RegisterTickable() override;
+	virtual void UnregisterTickable() override;
+	virtual void OnTickPhysics_Blueprint_Implementation(float DeltaTime) override;
 };

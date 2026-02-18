@@ -17,7 +17,7 @@ ATankBullet::ATankBullet()
 	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletMesh"));
 	RootComponent = BulletMesh;
 	BulletMesh->SetSimulatePhysics(false);
-	BulletMesh->SetUsingAbsoluteRotation(true);
+	BulletMesh->SetUsingAbsoluteRotation(false);
 	//BulletMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComponent"));
