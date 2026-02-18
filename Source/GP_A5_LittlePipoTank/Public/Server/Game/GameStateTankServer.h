@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Shared/TankGamePhase.h"
-#include "Shared/Game/PlayerData.h"
+#include "Server/Game/PlayerDataServer.h"
 #include "UObject/Object.h"
 #include "GameStateTankServer.generated.h"
 
@@ -22,7 +22,7 @@ public:
 	ETankGamePhase CurrentGamePhase = ETankGamePhase::NONE;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	TArray<FPlayerData> Players;
+	TArray<FPlayerDataServer> Players;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	int NextPlayerIndex = 0;

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Shared/TankGamePhase.h"
 #include "Shared/Game/PlayerTankInputs.h"
-#include "Shared/Game/PlayerData.h"
+#include "Shared/Game/PlayerDataServer.h"
 #include "GameStateTankClient.generated.h"
 
 /**
@@ -21,7 +21,7 @@ public:
 	ETankGamePhase CurrentGamePhase = ETankGamePhase::NONE;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	TArray<FPlayerData> Players;
+	TArray<FPlayerDataServer> Players;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FPlayerTankInputs OwnPlayerInputs;

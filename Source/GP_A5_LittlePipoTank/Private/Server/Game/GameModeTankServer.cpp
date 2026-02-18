@@ -176,7 +176,7 @@ void AGameModeTankServer::HandleConnection(const ENetEvent& event)
 	
 	bool PlayerPeerAlreadyExists = false;
 	
-	for (const FPlayerData& LocalPlayer : GameStateServer.Players)
+	for (const FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
 		if (LocalPlayer.Peer == event.peer)
 		{
@@ -200,7 +200,7 @@ void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
 
 	for (int i = 0; i < GameStateServer.Players.Num(); ++i)
 	{
-		FPlayerData& LocalPlayer = GameStateServer.Players[i];
+		FPlayerDataServer& LocalPlayer = GameStateServer.Players[i];
 
 		if (LocalPlayer.Peer == event.peer)
 		{
@@ -220,7 +220,7 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 		.LookDirInputs = 0.f
 	};
 
-	FPlayerData NewPlayerData
+	FPlayerDataServer NewPlayerData
 	{
 		.PlayerIndex = GameStateServer.NextPlayerIndex++,
 		.PlayerName = "NULL_NAME",
