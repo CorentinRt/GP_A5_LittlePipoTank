@@ -31,9 +31,6 @@ void AGameModeTankClient::Tick(float DeltaSeconds)
 
 	RunNetwork();
 
-	// Send player inputs every ticks
-	PredictClient(DeltaSeconds);
-
 	// Interpolation
 	InterpolateGame(DeltaSeconds);
 }
@@ -53,6 +50,9 @@ void AGameModeTankClient::InitGameClient()
 void AGameModeTankClient::GamePhysicsTick(float DeltaTime)
 {
 	Super::GamePhysicsTick(DeltaTime);
+
+	// Send player inputs every ticks
+	PredictClient(DeltaTime);
 }
 
 void AGameModeTankClient::GameNetworkTick(float DeltaTime)
@@ -221,6 +221,7 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 				GameStateClient.SnapshotBufferAccumulator);
 
 			// Apply Lerp Values
+			// TODO Apply lerps
 		}
 
 		// Look if we need to 'reset' accumulator
@@ -242,6 +243,7 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 void AGameModeTankClient::PredictClient(float DeltaTime)
 {
 	// Update Pawn physics here ?
+	//TODO Put that in Physics TICK
 	
 	SendClientPrediction();
 }
