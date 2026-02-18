@@ -25,7 +25,7 @@ T UNetworkProtocolHelpers::ByteSwap(T Value)
 		}
 		else if constexpr (sizeof(T) == sizeof(UINT16))
 		{
-			Value = BYTESWAP_ORDER16(Value);
+			Value = static_cast<T>(BYTESWAP_ORDER16(static_cast<UINT16>(Value)));
 		}
 	}
 
