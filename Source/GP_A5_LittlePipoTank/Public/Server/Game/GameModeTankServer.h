@@ -68,7 +68,7 @@ protected:
 	void SpawnTankPlayer(FPlayerDataServer& InPlayer, const APlayerTankSpawnPoint* InSpawnPoint);
 	
 private:
-	void PlayerJoined(const ENetEvent& event);
+	void PlayerJoined(ENetPeer* InPeer, FString InPlayerName);
 
 	void PlayerLeft(const ENetEvent& event, int IndexToRemove);
 

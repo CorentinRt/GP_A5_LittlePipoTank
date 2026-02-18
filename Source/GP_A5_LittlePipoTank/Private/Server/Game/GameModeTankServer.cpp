@@ -190,7 +190,21 @@ void AGameModeTankServer::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 				FColor::Red,
 				FString::Printf(TEXT("Receive msg name: %s"), *PlayerNamePacket.Name));
 
-			// Create new player
+			bool PlayerPeerAlreadyExists = false;
+	
+			for (const FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+			{
+				if (LocalPlayer.Peer == Peer)
+				{
+					PlayerPeerAlreadyExists = true;
+					break;
+				}
+			}
+
+			if (!PlayerPeerAlreadyExists)
+				return;
+
+			PlayerJoined(Peer, PlayerNamePacket.Name);
 			
 			break;
 		}
@@ -208,24 +222,8 @@ void AGameModeTankServer::HandleConnection(const ENetEvent& event)
 		-1,
 		10.f,
 		FColor::Yellow,
-		TEXT("Client try connect to server !")
+		TEXT("A client is trying to connect to server !")
 		);
-	
-	bool PlayerPeerAlreadyExists = false;
-	
-	for (const FPlayerDataServer& LocalPlayer : GameStateServer.Players)
-	{
-		if (LocalPlayer.Peer == event.peer)
-		{
-			PlayerPeerAlreadyExists = true;
-			break;
-		}
-	}
-
-	if (!PlayerPeerAlreadyExists)
-		return;
-
-	PlayerJoined(event);
 }
 
 void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
@@ -297,7 +295,7 @@ void AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer, const APl
 	InPlayer.PlayerTanks->SetActorRotation(InSpawnPoint->GetActorRotation());
 }
 
-void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
+void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, FString InPlayerName)
 {
 	++GameStateServer.PlayerCount;
 
@@ -314,9 +312,9 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 	FPlayerDataServer NewPlayerData
 	{
 		.PlayerIndex = GameStateServer.NextPlayerIndex++,
-		.PlayerName = "NULL_NAME",
+		.PlayerName = InPlayerName,
 		.PlayerInputs = PlayerInputs,
-		.Peer = event.peer
+		.Peer = InPeer
 	};
 
 	GEngine->AddOnScreenDebugMessage(
@@ -339,8 +337,14 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 	{
 		if (LocalPlayer.PlayerIndex == NewPlayerData.PlayerIndex)
 			return;
+		
+		FPlayerListPacket PlayerListPacket;
 
-		// Build packet and send it
+		for (FPlayerDataServer& ListedPlayer : GameStateServer.Players)
+		{
+			//FPlayerListPacket::
+			//PlayerListPacket.Players.Add();
+		}
 		
 		//UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerJoinedPacket, ENET_PACKET_FLAG_RELIABLE);
 	}
