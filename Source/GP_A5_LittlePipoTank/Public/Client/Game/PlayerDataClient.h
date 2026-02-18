@@ -21,8 +21,4 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FString PlayerName = "NULL_NAME";
-
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	FPlayerTankInputs PlayerInputs;
-	
 };

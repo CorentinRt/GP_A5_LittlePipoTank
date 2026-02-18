@@ -201,7 +201,7 @@ void AGameModeTankServer::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 				}
 			}
 
-			if (!PlayerPeerAlreadyExists)
+			if (PlayerPeerAlreadyExists)
 				return;
 
 			PlayerJoined(Peer, PlayerNamePacket.Name);
