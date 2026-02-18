@@ -110,8 +110,6 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 	//Move
 	AddMovementInput(this->GetActorForwardVector(), TankInputs.MoveInput.Y);
 	AddControllerYawInput(TankInputs.MoveInput.X);
-	FString text = TankInputs.MoveInput.ToString();
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, text);
 
 	//Aim Rotation
 	FRotator CurrentWorldRot = TankHeadMesh->GetComponentRotation();
@@ -133,7 +131,13 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 		Rotation.Yaw += 90;
 		FActorSpawnParameters SpawnParameters;
 		AActor* Bullet = GetWorld()->SpawnActor<ATankBullet>(Location, Rotation, SpawnParameters);
-		Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);
+		if (Bullet)
+		{
+			Bullet->SetInstigator(this);
+			Bullet->SetActorScale3D(Bullet->GetActorScale() * sizeOfBullet);
+			Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);	
+		}
+		
 		TankInputs.FireInput = false;
 	}
 }
@@ -141,4 +145,10 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 const FPlayerTankInputs& ATankPawn::GetTankInputs() const
 {
 	return TankInputs;
+}
+
+void ATankPawn::TankGetShoot()
+{
+	//Rien a mettre pour le moment donc on le détruit
+	this->Destroy();
 }
