@@ -12,8 +12,6 @@ ATankBullet::ATankBullet()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	BulletSpeed = 5.0f;
-
 	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletMesh"));
 	RootComponent = BulletMesh;
 	BulletMesh->SetSimulatePhysics(false);
@@ -21,8 +19,8 @@ ATankBullet::ATankBullet()
 	//BulletMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComponent"));
-	ProjectileMovement->InitialSpeed = 50.f;
-	ProjectileMovement->MaxSpeed = 50.f;
+	ProjectileMovement->InitialSpeed = 350.f;
+	ProjectileMovement->MaxSpeed = 350.f;
 	ProjectileMovement->bShouldBounce = true;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 	ProjectileMovement->SetUpdatedComponent(RootComponent);

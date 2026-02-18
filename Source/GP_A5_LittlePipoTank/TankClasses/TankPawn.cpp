@@ -63,11 +63,7 @@ void ATankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ATankPawn::Move(const FInputActionValue& Value) {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
 	if (IsValid(Controller)) {
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		TankInputs.MoveInput = MovementVector;
 	}
 }
@@ -134,6 +130,7 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 	{
 		FVector Location(TankShootingPoint->GetComponentLocation());
 		FRotator Rotation(TankShootingPoint->GetComponentRotation());
+		Rotation.Yaw += 90;
 		FActorSpawnParameters SpawnParameters;
 		AActor* Bullet = GetWorld()->SpawnActor<ATankBullet>(Location, Rotation, SpawnParameters);
 		Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);
