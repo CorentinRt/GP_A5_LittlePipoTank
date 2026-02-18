@@ -359,9 +359,20 @@ void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 
 	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
-		// Build packet and send it
+		FPlayerListPacket PlayerListPacket;
+		
+		for (FPlayerDataServer& ListedPlayer : GameStateServer.Players)
+		{
+			FPlayerListPacket::Player PlayerListSingle
+			{
+				.Name = ListedPlayer.PlayerName,
+				.Index = LocalPlayer.PlayerIndex
+			};
+			
+			PlayerListPacket.Players.Add(MoveTemp(PlayerListSingle));
+		}
 
-		//UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerLeftPacket, ENET_PACKET_FLAG_RELIABLE);
+		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerListPacket, ENET_PACKET_FLAG_RELIABLE);
 	}
 
 	SetServerGamePhase(ETankGamePhase::WAITING_PLAYER);
