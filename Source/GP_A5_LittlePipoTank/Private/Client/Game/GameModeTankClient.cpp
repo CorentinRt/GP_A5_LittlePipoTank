@@ -35,7 +35,7 @@ void AGameModeTankClient::Tick(float DeltaSeconds)
 	SendClientInputs();
 
 	// Interpolation
-	InterpolateGame();
+	InterpolateGame(DeltaSeconds);
 }
 
 void AGameModeTankClient::InitGameClient()
@@ -53,14 +53,11 @@ void AGameModeTankClient::InitGameClient()
 void AGameModeTankClient::GamePhysicsTick(float DeltaTime)
 {
 	Super::GamePhysicsTick(DeltaTime);
-
-	
 }
 
 void AGameModeTankClient::GameNetworkTick(float DeltaTime)
 {
 	Super::GameNetworkTick(DeltaTime);
-	
 }
 
 ETankGamePhase AGameModeTankClient::GetCurrentGamePhase()
@@ -149,7 +146,10 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			FPlayersStatePacket Packet = {};
 			Packet.Deserialize(ByteArray, Offset);
 
-			GameStateClient.PlayersStateSnapshots.Add(Packet);
+			// Reconciliation
+			ReconciliateGame();
+			
+			GameStateClient.PlayersStateSnapshots.Add({.PlayerStates = Packet.OtherPlayersStateData});
 			break;
 		}
 	}
@@ -215,17 +215,17 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 		// Add to accumulator
 		GameStateClient.SnapshotBufferAccumulator +=  Increment * PlaybackRate; // Hard code '10' To be replace by network tick delay
 
-		const FPlayersStatePacket& FromSnapshot = GameStateClient.PlayersStateSnapshots[0];
-		const FPlayersStatePacket& ToSnapshot = GameStateClient.PlayersStateSnapshots[1];
+		const FInterpolationSnapshot& FromSnapshot = GameStateClient.PlayersStateSnapshots[0];
+		const FInterpolationSnapshot& ToSnapshot = GameStateClient.PlayersStateSnapshots[1];
 
 		// Do the interpolation here
-		for (const auto& FromPlayerData : FromSnapshot.OtherPlayersStateData)
+		for (const auto& FromPlayerData : FromSnapshot.PlayerStates)
 		{
 
 			// check if To snapshot has a position for the same player
-			const FPlayersStatePacket::PlayerStateData* ToPlayerData = ToSnapshot.OtherPlayersStateData.FindByPredicate([&](const FPlayersStatePacket::PlayerStateData& ToPlayerData)
+			const FPlayersStatePacket::PlayerStateData* ToPlayerData = ToSnapshot.PlayerStates.FindByPredicate([&](const FPlayersStatePacket::PlayerStateData& PlayerData)
 			{
-				return ToPlayerData.Index == FromPlayerData.Index;
+				return PlayerData.Index == FromPlayerData.Index;
 			});
 
 			if (!ToPlayerData) continue;
@@ -263,4 +263,9 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 	{
 		// Do Nothing, we can't interpolate.
 	}
+}
+
+void AGameModeTankClient::ReconciliateGame()
+{
+	
 }

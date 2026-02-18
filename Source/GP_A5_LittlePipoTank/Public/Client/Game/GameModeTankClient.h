@@ -53,4 +53,5 @@ protected:
 private:
 	void SendClientInputs() const;
 	void InterpolateGame(float DeltaTime);
+	void ReconciliateGame();
 };

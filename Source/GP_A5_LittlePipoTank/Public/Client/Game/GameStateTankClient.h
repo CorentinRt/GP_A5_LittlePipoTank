@@ -13,6 +13,15 @@
 /**
  * 
  */
+USTRUCT()
+struct GP_A5_LITTLEPIPOTANK_API FInterpolationSnapshot
+{
+	GENERATED_BODY()
+
+public:
+	TArray<FPlayersStatePacket::PlayerStateData> PlayerStates;
+};
+
 USTRUCT(BlueprintType)
 struct GP_A5_LITTLEPIPOTANK_API FGameStateTankClient
 {
@@ -33,7 +42,11 @@ public:
 
 	ENetPeer* ServerPeer;
 
-	TArray<FPlayersStatePacket> PlayersStateSnapshots;
+	// Client Prediction and Reconciliation
+	
+	
+	// Game Interpolation
+	TArray<FInterpolationSnapshot> PlayersStateSnapshots;
 	float SnapshotBufferAccumulator = 0.0f;
 	UINT8 SnapshotBufferTargetSize = 4;
 };
