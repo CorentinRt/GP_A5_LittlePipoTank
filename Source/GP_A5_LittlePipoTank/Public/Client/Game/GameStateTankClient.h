@@ -22,6 +22,20 @@ public:
 	TArray<FPlayersStatePacket::PlayerStateData> PlayerStates;
 };
 
+USTRUCT()
+struct GP_A5_LITTLEPIPOTANK_API FPredictionSnapshot
+{
+	GENERATED_BODY()
+
+public:
+	UINT8 PredictionIndex;
+	FPlayerTankInputs Inputs;
+	FVector2D Location;
+	float Rotation;
+	float AimRotation;
+	FVector2D Velocity;
+};
+
 USTRUCT(BlueprintType)
 struct GP_A5_LITTLEPIPOTANK_API FGameStateTankClient
 {
@@ -43,7 +57,8 @@ public:
 	ENetPeer* ServerPeer;
 
 	// Client Prediction and Reconciliation
-	
+	TArray<FPredictionSnapshot> Predictions;
+	UINT8 NextPredictionIndex = 0;
 	
 	// Game Interpolation
 	TArray<FInterpolationSnapshot> PlayersStateSnapshots;

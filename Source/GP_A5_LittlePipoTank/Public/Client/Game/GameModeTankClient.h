@@ -51,7 +51,9 @@ protected:
 	virtual void HandleDisconnection(const ENetEvent& event) override;
 
 private:
-	void SendClientInputs() const;
 	void InterpolateGame(float DeltaTime);
-	void ReconciliateGame();
+	
+	void PredictClient(float DeltaTime);
+	void SendClientPrediction();
+	void ReconciliateClient(const FPlayersStatePacket::OwnPlayerStateData& OwnPlayerData);
 };

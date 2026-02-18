@@ -147,7 +147,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			Packet.Deserialize(ByteArray, Offset);
 
 			// Reconciliation
-			ReconciliateGame();
+			ReconciliateClient(Packet.OwnPlayerData);
 			
 			GameStateClient.PlayersStateSnapshots.Add({.PlayerStates = Packet.OtherPlayersStateData});
 			break;
@@ -167,32 +167,6 @@ void AGameModeTankClient::HandleDisconnection(const ENetEvent& event)
 	Super::HandleDisconnection(event);
 	
 	// n'est pas censé arriver sur le client
-}
-
-void AGameModeTankClient::SendClientInputs() const
-{
-	// TODO Get Client Pawn And Possess it on receive player tank, so we don't cast every frame
-	// TODO Maybe better: Input struct in player controller directly so easy to get
-
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-
-	if (!PlayerController)
-	{
-		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player controller is null.");
-		return;
-	}
-	
-	ATankPawn* PlayerTank = Cast<ATankPawn>(PlayerController->GetPawn());
-
-	if (!PlayerTank)
-	{
-		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player Tank is null.");
-		return;
-	}
-	
-	FPlayerInputsPacket InputsPacket = {.PlayerInputs = PlayerTank->GetTankInputs()};
-
-	UNetworkProtocolHelpers::SendPacket(ServerPeer, InputsPacket, ENET_PACKET_FLAG_RELIABLE);
 }
 
 void AGameModeTankClient::InterpolateGame(float DeltaTime)
@@ -257,7 +231,7 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 	}
 	else if (GameStateClient.PlayersStateSnapshots.Num() == 1)
 	{
-		// We set the game state to be the same as the only snapshot
+		//TODO We set the game state to be the same as the only snapshot
 	}
 	else
 	{
@@ -265,7 +239,52 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 	}
 }
 
-void AGameModeTankClient::ReconciliateGame()
+void AGameModeTankClient::PredictClient(float DeltaTime)
 {
+	// Update Pawn physics here ?
 	
+	SendClientPrediction();
+}
+
+void AGameModeTankClient::SendClientPrediction()
+{
+	// TODO Get Client Pawn And Possess it on receive player tank, so we don't cast every frame
+	// TODO Maybe better: Input struct in player controller directly so easy to get
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	if (!PlayerController)
+	{
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player controller is null.");
+		return;
+	}
+	
+	ATankPawn* PlayerTank = Cast<ATankPawn>(PlayerController->GetPawn());
+
+	if (!PlayerTank)
+	{
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player Tank is null.");
+		return;
+	}
+	
+	FPlayerInputsPacket InputsPacket = {
+		.PlayerInputs = PlayerTank->GetTankInputs(),
+		.PredictionIndex = GameStateClient.NextPredictionIndex
+	};
+
+	GameStateClient.Predictions.Add({
+		.PredictionIndex = GameStateClient.NextPredictionIndex,
+		.Inputs = PlayerTank->GetTankInputs(),
+		//TODO Set Position, Rotation, AimRotation, Velocity
+	});
+
+	UNetworkProtocolHelpers::SendPacket(ServerPeer, InputsPacket, ENET_PACKET_FLAG_RELIABLE);
+
+	GameStateClient.NextPredictionIndex++;
+}
+
+void AGameModeTankClient::ReconciliateClient(const FPlayersStatePacket::OwnPlayerStateData& OwnPlayerData)
+{
+	// TODO Prep Reconciliation but need Predicted Inputs back in OwnPlayerData
+	//while (!GameStateClient.Predictions.IsEmpty() && GameStateClient.Predictions[0].PredictionIndex < OwnPlayerData)
 }
