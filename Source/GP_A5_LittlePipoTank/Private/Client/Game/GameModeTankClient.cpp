@@ -6,6 +6,7 @@
 #include "GP_A5_LittlePipoTank.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Shared/LittlePipoTankGameInstance.h"
 #include "Shared/NetworkProtocol.h"
 #include "Shared/NetworkProtocolHelpers.h"
@@ -214,13 +215,38 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 		// Add to accumulator
 		GameStateClient.SnapshotBufferAccumulator +=  Increment * PlaybackRate; // Hard code '10' To be replace by network tick delay
 
-		FPlayersStatePacket FromSnapshot = GameStateClient.PlayersStateSnapshots[0];
-		FPlayersStatePacket ToSnapshot = GameStateClient.PlayersStateSnapshots[1];
+		const FPlayersStatePacket& FromSnapshot = GameStateClient.PlayersStateSnapshots[0];
+		const FPlayersStatePacket& ToSnapshot = GameStateClient.PlayersStateSnapshots[1];
 
 		// Do the interpolation here
-		for (auto& FromPlayerData : FromSnapshot.OtherPlayersStateData)
+		for (const auto& FromPlayerData : FromSnapshot.OtherPlayersStateData)
 		{
+
+			// check if To snapshot has a position for the same player
+			const FPlayersStatePacket::PlayerStateData* ToPlayerData = ToSnapshot.OtherPlayersStateData.FindByPredicate([&](const FPlayersStatePacket::PlayerStateData& ToPlayerData)
+			{
+				return ToPlayerData.Index == FromPlayerData.Index;
+			});
+
+			if (!ToPlayerData) continue;
 			
+			// Do Lerp
+			FVector2D LerpLocation = FMath::Lerp(
+				FromPlayerData.Location,
+				ToPlayerData->Location,
+				GameStateClient.SnapshotBufferAccumulator);
+			
+			float LerpRotation = FMath::Lerp(
+				FromPlayerData.Rotation,
+				ToPlayerData->Rotation,
+				GameStateClient.SnapshotBufferAccumulator);
+			
+			float LerpAimRotation = FMath::Lerp(
+				FromPlayerData.AimRotation,
+				ToPlayerData->AimRotation,
+				GameStateClient.SnapshotBufferAccumulator);
+
+			// Apply Lerp Values
 		}
 
 		// Look if we need to 'reset' accumulator
