@@ -31,28 +31,10 @@ void AGameModeTankClient::Tick(float DeltaSeconds)
 	RunNetwork();
 
 	// Send player inputs every ticks
+	SendClientInputs();
 
-	// TODO Get Client Pawn And Possess it on receive player tank, so we don't cast every frame
-
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-
-	if (!PlayerController)
-	{
-		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player controller is null.");
-		return;
-	}
-	
-	ATankPawn* PlayerTank = Cast<ATankPawn>(PlayerController->GetPawn());
-
-	if (!PlayerTank)
-	{
-		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player Tank is null.");
-		return;
-	}
-	
-	FPlayerInputsPacket InputsPacket = {.PlayerInputs = PlayerTank->GetTankInputs()};
-
-	UNetworkProtocolHelpers::SendPacket(ServerPeer, InputsPacket, ENET_PACKET_FLAG_RELIABLE);
+	// Interpolation
+	InterpolateGame();
 }
 
 void AGameModeTankClient::InitGameClient()
@@ -159,7 +141,17 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 {
 	Super::HandleMessage(OpCode, ByteArray, Offset);
 
-	
+	switch (OpCode)
+	{
+	case OpCode::S_PlayersState:
+		{
+			FPlayersStatePacket Packet = {};
+			Packet.Deserialize(ByteArray, Offset);
+
+			GameStateClient.PlayersStateSnapshots.Add(Packet);
+			break;
+		}
+	}
 }
 
 void AGameModeTankClient::HandleConnection(const ENetEvent& event)
@@ -174,4 +166,75 @@ void AGameModeTankClient::HandleDisconnection(const ENetEvent& event)
 	Super::HandleDisconnection(event);
 	
 	// n'est pas censé arriver sur le client
+}
+
+void AGameModeTankClient::SendClientInputs() const
+{
+	// TODO Get Client Pawn And Possess it on receive player tank, so we don't cast every frame
+	// TODO Maybe better: Input struct in player controller directly so easy to get
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	if (!PlayerController)
+	{
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player controller is null.");
+		return;
+	}
+	
+	ATankPawn* PlayerTank = Cast<ATankPawn>(PlayerController->GetPawn());
+
+	if (!PlayerTank)
+	{
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player Tank is null.");
+		return;
+	}
+	
+	FPlayerInputsPacket InputsPacket = {.PlayerInputs = PlayerTank->GetTankInputs()};
+
+	UNetworkProtocolHelpers::SendPacket(ServerPeer, InputsPacket, ENET_PACKET_FLAG_RELIABLE);
+}
+
+void AGameModeTankClient::InterpolateGame(float DeltaTime)
+{
+	// Snapshot Jitter Buffer Management
+	if (!GameStateClient.PlayersStateSnapshots.Num() >= 2)
+	{
+		// Compute increment
+		float Increment = (DeltaTime / TickDelayNetwork);
+
+		// Compute playback rate
+		float PlaybackRate = 1.0f;
+		
+		int SnapshotBufferSize = GameStateClient.PlayersStateSnapshots.Num();
+		if (SnapshotBufferSize > GameStateClient.SnapshotBufferTargetSize)
+			PlaybackRate += 0.05f * (SnapshotBufferSize - GameStateClient.SnapshotBufferTargetSize);
+		else if (SnapshotBufferSize > GameStateClient.SnapshotBufferTargetSize)
+			PlaybackRate -= 0.05f * (GameStateClient.SnapshotBufferTargetSize - SnapshotBufferSize);
+
+		// Add to accumulator
+		GameStateClient.SnapshotBufferAccumulator +=  Increment * PlaybackRate; // Hard code '10' To be replace by network tick delay
+
+		FPlayersStatePacket FromSnapshot = GameStateClient.PlayersStateSnapshots[0];
+		FPlayersStatePacket ToSnapshot = GameStateClient.PlayersStateSnapshots[1];
+
+		// Do the interpolation here
+		for (auto& FromPlayerData : FromSnapshot.OtherPlayersStateData)
+		{
+			
+		}
+
+		// Look if we need to 'reset' accumulator
+		if (GameStateClient.SnapshotBufferAccumulator < 1.0f) return;
+		
+		GameStateClient.SnapshotBufferAccumulator -= 1.0f;
+		GameStateClient.PlayersStateSnapshots.RemoveAt(0);
+	}
+	else if (GameStateClient.PlayersStateSnapshots.Num() == 1)
+	{
+		// We set the game state to be the same as the only snapshot
+	}
+	else
+	{
+		// Do Nothing, we can't interpolate.
+	}
 }

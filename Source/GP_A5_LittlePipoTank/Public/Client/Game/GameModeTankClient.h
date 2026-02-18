@@ -49,4 +49,8 @@ protected:
 	virtual void HandleConnection(const ENetEvent& event) override;
 
 	virtual void HandleDisconnection(const ENetEvent& event) override;
+
+private:
+	void SendClientInputs() const;
+	void InterpolateGame(float DeltaTime);
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PlayerDataClient.h"
+#include "Shared/NetworkProtocol.h"
 #include "Shared/TankGamePhase.h"
 #include "Shared/ENetWrapper/ENetPeer.h"
 #include "Shared/Game/PlayerTankInputs.h"
@@ -31,4 +32,8 @@ public:
 	int OwnPlayerIndex = 0;
 
 	ENetPeer* ServerPeer;
+
+	TArray<FPlayersStatePacket> PlayersStateSnapshots;
+	float SnapshotBufferAccumulator = 0.0f;
+	UINT8 SnapshotBufferTargetSize = 4;
 };
