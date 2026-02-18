@@ -312,7 +312,7 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 		.OwnPlayerIndex = NewPlayerData.PlayerIndex
 	};
 
-	UNetworkProtocolHelpers::SendPacket(*NewPlayerData.Peer, NewPlayerInitPacket, ENET_PACKET_FLAG_RELIABLE);
+	UNetworkProtocolHelpers::SendPacket(NewPlayerData.Peer, NewPlayerInitPacket, ENET_PACKET_FLAG_RELIABLE);
 	
 	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
@@ -325,7 +325,7 @@ void AGameModeTankServer::PlayerJoined(const ENetEvent& event)
 			.PlayerName = LocalPlayer.PlayerName
 		};
 		
-		UNetworkProtocolHelpers::SendPacket(*LocalPlayer.Peer, PlayerJoinedPacket, ENET_PACKET_FLAG_RELIABLE);
+		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerJoinedPacket, ENET_PACKET_FLAG_RELIABLE);
 	}
 }
 
@@ -342,6 +342,6 @@ void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 			.PlayerIndex = LocalPlayer.PlayerIndex,
 		};
 
-		UNetworkProtocolHelpers::SendPacket(*LocalPlayer.Peer, PlayerLeftPacket, ENET_PACKET_FLAG_RELIABLE);
+		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerLeftPacket, ENET_PACKET_FLAG_RELIABLE);
 	}
 }

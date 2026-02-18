@@ -140,3 +140,8 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 		TankInputs.FireInput = false;
 	}
 }
+
+const FPlayerTankInputs& ATankPawn::GetTankInputs() const
+{
+	return TankInputs;
+}
