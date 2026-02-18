@@ -110,8 +110,6 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 	//Move
 	AddMovementInput(this->GetActorForwardVector(), TankInputs.MoveInput.Y);
 	AddControllerYawInput(TankInputs.MoveInput.X);
-	FString text = TankInputs.MoveInput.ToString();
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, text);
 
 	//Aim Rotation
 	FRotator CurrentWorldRot = TankHeadMesh->GetComponentRotation();
