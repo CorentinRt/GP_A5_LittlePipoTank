@@ -35,96 +35,81 @@ void FPlayerLeftPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>:
 	PlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
 }
 
-void FOwnPlayerStatePacket::Serialize(TArray<BYTE>& ByteArray) const
-{
-	// Size array
-	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayersData.Num());
-
-	for (const PlayerData& LocalPlayerData : PlayersData)
-	{
-		// Index
-		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalPlayerData.Index);
-		// Location
-		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalPlayerData.Location.X);
-		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalPlayerData.Location.Y);
-		// Rotation
-		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalPlayerData.Rotation);
-		// Velocity
-		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalPlayerData.Velocity.X);
-		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalPlayerData.Velocity.Y);
-	}
-}
-
-void FOwnPlayerStatePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
-{
-	TArray<BYTE>::SizeType PlayersDataSize = UNetworkProtocolHelpers::DeserializeArithmetic<TArray<BYTE>::SizeType>(ByteArray, Offset);
-
-	for (int i = 0; i < PlayersDataSize; ++i)
-	{
-		int PlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
-
-		FVector2D PlayerLocation = FVector2D::ZeroVector;
-		PlayerLocation.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
-		PlayerLocation.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
-
-		float PlayerRotation = UNetworkProtocolHelpers::DeserializeArithmetic<float>(ByteArray, Offset);
-		
-		FVector2D PlayerVelocity = FVector2D::ZeroVector;
-		PlayerVelocity.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
-		PlayerVelocity.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
-		
-		PlayerData NewPlayerData
-		{
-			.Index = PlayerIndex,
-			.Location = PlayerLocation,
-			.Rotation = PlayerRotation,
-			.Velocity = PlayerVelocity
-		};
-		
-		PlayersData.Add(MoveTemp(NewPlayerData));
-	}
-}
-
-void FPlayersVisualPacket::Serialize(TArray<BYTE>& ByteArray) const
+void FPlayersStatePacket::Serialize(TArray<BYTE>& ByteArray) const
 {
 	// Size Array
-	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayersVisualData.Num());
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OtherPlayersStateData.Num());
 
-	for (const PlayerVisualData& LocalPlayerVisualData : PlayersVisualData)
+	for (const PlayerStateData& OtherPlayerStateData : OtherPlayersStateData)
 	{
 		// Index
-		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalPlayerVisualData.PlayerIndex);
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OtherPlayerStateData.Index);
 		// Location
-		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalPlayerVisualData.PlayerLocation.X);
-		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalPlayerVisualData.PlayerLocation.Y);
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OtherPlayerStateData.Location.X);
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OtherPlayerStateData.Location.Y);
 		// Rotation
-		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalPlayerVisualData.PlayerRotation);
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OtherPlayerStateData.Rotation);
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OtherPlayerStateData.AimRotation);
 	}
+
+	// Own Player Data
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.Index);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.Location.X);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.Location.Y);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.Rotation);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.AimRotation);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.Velocity.X);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.Velocity.Y);
 }
 
-void FPlayersVisualPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
+void FPlayersStatePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
 {
 	TArray<BYTE>::SizeType PlayersDataSize = UNetworkProtocolHelpers::DeserializeArithmetic<TArray<BYTE>::SizeType>(ByteArray, Offset);
 
 	for (int i = 0; i < PlayersDataSize; ++i)
 	{
-		int PlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
+		int OtherPlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
 
-		FVector2D PlayerLocation = FVector2D::ZeroVector;
-		PlayerLocation.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
-		PlayerLocation.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+		FVector2D OtherPlayerLocation = FVector2D::ZeroVector;
+		OtherPlayerLocation.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+		OtherPlayerLocation.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 
-		float PlayerRotation = UNetworkProtocolHelpers::DeserializeArithmetic<float>(ByteArray, Offset);
+		float OtherPlayerRotation = UNetworkProtocolHelpers::DeserializeArithmetic<float>(ByteArray, Offset);
+		float OtherPlayerAimRotation = UNetworkProtocolHelpers::DeserializeArithmetic<float>(ByteArray, Offset);
 		
-		PlayerVisualData NewPlayerVisualData
+		PlayerStateData NewOtherPlayerVisualData
 		{
-			.PlayerIndex = PlayerIndex,
-			.PlayerLocation = PlayerLocation,
-			.PlayerRotation = PlayerRotation
+			.Index = OtherPlayerIndex,
+			.Location = OtherPlayerLocation,
+			.Rotation = OtherPlayerRotation,
+			.AimRotation = OtherPlayerAimRotation
 		};
 		
-		PlayersVisualData.Add(MoveTemp(NewPlayerVisualData));
+		OtherPlayersStateData.Add(MoveTemp(NewOtherPlayerVisualData));
 	}
+
+	// Own Player Data
+	int OwnPlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
+
+	FVector2D OwnPlayerLocation = FVector2D::ZeroVector;
+	OwnPlayerLocation.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+	OwnPlayerLocation.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+
+	float OwnPlayerRotation = UNetworkProtocolHelpers::DeserializeArithmetic<float>(ByteArray, Offset);
+	float OwnPlayerAimRotation = UNetworkProtocolHelpers::DeserializeArithmetic<float>(ByteArray, Offset);
+
+	FVector2D OwnPlayerVelocity = FVector2D::ZeroVector;
+	OwnPlayerVelocity.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+	OwnPlayerVelocity.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+	
+	OwnPlayerData =
+	{
+		.Index = OwnPlayerIndex,
+		.Location = OwnPlayerLocation,
+		.Rotation = OwnPlayerRotation,
+		.AimRotation = OwnPlayerAimRotation,
+		.Velocity = OwnPlayerVelocity
+	};
 }
 
 void FBulletsStatePacket::Serialize(TArray<BYTE>& ByteArray) const
