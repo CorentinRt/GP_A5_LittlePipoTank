@@ -36,10 +36,9 @@ void AClientTankPawn::SetLocation(const FVector2D& Location)
 	SetActorLocation(NewLocation, true);
 }
 
-void AClientTankPawn::SetRotation(float Rotation)
+void AClientTankPawn::SetRotation(const FRotator& Rotation)
 {
-	FRotator NewRotation(0.0f, Rotation, 0.0f);
-	SetActorRotation(NewRotation);
+	SetActorRotation(Rotation);
 }
 
 void AClientTankPawn::SetAimRotation(float AimRotation)

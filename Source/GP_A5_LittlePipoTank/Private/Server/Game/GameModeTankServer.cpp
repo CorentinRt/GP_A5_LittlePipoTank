@@ -8,6 +8,7 @@
 #include "Shared/NetworkProtocolHelpers.h"
 #include "Shared/Game/GamePhaseListener.h"
 #include "TankClasses/TankPawn.h"
+#include "Trace/Detail/Transport.h"
 
 AGameModeTankServer::AGameModeTankServer()
 {
@@ -96,7 +97,10 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 
 			GameStatePacket.OtherPlayersStateData.Add(MoveTemp(OtherPlayerData));
 		}
+		
+		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, GameStatePacket, ENET_PACKET_FLAG_RELIABLE);
 	}
+
 }
 
 ETankGamePhase AGameModeTankServer::GetCurrentGamePhase()
