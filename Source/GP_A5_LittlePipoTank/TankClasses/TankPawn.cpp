@@ -213,16 +213,19 @@ void ATankPawn::ReactOnGamePhaseChanged_Implementation(ETankGamePhase InGamePhas
 	{
 	case ETankGamePhase::IN_GAME:
 		bBlockAllInputs = false;
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Block input false");
 		break;
 	case ETankGamePhase::WAITING_PLAYER:
 		bBlockAllInputs = true;
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Block input true");
 		break;
 	case ETankGamePhase::PRE_GAME:
 		bBlockAllInputs = true;
-		break;
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Block input true");
 		break;
 	case ETankGamePhase::POST_GAME:
 		bBlockAllInputs = true;
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Block input true");
 		break;
 	case ETankGamePhase::NONE:
 		break;
