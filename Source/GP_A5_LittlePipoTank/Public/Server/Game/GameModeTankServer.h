@@ -45,7 +45,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetGamePhaseDuration(ETankGamePhase InGamePhase);
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FGameStateTankServer GameStateServer;
 
 	bool IsServerInitialized = false;
