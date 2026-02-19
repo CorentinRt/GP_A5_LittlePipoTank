@@ -226,7 +226,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 					if (PlayerTank == nullptr)
 					{
 						UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to cast spawned tank to ClientTank class");
-						return;
+						continue;
 					}
 					
 					GameStateClient.Players.Add({
@@ -237,6 +237,40 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 				}
 			}
 			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "S_PlayerList: Nb players after add: {0}", GameStateClient.Players.Num());
+			
+			break;
+		}
+
+	case OpCode::S_GamePhase:
+		{
+			FGamePhasePacket Packet = {};
+			Packet.Deserialize(ByteArray, Offset);
+
+			GameStateClient.CurrentGamePhase = Packet.GamePhase;
+
+			switch (GameStateClient.CurrentGamePhase)
+			{
+			case ETankGamePhase::NONE:
+				{
+					break;
+				}
+			case ETankGamePhase::WAITING_PLAYER:
+				{
+					break;
+				}
+			case ETankGamePhase::PRE_GAME:
+				{
+					break;
+				}
+			case ETankGamePhase::IN_GAME:
+				{
+					break;
+				}
+			case ETankGamePhase::POST_GAME:
+				{
+					break;
+				}
+			}
 			
 			break;
 		}
@@ -403,7 +437,9 @@ void AGameModeTankClient::InterpolationClientPlayer(float DeltaTime)
 
 void AGameModeTankClient::PredictClient(float DeltaTime)
 {
-	//TODO Update Pawn physics here ?
+	// TODO Update Pawn physics here ?
+	// TODO Block Inputs if not in IN_GAME
+
 	
 	SendClientPrediction();
 }
