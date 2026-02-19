@@ -73,6 +73,8 @@ private:
 	void PlayerJoined(ENetPeer* InPeer, const FString& InPlayerName);
 
 	void PlayerLeft(const ENetEvent& event, int IndexToRemove);
+
+	FPlayerDataServer& GetAvailableNewPlayerDataOrCreate();
 	
 	float CurrentAccumulatedGamePhaseTime = 0.f;
 

@@ -67,6 +67,9 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 {
 	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+		
 		FGameStatePacket GameStatePacket = {};
 
 		GameStatePacket.OwnPlayerData.Index = LocalPlayer.PlayerIndex;
@@ -81,6 +84,9 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 
 		for (FPlayerDataServer& OtherPlayer : GameStateServer.Players)
 		{
+			if (OtherPlayer.Peer == nullptr)
+				continue;
+			
 			if (OtherPlayer.PlayerIndex == LocalPlayer.PlayerIndex)
 				continue;
 
@@ -231,6 +237,9 @@ void AGameModeTankServer::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 	
 			for (const FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 			{
+				if (LocalPlayer.Peer == nullptr)
+					continue;
+				
 				if (LocalPlayer.Peer == Peer)
 				{
 					PlayerPeerAlreadyExists = true;
@@ -253,6 +262,9 @@ void AGameModeTankServer::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 
 			for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 			{
+				if (LocalPlayer.Peer == nullptr)
+					continue;
+				
 				if (LocalPlayer.Peer == Peer)
 				{
 					LocalPlayer.PlayerInputs = PlayerInputsPacket.PlayerInputs;
@@ -294,6 +306,9 @@ void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
 	{
 		FPlayerDataServer& LocalPlayer = GameStateServer.Players[i];
 
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+		
 		if (LocalPlayer.Peer == event.peer)
 		{
 			if (LocalPlayer.PlayerTanks)
@@ -360,13 +375,16 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 		.FireInput = false
 	};
 
-	FPlayerDataServer NewPlayerData
+	FPlayerDataServer& NewPlayerData = GetAvailableNewPlayerDataOrCreate();
+
+	if (NewPlayerData.PlayerIndex < 0)
 	{
-		.PlayerIndex = GameStateServer.NextPlayerIndex++,
-		.PlayerName = InPlayerName,
-		.PlayerInputs = PlayerInputs,
-		.Peer = InPeer
-	};
+		NewPlayerData.PlayerIndex = GameStateServer.NextPlayerIndex++;
+	}
+
+	NewPlayerData.PlayerName = InPlayerName;
+	NewPlayerData.PlayerInputs = PlayerInputs;
+	NewPlayerData.Peer = InPeer;
 	
 	if (!SpawnTankPlayer(NewPlayerData))
 	{
@@ -380,8 +398,6 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 			TEXT("Success Player created !")
 			);
 	
-	GameStateServer.Players.Add(MoveTemp(NewPlayerData));
-
 	FInitClientDataPacket NewPlayerInitPacket
 	{
 		.OwnPlayerIndex = NewPlayerData.PlayerIndex
@@ -391,10 +407,16 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 	
 	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+		
 		FPlayerListPacket PlayerListPacket;
 
 		for (FPlayerDataServer& ListedPlayer : GameStateServer.Players)
 		{
+			if (ListedPlayer.Peer == nullptr)
+				continue;
+			
 			FPlayerListPacket::Player PlayerListSingle
 			{
 				.Name = ListedPlayer.PlayerName,
@@ -412,14 +434,20 @@ void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 {
 	--GameStateServer.PlayerCount;
 	
-	GameStateServer.Players.RemoveAt(IndexToRemove);
+	GameStateServer.Players[IndexToRemove].Peer = nullptr;
 
 	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+		
 		FPlayerListPacket PlayerListPacket;
 		
 		for (FPlayerDataServer& ListedPlayer : GameStateServer.Players)
 		{
+			if (ListedPlayer.Peer == nullptr)
+				continue;
+			
 			FPlayerListPacket::Player PlayerListSingle
 			{
 				.Name = ListedPlayer.PlayerName,
@@ -433,4 +461,21 @@ void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 	}
 
 	SetServerGamePhase(ETankGamePhase::WAITING_PLAYER);
+}
+
+FPlayerDataServer& AGameModeTankServer::GetAvailableNewPlayerDataOrCreate()
+{
+	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	{
+		if (LocalPlayer.Peer == nullptr)
+		{
+			return LocalPlayer;
+		}
+	}
+
+	FPlayerDataServer NewPlayerData = {};
+	
+	GameStateServer.Players.Add(MoveTemp(NewPlayerData));
+
+	return GameStateServer.Players[GameStateServer.Players.Num() - 1];
 }

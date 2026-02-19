@@ -21,7 +21,7 @@ struct GP_A5_LITTLEPIPOTANK_API FPlayerDataServer
 
 public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	int PlayerIndex = 0;
+	int PlayerIndex = -1;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FString PlayerName = "NULL_NAME";
