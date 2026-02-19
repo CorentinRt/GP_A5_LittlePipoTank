@@ -27,6 +27,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void SetLocation(const FVector2D& Location);
-	void SetRotation(float Rotation);
+	void SetRotation(const FRotator& Rotation);
 	void SetAimRotation(float AimRotation);
 };
