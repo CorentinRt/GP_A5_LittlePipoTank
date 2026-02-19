@@ -131,7 +131,6 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 		
 		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, GameStatePacket, ENET_PACKET_FLAG_RELIABLE);
 	}
-
 }
 
 ETankGamePhase AGameModeTankServer::GetCurrentGamePhase()
@@ -363,6 +362,8 @@ bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		InPlayer.PlayerTanks = GetWorld()->SpawnActor<ATankPawn>(TankPawnClassBlueprint, SpawnParameters);
 		InPlayer.PlayerTanks->ReactOnGamePhaseChanged_Implementation(GameStateServer.CurrentGamePhase);
+
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Bind Tank Spawn Bullet");
 		InPlayer.PlayerTanks->OnSpawnBullet.AddDynamic(this, &AGameModeTankServer::BindTankSpawnBullet);
 	}
 	
@@ -482,16 +483,20 @@ void AGameModeTankServer::BindTankSpawnBullet(ATankBullet* InTankBullet)
 	if (!InTankBullet)
 		return;
 
+	
 	InTankBullet->BulletIndex = GameStateServer.NextBulletIndex++;
 
 	InTankBullet->OnBulletDestroyed.AddDynamic(this, &AGameModeTankServer::BindHandleBulletDestroyed);
 	
 	GameStateServer.AllTankBullets.Add(InTankBullet);
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Add bullet to list count = {0}", GameStateServer.AllTankBullets.Num());
 }
 
 void AGameModeTankServer::BindHandleBulletDestroyed(ATankBullet* InTankBullet)
 {
+	InTankBullet->OnBulletDestroyed.RemoveDynamic(this, &AGameModeTankServer::BindHandleBulletDestroyed);
 	GameStateServer.AllTankBullets.Remove(InTankBullet);
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Remove bullet from list count = {0}", GameStateServer.AllTankBullets.Num());
 }
 
 FPlayerDataServer& AGameModeTankServer::GetAvailableNewPlayerDataOrCreate()
