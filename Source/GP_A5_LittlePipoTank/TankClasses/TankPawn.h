@@ -71,7 +71,18 @@ protected:
 	void Aim(const FInputActionValue& Value);
 	void Shoot(const FInputActionValue& Value);
 
+	void MoveTank(float MoveInput, float DeltaTime);
+
+	void RotateTank(float RotateInput, float DeltaTime);
+	
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Speed = 600.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RotateSpeed = 100.f;
+	
 	virtual void RegisterTickable() override;
 	virtual void UnregisterTickable() override;
 	virtual void OnTickPhysics_Blueprint_Implementation(float DeltaTime) override;

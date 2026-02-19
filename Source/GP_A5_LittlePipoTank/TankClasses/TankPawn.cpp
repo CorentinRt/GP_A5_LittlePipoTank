@@ -40,6 +40,7 @@ void ATankPawn::BeginPlay()
 void ATankPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 // Called to bind functionality to input
@@ -86,6 +87,21 @@ void ATankPawn::Shoot(const FInputActionValue& Value)
 	}
 }
 
+void ATankPawn::MoveTank(float MoveInput, float DeltaTime)
+{
+	FVector Dir = GetActorForwardVector();
+
+	FVector LastActorLocation = GetActorLocation();
+
+	SetActorLocation(LastActorLocation + Speed * Dir * MoveInput * DeltaTime, true);
+}
+
+void ATankPawn::RotateTank(float RotateInput, float DeltaTime)
+{
+	FRotator RotationDelta = {0.f, RotateInput, 0.f};
+	AddActorLocalRotation(RotationDelta * DeltaTime * RotateSpeed);
+}
+
 void ATankPawn::RegisterTickable()
 {
 	GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
@@ -108,9 +124,11 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 	IPhysicsTickableShared::OnTickPhysics_Blueprint_Implementation(DeltaTime);
 
 	//Move
-	AddMovementInput(this->GetActorForwardVector(), TankInputs.MoveInput.Y);
-	AddControllerYawInput(TankInputs.MoveInput.X);
+	MoveTank(TankInputs.MoveInput.Y, DeltaTime);
 
+	// Rotation Tank
+	RotateTank(TankInputs.MoveInput.X, DeltaTime);
+	
 	//Aim Rotation
 	FRotator CurrentWorldRot = TankHeadMesh->GetComponentRotation();
 	FVector AimFVector {TankInputs.AimInput.X, TankInputs.AimInput.Y, 0.0f};
