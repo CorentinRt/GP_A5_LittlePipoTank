@@ -4,8 +4,7 @@
 #include "TankClasses/TankBullet.h"
 
 #include "TankPawn.h"
-#include "Chaos/Utilities.h"
-#include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ATankBullet::ATankBullet()
@@ -18,16 +17,6 @@ ATankBullet::ATankBullet()
 	BulletMesh->SetSimulatePhysics(false);
 	BulletMesh->SetUsingAbsoluteRotation(false);
 	//BulletMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
-
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComponent"));
-	ProjectileMovement->InitialSpeed = 350.f;
-	ProjectileMovement->MaxSpeed = 350.f;
-	ProjectileMovement->bShouldBounce = true;
-	ProjectileMovement->ProjectileGravityScale = 0.0f;
-	ProjectileMovement->SetUpdatedComponent(RootComponent);
-	ProjectileMovement->bRotationFollowsVelocity = true;
-	
-	ProjectileMovement->OnProjectileBounce.AddDynamic(this, &ATankBullet::OnBounce);
 	
 	numberOfBouncesLeft = numberOfBounces;
 }
@@ -36,36 +25,139 @@ ATankBullet::ATankBullet()
 void ATankBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
+
+	SetBulletVelocity(GetActorForwardVector() * BulletSpeed);
+	
+	RegisterTickable();
+	RegisterListener();
+	
 	if (GetInstigator())
 	{
 		BulletMesh->IgnoreActorWhenMoving(GetInstigator(), true); //Ignore le big tank 
 	}
 }
 
+void ATankBullet::Destroyed()
+{
+	Super::Destroyed();
+
+	UnregisterTickable();
+	UnregisterListener();
+}
+
+void ATankBullet::HandleBounce(const FHitResult& Hit)
+{
+	const FVector Normal = Hit.ImpactNormal.GetSafeNormal();
+
+	SetBulletVelocity(Velocity.MirrorByVector(Normal));
+
+	SetActorLocation(Hit.ImpactPoint + Normal * 2.f);
+}
+
 void ATankBullet::OnBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
 {
 	numberOfBouncesLeft--;
+	
 	AActor* HitActor = ImpactResult.GetActor();
-	ATankPawn* HitPawn = Cast<ATankPawn>(HitActor);
-	if (HitPawn)
+	
+	if (ATankPawn* HitPawn = Cast<ATankPawn>(HitActor))
 	{
 		HitPawn->TankGetShoot();
+		this->Destroy();
+		return;
 	}
-	ATankBullet* HitBulletPawn = Cast<ATankBullet>(HitActor);
-	if (HitBulletPawn)
+
+	if (ATankBullet* HitBulletPawn = Cast<ATankBullet>(HitActor))
 	{
 		HitBulletPawn->Destroy();
 		this->Destroy();
+		return;
 	}
-	if (this && numberOfBouncesLeft == 0)
+	
+	if (numberOfBouncesLeft == 0)
 	{
 		this->Destroy();
 	}
+}
+
+void ATankBullet::SetBulletVelocity(const FVector& InVelocity)
+{
+	Velocity = InVelocity;
+
+	SetActorRotation(Velocity.Rotation());
 }
 
 // Called every frame
 void ATankBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ATankBullet::RegisterTickable()
+{
+	if (!GameMode)
+		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
+	
+	if (GameMode)
+	{
+		GameMode->RegisterPhysicsTickable(this);
+	}
+}
+
+void ATankBullet::UnregisterTickable()
+{
+	if (!GameMode)
+		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
+	
+	if (GameMode)
+	{
+		GameMode->UnregisterPhysicsTickable(this);
+	}
+}
+
+void ATankBullet::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
+{
+	IPhysicsTickableShared::OnTickPhysics_Blueprint_Implementation(DeltaTime);
+
+	FVector Start = GetActorLocation();
+
+	FVector End = Start + Velocity * DeltaTime;
+
+	FHitResult Hit;
+
+	SetActorLocation(End, true, &Hit);
+
+	if (Hit.bBlockingHit)
+	{
+		HandleBounce(Hit);
+		OnBounce(Hit, Velocity);
+	}
+}
+
+void ATankBullet::RegisterListener()
+{
+	if (!GameMode)
+		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
+	
+	if (GameMode)
+	{
+		GameMode->RegisterListener(this);
+	}
+}
+
+void ATankBullet::UnregisterListener()
+{
+	if (!GameMode)
+		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
+	
+	if (GameMode)
+	{
+		GameMode->UnregisterListener(this);
+	}
+}
+
+void ATankBullet::ReactOnGamePhaseChanged_Implementation(ETankGamePhase InGamePhase)
+{
+	IGamePhaseListener::ReactOnGamePhaseChanged_Implementation(InGamePhase);
+	
 }
