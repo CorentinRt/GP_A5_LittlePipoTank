@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Runtime/Engine/Internal/Kismet/BlueprintTypeConversions.h"
+#include "Server/Game/PlayerTankSpawnPoint.h"
 #include "Shared/LittlePipoTankGameInstance.h"
 #include "Shared/NetworkProtocol.h"
 #include "Shared/NetworkProtocolHelpers.h"
@@ -55,7 +56,8 @@ void AGameModeTankClient::InitGameClient()
 	{
 		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to get Client Player Controller");
 	}
-	
+
+	GetAllPlayerSpawnPoints();
 }
 
 void AGameModeTankClient::GamePhysicsTick(float DeltaTime)
@@ -219,9 +221,15 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 				{
 					// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "And ClientTank");
 					
+					APlayerTankSpawnPoint* SpawnPoint = PlayersSpawnPoints[Player->PlayerIndex];
+					
 					FActorSpawnParameters SpawnParameters;
 					SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-					AClientTankPawn* PlayerTank = GetWorld()->SpawnActor<AClientTankPawn>(BlueprintClientTankClass, SpawnParameters);
+					AClientTankPawn* PlayerTank = GetWorld()->SpawnActor<AClientTankPawn>(
+						BlueprintClientTankClass,
+						SpawnPoint->GetActorLocation(),
+						SpawnPoint->GetActorRotation(),
+						SpawnParameters);
 
 					if (PlayerTank == nullptr)
 					{
