@@ -371,7 +371,7 @@ bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 	InPlayer.PlayerTanks->SetActorEnableCollision(true);
 	InPlayer.PlayerTanks->SetActorLocation(SpawnPoint->GetActorLocation());
 	InPlayer.PlayerTanks->SetActorRotation(SpawnPoint->GetActorRotation());
-
+	
 	return true;
 }
 
@@ -404,6 +404,16 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 	{
 		return;
 	}
+
+	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	{
+		FSpawnTankPacket SpawnTankPacket = {};
+		
+		SpawnTankPacket.PlayerIndex = NewPlayerData.PlayerIndex;
+		
+		UNetworkProtocolHelpers::SendPacket(NewPlayerData.Peer, SpawnTankPacket, ENET_PACKET_FLAG_RELIABLE);
+	}
+
 
 	GEngine->AddOnScreenDebugMessage(
 			-1,

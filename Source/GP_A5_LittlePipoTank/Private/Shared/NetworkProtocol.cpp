@@ -17,6 +17,26 @@ void FExemplePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::Si
 	X = UNetworkProtocolHelpers::DeserializeArithmetic<float>(ByteArray, Offset);
 }
 
+void FSpawnTankPacket::Serialize(TArray<BYTE>& ByteArray) const
+{
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerIndex);
+}
+
+void FSpawnTankPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
+{
+	PlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
+}
+
+void FDestroyTankPacket::Serialize(TArray<BYTE>& ByteArray) const
+{
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerIndex);
+}
+
+void FDestroyTankPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
+{
+	PlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
+}
+
 void FInitClientDataPacket::Serialize(TArray<BYTE>& ByteArray) const
 {
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerIndex);

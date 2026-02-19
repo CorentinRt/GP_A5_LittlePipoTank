@@ -190,7 +190,11 @@ FVector::One(),
 true);
 	}
 	ReceiveGetShoot();
-	this->Destroy();
+	
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+
+	OnTankDestroyed.Broadcast(this);
 }
 
 void ATankPawn::RegisterListener()

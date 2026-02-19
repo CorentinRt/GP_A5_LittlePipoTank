@@ -88,8 +88,10 @@ protected:
 public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSpawnBullet, ATankBullet*, SpawnedTankBullet);
-
 	FOnSpawnBullet OnSpawnBullet;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTankDestroyed, ATankPawn*, InTank);
+	FOnTankDestroyed OnTankDestroyed;
 	
 	float GetHeadAimRotation() const;
 	

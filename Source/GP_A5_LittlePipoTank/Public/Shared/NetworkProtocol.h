@@ -21,6 +21,8 @@ enum class OpCode : UINT8
 	S_BulletsState = 3,
 	S_GamePhase = 4,
 	S_InitClientData = 5,
+	S_SpawnTank = 6,
+	S_DestroyTank = 7,
 
 	C_PlayerInputs = 126,
 	C_PlayerName = 127,
@@ -39,6 +41,36 @@ struct FExemplePacket
 	
 	float X;
 
+	void Serialize(TArray<BYTE>& ByteArray) const;
+	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+};
+
+USTRUCT()
+struct FSpawnTankPacket
+{
+	GENERATED_BODY()
+
+	~FSpawnTankPacket() = default;
+
+	static constexpr OpCode OpCode = OpCode::S_SpawnTank;
+	
+	int PlayerIndex = -1;
+	
+	void Serialize(TArray<BYTE>& ByteArray) const;
+	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
+};
+
+USTRUCT()
+struct FDestroyTankPacket
+{
+	GENERATED_BODY()
+
+	~FDestroyTankPacket() = default;
+
+	static constexpr OpCode OpCode = OpCode::S_DestroyTank;
+	
+	int PlayerIndex = -1;
+	
 	void Serialize(TArray<BYTE>& ByteArray) const;
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
 };
