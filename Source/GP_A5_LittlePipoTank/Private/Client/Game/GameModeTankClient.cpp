@@ -331,6 +331,13 @@ void AGameModeTankClient::SendClientPrediction()
 		.PredictionIndex = GameStateClient.NextPredictionIndex
 	};
 
+	/*UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning,
+		"Sent inputs => Move: X = {0}, Y = {1} | Aim: X = {2}, Y = {3} | Fire: {4}",
+		InputsPacket.PlayerInputs.MoveInput.X, InputsPacket.PlayerInputs.MoveInput.Y,
+		InputsPacket.PlayerInputs.AimInput.X, InputsPacket.PlayerInputs.AimInput.Y,
+		InputsPacket.PlayerInputs.FireInput);*/
+
+	
 	GameStateClient.Predictions.Add({
 		.PredictionIndex = GameStateClient.NextPredictionIndex,
 		.Inputs = PlayerController->GetTankInputs(),
