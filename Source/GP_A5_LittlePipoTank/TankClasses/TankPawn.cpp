@@ -37,6 +37,7 @@ void ATankPawn::BeginPlay()
 	Super::BeginPlay();
 
 	RegisterTickable();
+	RegisterListener();
 }
 
 void ATankPawn::Destroyed()
@@ -44,6 +45,7 @@ void ATankPawn::Destroyed()
 	Super::Destroyed();
 
 	UnregisterTickable();
+	UnregisterListener();
 }
 
 // Called every frame
