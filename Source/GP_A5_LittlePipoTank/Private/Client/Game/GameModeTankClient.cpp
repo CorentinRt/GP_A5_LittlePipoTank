@@ -221,7 +221,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 				{
 					// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "And ClientTank");
 					
-					APlayerTankSpawnPoint* SpawnPoint = PlayersSpawnPoints[Player->PlayerIndex];
+					APlayerTankSpawnPoint* SpawnPoint = PlayersSpawnPoints[It->Index];
 					
 					FActorSpawnParameters SpawnParameters;
 					SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
