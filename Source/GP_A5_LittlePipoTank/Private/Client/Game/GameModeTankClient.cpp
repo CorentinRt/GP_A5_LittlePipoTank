@@ -339,6 +339,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 		{
 			FSpawnTankPacket Packet = {};
 			Packet.Deserialize(ByteArray, Offset);
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Receive Spawn ClientTank");
 
 			for (const FSpawnTankPacket::TankSpawnData& SpawnTankData : Packet.TankSpawnsData)
 			{
@@ -350,7 +351,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 				if (!Player) continue;
 				if (Player->Tank) continue;
 			
-				// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Spawn ClientTank");
+				UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Try Spawn ClientTank");
 
 				FVector SpawnLocation(SpawnTankData.SpawnLocation.X, SpawnTankData.SpawnLocation.Y, 0.0f);
 				FRotator SpawnRotation(0.0f, SpawnTankData.SpawnRotation, 0.0f);
@@ -370,6 +371,8 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 				}
 
 				Player->Tank = PlayerTank;
+				UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Spawn ClientTank Success");
+				
 			}
 			
 			break;
@@ -379,6 +382,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 		{
 			FDestroyTankPacket Packet = {};
 			Packet.Deserialize(ByteArray, Offset);
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Receive Destroy ClientTank");
 
 			FPlayerDataClient* Player =  GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
 			{
@@ -386,9 +390,11 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			});
 
 			if (!Player || !Player->Tank) break;
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Try Destroy ClientTank");
 
 			GetWorld()->DestroyActor(Player->Tank);
 			Player->Tank = nullptr;
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Destroy ClientTank Success");
 			
 			break;
 		}
