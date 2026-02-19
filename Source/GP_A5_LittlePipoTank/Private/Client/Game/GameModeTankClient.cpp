@@ -5,6 +5,7 @@
 
 #include "GP_A5_LittlePipoTank.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
+#include "Client/ClientPlayerController.h"
 #include "Client/Game/ClientTankPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -46,6 +47,14 @@ void AGameModeTankClient::InitGameClient()
 
 	FPlayerNamePacket Packet = {.Name = GameInstance->GetPlayerName()};
 	UNetworkProtocolHelpers::SendPacket(ServerPeer, Packet, ENET_PACKET_FLAG_RELIABLE);
+
+	PlayerController = Cast<AClientPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+
+	if (!PlayerController)
+	{
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to get Client Player Controller");
+	}
+	
 }
 
 void AGameModeTankClient::GamePhysicsTick(float DeltaTime)
@@ -301,8 +310,7 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 
 void AGameModeTankClient::PredictClient(float DeltaTime)
 {
-	// Update Pawn physics here ?
-	//TODO Put that in Physics TICK
+	//TODO Update Pawn physics here ?
 	
 	SendClientPrediction();
 }
@@ -311,31 +319,21 @@ void AGameModeTankClient::SendClientPrediction()
 {
 	// TODO Get Client Pawn And Possess it on receive player tank, so we don't cast every frame
 	// TODO Maybe better: Input struct in player controller directly so easy to get
-
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-
+	
 	if (!PlayerController)
 	{
 		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player controller is null.");
 		return;
 	}
 	
-	ATankPawn* PlayerTank = Cast<ATankPawn>(PlayerController->GetPawn());
-
-	if (!PlayerTank)
-	{
-		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player Tank is null.");
-		return;
-	}
-	
 	FPlayerInputsPacket InputsPacket = {
-		.PlayerInputs = PlayerTank->GetTankInputs(),
+		.PlayerInputs = PlayerController->GetTankInputs(),
 		.PredictionIndex = GameStateClient.NextPredictionIndex
 	};
 
 	GameStateClient.Predictions.Add({
 		.PredictionIndex = GameStateClient.NextPredictionIndex,
-		.Inputs = PlayerTank->GetTankInputs(),
+		.Inputs = PlayerController->GetTankInputs(),
 		//TODO Set Position, Rotation, AimRotation, Velocity
 	});
 
