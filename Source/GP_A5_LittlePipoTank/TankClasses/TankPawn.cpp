@@ -162,14 +162,13 @@ void ATankPawn::TankGetShoot()
 	//Rien a mettre pour le moment donc on le détruit
 	if(TankParticleExplosion)
 	{
-		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			TankParticleExplosion,
-			TankBodyMesh,
-			NAME_None,
-			FVector(this->GetActorLocation()),
-			FRotator(0.f),
-			EAttachLocation::Type::KeepRelativeOffset,
-			true);
+		UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		this,
+		TankParticleExplosion,
+FVector(this->GetActorLocation()),
+FRotator(0.f),
+FVector::One(),
+true);
 	}
 	this->Destroy();
 }
