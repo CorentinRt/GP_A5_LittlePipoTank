@@ -85,6 +85,20 @@ void FGameStatePacket::Serialize(TArray<BYTE>& ByteArray) const
 		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OtherPlayerStateData.AimRotation);
 	}
 
+	// Bullet Array
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, BulletsStateData.Num());
+
+	for (const BulletStateData& BulletStateData : BulletsStateData)
+	{
+		// Index
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, BulletStateData.Index);
+		// Location
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, BulletStateData.Location.X);
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, BulletStateData.Location.Y);
+		// Rotation
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, BulletStateData.Rotation);
+	}
+
 	// Own Player Data
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.Index);
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.Location.X);
@@ -119,6 +133,29 @@ void FGameStatePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::
 		};
 		
 		OtherPlayersStateData.Add(MoveTemp(NewOtherPlayerVisualData));
+	}
+
+	// Bullets Data
+
+	TArray<BYTE>::SizeType BulletsDataSize = UNetworkProtocolHelpers::DeserializeArithmetic<TArray<BYTE>::SizeType>(ByteArray, Offset);
+	for (int i = 0; i < BulletsDataSize; ++i)
+	{
+		int BulletIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
+
+		FVector2D BulletLocation = FVector2D::ZeroVector;
+		BulletLocation.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+		BulletLocation.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+
+		float BulletRotation = UNetworkProtocolHelpers::DeserializeArithmetic<float>(ByteArray, Offset);
+		
+		BulletStateData NewBulletVisualData
+		{
+			.Index = BulletIndex,
+			.Location = BulletLocation,
+			.Rotation = BulletRotation,
+		};
+		
+		BulletsStateData.Add(MoveTemp(NewBulletVisualData));
 	}
 
 	// Own Player Data

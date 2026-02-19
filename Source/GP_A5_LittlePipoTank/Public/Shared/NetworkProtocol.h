@@ -119,10 +119,18 @@ struct FGameStatePacket
 		float Rotation = 0.f;
 		float AimRotation = 0.f;
 	};
+	
+	struct BulletStateData
+	{
+		int Index = -1;
+		FVector2D Location = FVector2D::ZeroVector;
+		float Rotation = 0.f;
+	};
 
 	OwnPlayerStateData OwnPlayerData;
 	TArray<PlayerStateData> OtherPlayersStateData;
-
+	TArray<BulletStateData> BulletsStateData;
+	
 	void Serialize(TArray<BYTE>& ByteArray) const;
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
 };
