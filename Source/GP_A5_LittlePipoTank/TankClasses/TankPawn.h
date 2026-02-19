@@ -10,11 +10,12 @@
 #include "Server/Game/GameModeTankServer.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "Shared/Game/GamePhaseListener.h"
 #include "Shared/Game/PhysicsTickableShared.h"
 #include "TankPawn.generated.h"
 
 UCLASS()
-class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn, public IPhysicsTickableShared
+class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn, public IPhysicsTickableShared, public IGamePhaseListener
 {
 	GENERATED_BODY()
 
@@ -78,6 +79,9 @@ protected:
 	void MoveTank(float MoveInput, float DeltaTime);
 
 	void RotateTank(float RotateInput, float DeltaTime);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bBlockAllInputs = true;
 	
 public:
 
@@ -96,4 +100,10 @@ public:
 	const FPlayerTankInputs& GetTankInputs() const;
 	
 	void TankGetShoot();
+	
+	virtual void RegisterListener() override;
+	
+	virtual void UnregisterListener() override;
+
+	virtual void ReactOnGamePhaseChanged_Implementation(ETankGamePhase InGamePhase) override;
 };

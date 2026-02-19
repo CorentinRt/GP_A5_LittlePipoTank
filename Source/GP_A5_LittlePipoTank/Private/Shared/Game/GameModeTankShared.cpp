@@ -5,6 +5,7 @@
 
 #include "GP_A5_LittlePipoTank.h"
 #include "Kismet/GameplayStatics.h"
+#include "Server/Game/PlayerTankSpawnPoint.h"
 #include "Shared/Game/GamePhaseListener.h"
 #include "Shared/Game/PhysicsTickableShared.h"
 
@@ -76,6 +77,20 @@ void AGameModeTankShared::SetGamePhase(ETankGamePhase& CurrentGamePhase, ETankGa
 {
 	CurrentGamePhase = NewGamePhase;
 	ReactChangeGamePhase(NewGamePhase);
+}
+
+void AGameModeTankShared::GetAllPlayerSpawnPoints()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(this, APlayerTankSpawnPoint::StaticClass(), FoundActors);
+
+	for (AActor* Actor : FoundActors)
+	{
+		APlayerTankSpawnPoint* SpawnPoint = Cast<APlayerTankSpawnPoint>(Actor);
+
+		if (SpawnPoint)
+			PlayersSpawnPoints.Add(SpawnPoint);
+	}
 }
 
 void AGameModeTankShared::ReactChangeGamePhase(ETankGamePhase InGamePhase)

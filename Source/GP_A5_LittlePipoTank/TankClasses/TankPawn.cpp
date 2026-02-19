@@ -122,10 +122,10 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 
 	// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Tick physi tank");
 	//Move
-	MoveTank(TankInputs.MoveInput.Y, DeltaTime);
+	MoveTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.Y, DeltaTime);
 
 	// Rotation Tank
-	RotateTank(TankInputs.MoveInput.X, DeltaTime);
+	RotateTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.X, DeltaTime);
 	
 	//Aim Rotation
 	FRotator CurrentWorldRot = TankHeadMesh->GetComponentRotation();
@@ -140,6 +140,10 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 	TankHeadMesh->SetWorldRotation(SmoothedRot);
 
 	//Fire Input
+
+	if (bBlockAllInputs)
+		TankInputs.FireInput = false;
+	
 	if(TankInputs.FireInput == true)
 	{
 		FVector Location(TankShootingPoint->GetComponentLocation());
@@ -177,4 +181,53 @@ FVector::One(),
 true);
 	}
 	this->Destroy();
+}
+
+void ATankPawn::RegisterListener()
+{
+	if (!GameMode)
+		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
+	
+	if (GameMode)
+	{
+		GameMode->RegisterListener(this);
+	}
+}
+
+void ATankPawn::UnregisterListener()
+{
+	if (!GameMode)
+		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
+
+	if (GameMode)
+	{
+		GameMode->UnregisterListener(this);
+	}
+}
+
+void ATankPawn::ReactOnGamePhaseChanged_Implementation(ETankGamePhase InGamePhase)
+{
+	IGamePhaseListener::ReactOnGamePhaseChanged_Implementation(InGamePhase);
+
+	switch (InGamePhase)
+	{
+	case ETankGamePhase::IN_GAME:
+		bBlockAllInputs = false;
+		break;
+	case ETankGamePhase::WAITING_PLAYER:
+		bBlockAllInputs = true;
+		break;
+	case ETankGamePhase::PRE_GAME:
+		bBlockAllInputs = true;
+		break;
+		break;
+	case ETankGamePhase::POST_GAME:
+		bBlockAllInputs = true;
+		break;
+	case ETankGamePhase::NONE:
+		break;
+
+	default:
+		break;
+	}
 }

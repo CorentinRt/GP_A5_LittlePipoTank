@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
 #include "Shared/TankGamePhase.h"
 #include "Shared/ENetWrapper/ENetGameMode.h"
 #include "GameModeTankShared.generated.h"
 
+class APlayerTankSpawnPoint;
 /**
  * 
  */
@@ -51,6 +51,8 @@ public:
 
 protected:
 	virtual void SetGamePhase(ETankGamePhase& CurrentGamePhase, ETankGamePhase NewGamePhase);
+
+	virtual void GetAllPlayerSpawnPoints();
 	
 	float TickDelayPhysics = 1/60.0f;
 	float TickDelayNetwork = 1/10.f;
@@ -63,4 +65,7 @@ protected:
 
 	UPROPERTY()
 	TArray<AActor*> PhysicsTickables;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
+	TArray<APlayerTankSpawnPoint*> PlayersSpawnPoints;
 };

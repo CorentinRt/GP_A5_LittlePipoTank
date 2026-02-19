@@ -3,12 +3,10 @@
 
 #include "Server/Game/GameModeTankServer.h"
 
-#include "Kismet/GameplayStatics.h"
+#include "Server/Game/PlayerTankSpawnPoint.h"
 #include "Shared/NetworkProtocol.h"
 #include "Shared/NetworkProtocolHelpers.h"
-#include "Shared/Game/GamePhaseListener.h"
 #include "TankClasses/TankPawn.h"
-#include "Trace/Detail/Transport.h"
 
 AGameModeTankServer::AGameModeTankServer()
 {
@@ -324,16 +322,7 @@ void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
 
 void AGameModeTankServer::GetAllPlayerSpawnPoints()
 {
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(this, APlayerTankSpawnPoint::StaticClass(), FoundActors);
-
-	for (AActor* Actor : FoundActors)
-	{
-		APlayerTankSpawnPoint* SpawnPoint = Cast<APlayerTankSpawnPoint>(Actor);
-
-		if (SpawnPoint)
-			PlayersSpawnPoints.Add(SpawnPoint);
-	}
+	Super::GetAllPlayerSpawnPoints();
 }
 
 bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
