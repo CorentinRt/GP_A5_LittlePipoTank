@@ -246,7 +246,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			FGamePhasePacket Packet = {};
 			Packet.Deserialize(ByteArray, Offset);
 
-			GameStateClient.CurrentGamePhase = Packet.GamePhase;
+			SetClientGamePhase(Packet.GamePhase);
 
 			switch (GameStateClient.CurrentGamePhase)
 			{
