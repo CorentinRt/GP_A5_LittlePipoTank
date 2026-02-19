@@ -37,6 +37,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetServerGamePhase(ETankGamePhase NewGamePhase);
+
+	virtual void ReactChangeGamePhase(ETankGamePhase InGamePhase) override;
 	
 	UFUNCTION(BlueprintCallable)
 	void NextGamePhase();
@@ -78,6 +80,9 @@ private:
 	UFUNCTION()
 	void BindHandleBulletDestroyed(ATankBullet* InTankBullet);
 
+	UFUNCTION()
+	void BindHandleTankDestroyed(ATankPawn* InTank);
+	
 	void SendTankSpawnToAllClients();
 	
 	FPlayerDataServer& GetAvailableNewPlayerDataOrCreate();

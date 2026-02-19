@@ -76,7 +76,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void SetPlayerTankInputs(const FPlayerTankInputs& InTankInputs);
-
+	
 protected:
 	void MoveTank(float MoveInput, float DeltaTime);
 

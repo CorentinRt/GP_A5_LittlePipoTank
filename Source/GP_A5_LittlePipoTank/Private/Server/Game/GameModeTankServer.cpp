@@ -143,6 +143,21 @@ void AGameModeTankServer::SetServerGamePhase(ETankGamePhase NewGamePhase)
 	SetGamePhase(GameStateServer.CurrentGamePhase, NewGamePhase);
 }
 
+void AGameModeTankServer::ReactChangeGamePhase(ETankGamePhase InGamePhase)
+{
+	Super::ReactChangeGamePhase(InGamePhase);
+
+	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	{
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+
+		SpawnTankPlayer(LocalPlayer);
+	}
+	
+	SendTankSpawnToAllClients();
+}
+
 void AGameModeTankServer::NextGamePhase()
 {
 	switch (GameStateServer.CurrentGamePhase)
@@ -365,6 +380,7 @@ bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 
 		UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Bind Tank Spawn Bullet");
 		InPlayer.PlayerTanks->OnSpawnBullet.AddDynamic(this, &AGameModeTankServer::BindTankSpawnBullet);
+		InPlayer.PlayerTanks->OnTankDestroyed.AddDynamic(this, &AGameModeTankServer::BindHandleTankDestroyed);
 	}
 	
 	InPlayer.PlayerTanks->SetActorHiddenInGame(false);
@@ -438,7 +454,12 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerListPacket, ENET_PACKET_FLAG_RELIABLE);
 	}
 
-	// Send Tank Spawn
+	if (SpawnTankPlayer(NewPlayerData))
+	{
+		
+	}
+	
+	// Send Tank Spawned
 	SendTankSpawnToAllClients();
 }
 
@@ -497,10 +518,37 @@ void AGameModeTankServer::BindHandleBulletDestroyed(ATankBullet* InTankBullet)
 	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Remove bullet from list count = {0}", GameStateServer.AllTankBullets.Num());
 }
 
+void AGameModeTankServer::BindHandleTankDestroyed(ATankPawn* InTank)
+{
+	int AssociatedPlayerIndex = -1;
+	for (FPlayerDataServer& CheckPlayerTank : GameStateServer.Players)
+	{
+		if (CheckPlayerTank.PlayerTanks == InTank)
+		{
+			AssociatedPlayerIndex = CheckPlayerTank.PlayerIndex;
+			break;
+		}
+	}
+
+	if (AssociatedPlayerIndex < 0)
+		return;
+	
+	FDestroyTankPacket DestroyedTankPacket = {};
+	DestroyedTankPacket.PlayerIndex = AssociatedPlayerIndex;
+	
+	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	{
+		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, DestroyedTankPacket, ENET_PACKET_FLAG_RELIABLE);
+	}
+}
+
 void AGameModeTankServer::SendTankSpawnToAllClients()
 {
 	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+		
 		FSpawnTankPacket SpawnTankPacket = {};
 
 		for (FPlayerDataServer& ListedPlayer : GameStateServer.Players)
