@@ -313,10 +313,12 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 					GameStateClient.SnapshotBufferAccumulator,
 					true);
 				
-				float LerpAimRotation = FMath::Lerp(
-					FromPlayerData.AimRotation,
-					ToPlayerData.AimRotation,
-					GameStateClient.SnapshotBufferAccumulator);
+				FRotator LerpAimRotation = UKismetMathLibrary::RLerp(
+					FRotator(0.0f, FromPlayerData.AimRotation, 0.0f),
+					FRotator(0.0f, ToPlayerData.AimRotation, 0.0f),
+
+					GameStateClient.SnapshotBufferAccumulator,
+					true);
 
 				//Apply Own Player Lerp
 				OwnPlayerData->Tank->SetLocation(LerpLocation);
@@ -360,10 +362,12 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 					GameStateClient.SnapshotBufferAccumulator,
 					true);
 			
-			float LerpAimRotation = FMath::Lerp(
-				FromPlayerData.AimRotation,
-				ToPlayerData->AimRotation,
-				GameStateClient.SnapshotBufferAccumulator);
+			FRotator LerpAimRotation = UKismetMathLibrary::RLerp(
+					FRotator(0.0f, FromPlayerData.AimRotation, 0.0f),
+					FRotator(0.0f, ToPlayerData->AimRotation, 0.0f),
+
+					GameStateClient.SnapshotBufferAccumulator,
+					true);
 
 			// Apply Lerp Values
 			// TODO Apply lerps

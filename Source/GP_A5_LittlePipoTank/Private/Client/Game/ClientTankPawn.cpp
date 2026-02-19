@@ -41,8 +41,8 @@ void AClientTankPawn::SetRotation(const FRotator& Rotation)
 	SetActorRotation(Rotation);
 }
 
-void AClientTankPawn::SetAimRotation(float AimRotation)
+void AClientTankPawn::SetAimRotation(const FRotator& AimRotation)
 {
-	
+	TankHeadMesh->SetWorldRotation(AimRotation);
 }
 

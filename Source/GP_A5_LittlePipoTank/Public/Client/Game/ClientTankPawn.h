@@ -28,5 +28,5 @@ public:
 
 	void SetLocation(const FVector2D& Location);
 	void SetRotation(const FRotator& Rotation);
-	void SetAimRotation(float AimRotation);
+	void SetAimRotation(const FRotator& AimRotation);
 };
