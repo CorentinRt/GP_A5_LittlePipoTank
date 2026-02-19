@@ -91,6 +91,8 @@ void AGameModeTankShared::GetAllPlayerSpawnPoints()
 		if (SpawnPoint)
 			PlayersSpawnPoints.Add(SpawnPoint);
 	}
+
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Amount of spawn points found: {0}", PlayersSpawnPoints.Num());
 }
 
 void AGameModeTankShared::ReactChangeGamePhase(ETankGamePhase InGamePhase)
