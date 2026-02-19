@@ -4,6 +4,7 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "GP_A5_LittlePipoTank.h"
 #include "TankBullet.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -34,12 +35,22 @@ ATankPawn::ATankPawn()
 void ATankPawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	RegisterTickable();
+}
+
+void ATankPawn::Destroyed()
+{
+	Super::Destroyed();
+
+	UnregisterTickable();
 }
 
 // Called every frame
 void ATankPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 // Called to bind functionality to input
@@ -47,6 +58,7 @@ void ATankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	/*
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->AddMappingContext(InputMapping, 0);
@@ -59,31 +71,27 @@ void ATankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		Input->BindAction(AimAction, ETriggerEvent::Triggered, this, &ATankPawn::Aim);
 		Input->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ATankPawn::Shoot);
 	}
+	*/
 }
 
-void ATankPawn::Move(const FInputActionValue& Value) {
-	FVector2D MovementVector = Value.Get<FVector2D>();
-	if (IsValid(Controller)) {
-		TankInputs.MoveInput = MovementVector;
-	}
-}
-
-void ATankPawn::Aim(const FInputActionValue& Value)
+void ATankPawn::SetPlayerTankInputs(const FPlayerTankInputs& InTankInputs)
 {
-	FVector2D AimVector = Value.Get<FVector2D>();
-	if (IsValid(Controller))
-	{
-		TankInputs.AimInput = AimVector;
-	}
+	TankInputs = InTankInputs;
 }
 
-void ATankPawn::Shoot(const FInputActionValue& Value)
+void ATankPawn::MoveTank(float MoveInput, float DeltaTime)
 {
-	bool shootValue = Value.Get<bool>();
-	if (IsValid(Controller) && shootValue == true)
-	{
-		TankInputs.FireInput = true;
-	}
+	FVector Dir = GetActorForwardVector();
+
+	FVector LastActorLocation = GetActorLocation();
+
+	SetActorLocation(LastActorLocation + Speed * Dir * MoveInput * DeltaTime, true);
+}
+
+void ATankPawn::RotateTank(float RotateInput, float DeltaTime)
+{
+	FRotator RotationDelta = {0.f, RotateInput, 0.f};
+	AddActorLocalRotation(RotationDelta * DeltaTime * RotateSpeed);
 }
 
 void ATankPawn::RegisterTickable()
@@ -106,11 +114,13 @@ void ATankPawn::UnregisterTickable()
 void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 {
 	IPhysicsTickableShared::OnTickPhysics_Blueprint_Implementation(DeltaTime);
-
+	
 	//Move
-	AddMovementInput(this->GetActorForwardVector(), TankInputs.MoveInput.Y);
-	AddControllerYawInput(TankInputs.MoveInput.X);
+	MoveTank(TankInputs.MoveInput.Y, DeltaTime);
 
+	// Rotation Tank
+	RotateTank(TankInputs.MoveInput.X, DeltaTime);
+	
 	//Aim Rotation
 	FRotator CurrentWorldRot = TankHeadMesh->GetComponentRotation();
 	FVector AimFVector {TankInputs.AimInput.X, TankInputs.AimInput.Y, 0.0f};

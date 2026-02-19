@@ -63,6 +63,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void Destroyed() override;
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -70,12 +72,21 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-protected:
-	void Move(const FInputActionValue& Value);
-	void Aim(const FInputActionValue& Value);
-	void Shoot(const FInputActionValue& Value);
+	void SetPlayerTankInputs(const FPlayerTankInputs& InTankInputs);
 
+protected:
+	void MoveTank(float MoveInput, float DeltaTime);
+
+	void RotateTank(float RotateInput, float DeltaTime);
+	
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Speed = 600.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RotateSpeed = 100.f;
+	
 	virtual void RegisterTickable() override;
 	virtual void UnregisterTickable() override;
 	virtual void OnTickPhysics_Blueprint_Implementation(float DeltaTime) override;
