@@ -221,7 +221,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 
 					if (BulletActor == nullptr)
 					{
-						UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to cast spawned tank to ClientTank class");
+						UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to cast spawned bullet to ClientBullet class");
 						continue;
 					}
 					
