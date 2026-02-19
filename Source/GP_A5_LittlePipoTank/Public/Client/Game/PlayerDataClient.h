@@ -7,6 +7,7 @@
 #include "UObject/Object.h"
 #include "PlayerDataClient.generated.h"
 
+class AClientTankBullet;
 class AClientTankPawn;
 /**
  * 
@@ -25,4 +26,17 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<AClientTankPawn> Tank;
+};
+
+USTRUCT(BlueprintType)
+struct GP_A5_LITTLEPIPOTANK_API FBulletDataClient
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	int BulletIndex = 0;
+
+	UPROPERTY()
+	TObjectPtr<AClientTankBullet> Bullet;
 };

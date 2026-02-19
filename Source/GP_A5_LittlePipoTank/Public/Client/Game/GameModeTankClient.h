@@ -10,6 +10,7 @@
 
 class AClientPlayerController;
 class AClientTankPawn;
+class AClientTankBullet;
 /**
  * 
  */
@@ -66,6 +67,9 @@ private:
 	UPROPERTY(EditAnywhere, meta=(AllowPrivateAccess = "true"))
 	TSubclassOf<AClientTankPawn> BlueprintClientTankClass;
 
+	UPROPERTY(EditAnywhere, meta=(AllowPrivateAccess = "true"))
+	TSubclassOf<AClientTankBullet> BlueprintClientBulletClass;
+	
 	UPROPERTY()
 	TObjectPtr<AClientPlayerController> PlayerController;
 };

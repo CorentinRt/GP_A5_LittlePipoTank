@@ -21,6 +21,8 @@ struct GP_A5_LITTLEPIPOTANK_API FInterpolationSnapshot
 public:
 	TArray<FGameStatePacket::PlayerStateData> OtherPlayerStates;
 	FGameStatePacket::OwnPlayerStateData OwnPlayerState;
+
+	TArray<FGameStatePacket::BulletStateData> BulletsStates;
 };
 
 USTRUCT()
@@ -49,6 +51,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	TArray<FPlayerDataClient> Players;
 
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	TArray<FBulletDataClient> Bullets;
+	
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FPlayerTankInputs OwnPlayerInputs;
 
