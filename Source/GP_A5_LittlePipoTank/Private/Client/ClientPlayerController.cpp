@@ -25,6 +25,11 @@ void AClientPlayerController::SetupInputComponent()
 	}
 }
 
+FPlayerTankInputs& AClientPlayerController::GetTankInputs()
+{
+	return TankInputs;
+}
+
 const FPlayerTankInputs& AClientPlayerController::GetTankInputs() const
 {
 	return TankInputs;

@@ -541,51 +541,41 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 	}
 }
 
-void AGameModeTankClient::InterpolationClientPlayer(float DeltaTime)
-{
-}
 
 void AGameModeTankClient::PredictClient(float DeltaTime)
 {
 	// TODO Update Pawn physics here ?
 	// TODO Block Inputs if not in IN_GAME
-
-	
-	SendClientPrediction();
-}
-
-void AGameModeTankClient::SendClientPrediction()
-{
-	// TODO Get Client Pawn And Possess it on receive player tank, so we don't cast every frame
-	// TODO Maybe better: Input struct in player controller directly so easy to get
-	
-	if (!PlayerController)
-	{
-		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player controller is null.");
-		return;
-	}
-	
-	FPlayerInputsPacket InputsPacket = {
-		.PlayerInputs = PlayerController->GetTankInputs(),
-		.PredictionIndex = GameStateClient.NextPredictionIndex
-	};
-
-	/*UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning,
-		"Sent inputs => Move: X = {0}, Y = {1} | Aim: X = {2}, Y = {3} | Fire: {4}",
-		InputsPacket.PlayerInputs.MoveInput.X, InputsPacket.PlayerInputs.MoveInput.Y,
-		InputsPacket.PlayerInputs.AimInput.X, InputsPacket.PlayerInputs.AimInput.Y,
-		InputsPacket.PlayerInputs.FireInput);*/
-
 	
 	GameStateClient.Predictions.Add({
 		.PredictionIndex = GameStateClient.NextPredictionIndex,
 		.Inputs = PlayerController->GetTankInputs(),
 		//TODO Set Position, Rotation, AimRotation, Velocity
 	});
+	
+	SendClientPrediction();
+}
+
+void AGameModeTankClient::SendClientPrediction()
+{
+	if (!PlayerController)
+	{
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player controller is null.");
+		return;
+	}
+
+	FPlayerTankInputs& CurrentInputs = PlayerController->GetTankInputs();
+	
+	FPlayerInputsPacket InputsPacket = {
+		.PlayerInputs = CurrentInputs,
+		.PredictionIndex = GameStateClient.NextPredictionIndex
+	};
 
 	UNetworkProtocolHelpers::SendPacket(ServerPeer, InputsPacket, ENET_PACKET_FLAG_RELIABLE);
 
 	GameStateClient.NextPredictionIndex++;
+
+	if (CurrentInputs.FireInput) CurrentInputs.FireInput = false;
 }
 
 void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerStateData& OwnPlayerData)

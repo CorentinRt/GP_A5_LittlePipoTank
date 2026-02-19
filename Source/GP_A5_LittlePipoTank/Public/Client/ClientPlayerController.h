@@ -23,6 +23,7 @@ public:
 	
 	virtual void SetupInputComponent() override;
 
+	FPlayerTankInputs& GetTankInputs() ;
 	const FPlayerTankInputs& GetTankInputs() const;
 	
 protected:
