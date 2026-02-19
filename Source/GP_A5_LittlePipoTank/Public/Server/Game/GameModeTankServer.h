@@ -77,6 +77,8 @@ private:
 
 	UFUNCTION()
 	void BindHandleBulletDestroyed(ATankBullet* InTankBullet);
+
+	void SendTankSpawnToAllClients();
 	
 	FPlayerDataServer& GetAvailableNewPlayerDataOrCreate();
 	

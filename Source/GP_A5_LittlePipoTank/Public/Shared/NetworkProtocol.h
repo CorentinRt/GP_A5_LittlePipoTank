@@ -53,8 +53,15 @@ struct FSpawnTankPacket
 	~FSpawnTankPacket() = default;
 
 	static constexpr OpCode OpCode = OpCode::S_SpawnTank;
-	
-	int PlayerIndex = -1;
+
+	struct TankSpawnData
+	{
+		int PlayerIndex = -1;
+		FVector2D SpawnLocation = FVector2D::ZeroVector;
+		float SpawnRotation = 0.0f;
+	};
+
+	TArray<TankSpawnData> TankSpawnsData;
 	
 	void Serialize(TArray<BYTE>& ByteArray) const;
 	void Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset);
