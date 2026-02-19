@@ -9,6 +9,7 @@
 #include "Client/Game/ClientTankPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Runtime/Engine/Internal/Kismet/BlueprintTypeConversions.h"
 #include "Shared/LittlePipoTankGameInstance.h"
 #include "Shared/NetworkProtocol.h"
 #include "Shared/NetworkProtocolHelpers.h"
@@ -155,10 +156,16 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			FGameStatePacket Packet = {};
 			Packet.Deserialize(ByteArray, Offset);
 
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received Game State");
+			
 			// Reconciliation
 			ReconciliateClient(Packet.OwnPlayerData);
 			
-			GameStateClient.PlayersStateSnapshots.Add({.PlayerStates = Packet.OtherPlayersStateData});
+			GameStateClient.PlayersStateSnapshots.Add({
+				.OtherPlayerStates = Packet.OtherPlayersStateData,
+				.OwnPlayerState = Packet.OwnPlayerData
+			});
+			
 			break;
 		}
 
@@ -260,28 +267,78 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 		const FInterpolationSnapshot& FromSnapshot = GameStateClient.PlayersStateSnapshots[0];
 		const FInterpolationSnapshot& ToSnapshot = GameStateClient.PlayersStateSnapshots[1];
 
-		// Do the interpolation here
-		for (const auto& FromPlayerData : FromSnapshot.PlayerStates)
+		// Temp for test: Own Player Interp
+		// TODO Remove Client Player Interp
 		{
-
 			// check if To snapshot has a position for the same player
-			const FGameStatePacket::PlayerStateData* ToPlayerData = ToSnapshot.PlayerStates.FindByPredicate([&](const FGameStatePacket::PlayerStateData& PlayerData)
+			FPlayerDataClient* OwnPlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
+			{
+				return PlayerData.PlayerIndex == GameStateClient.OwnPlayerIndex;
+			});
+
+			if (OwnPlayerData && OwnPlayerData->Tank)
+			{
+				
+			
+				FGameStatePacket::OwnPlayerStateData FromPlayerData = FromSnapshot.OwnPlayerState;
+				FGameStatePacket::OwnPlayerStateData ToPlayerData = ToSnapshot.OwnPlayerState;
+				
+				// Do Lerp
+				FVector2D LerpLocation = FMath::Lerp(
+					FromPlayerData.Location,
+					ToPlayerData.Location,
+					GameStateClient.SnapshotBufferAccumulator);
+
+				FRotator LerpRotation = UKismetMathLibrary::RLerp(
+					FRotator(0.0f, FromPlayerData.Rotation, 0.0f),
+					FRotator(0.0f, ToPlayerData.Rotation, 0.0f),
+					GameStateClient.SnapshotBufferAccumulator,
+					true);
+				
+				float LerpAimRotation = FMath::Lerp(
+					FromPlayerData.AimRotation,
+					ToPlayerData.AimRotation,
+					GameStateClient.SnapshotBufferAccumulator);
+
+				//Apply Own Player Lerp
+				OwnPlayerData->Tank->SetLocation(LerpLocation);
+				OwnPlayerData->Tank->SetRotation(LerpRotation);
+				OwnPlayerData->Tank->SetAimRotation(LerpAimRotation);
+			}
+		}
+		
+		// Do the interpolation here
+		for (const auto& FromPlayerData : FromSnapshot.OtherPlayerStates)
+		{
+			// TODO do the loop taking in to account that I have to find other player index and tank
+				
+			// check if To snapshot has a position for the same player
+			const FGameStatePacket::PlayerStateData* ToPlayerData = ToSnapshot.OtherPlayerStates.FindByPredicate([&](const FGameStatePacket::PlayerStateData& PlayerData)
 			{
 				return PlayerData.Index == FromPlayerData.Index;
 			});
 
 			if (!ToPlayerData) continue;
+
+			// check if To snapshot has a position for the same player
+			FPlayerDataClient* OtherPlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
+			{
+				return PlayerData.PlayerIndex == FromPlayerData.Index;
+			});
+
+			if (!OtherPlayerData || !OtherPlayerData->Tank) continue;
 			
 			// Do Lerp
 			FVector2D LerpLocation = FMath::Lerp(
 				FromPlayerData.Location,
 				ToPlayerData->Location,
 				GameStateClient.SnapshotBufferAccumulator);
-			
-			float LerpRotation = FMath::Lerp(
-				FromPlayerData.Rotation,
-				ToPlayerData->Rotation,
-				GameStateClient.SnapshotBufferAccumulator);
+
+			FRotator LerpRotation = UKismetMathLibrary::RLerp(
+					FRotator(0.0f, FromPlayerData.Rotation, 0.0f),
+					FRotator(0.0f, ToPlayerData->Rotation, 0.0f),
+					GameStateClient.SnapshotBufferAccumulator,
+					true);
 			
 			float LerpAimRotation = FMath::Lerp(
 				FromPlayerData.AimRotation,
@@ -290,8 +347,12 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 
 			// Apply Lerp Values
 			// TODO Apply lerps
+			OtherPlayerData->Tank->SetLocation(LerpLocation);
+			OtherPlayerData->Tank->SetRotation(LerpRotation);
+			OtherPlayerData->Tank->SetAimRotation(LerpAimRotation);
 		}
 
+		
 		// Look if we need to 'reset' accumulator
 		if (GameStateClient.SnapshotBufferAccumulator < 1.0f) return;
 		
@@ -306,6 +367,10 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 	{
 		// Do Nothing, we can't interpolate.
 	}
+}
+
+void AGameModeTankClient::InterpolationClientPlayer(float DeltaTime)
+{
 }
 
 void AGameModeTankClient::PredictClient(float DeltaTime)
