@@ -340,34 +340,37 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			FSpawnTankPacket Packet = {};
 			Packet.Deserialize(ByteArray, Offset);
 
-			FPlayerDataClient* Player =  GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
+			for (const FSpawnTankPacket::TankSpawnData& SpawnTankData : Packet.TankSpawnsData)
 			{
-				return PlayerData.PlayerIndex == Packet.PlayerIndex;
-			});
+				FPlayerDataClient* Player =  GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
+				{
+					return PlayerData.PlayerIndex == SpawnTankData.PlayerIndex;
+				});
 
-			if (!Player) break;
-			if (Player->Tank) break;
+				if (!Player) continue;
+				if (Player->Tank) continue;
 			
-			// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Spawn ClientTank");
+				// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Spawn ClientTank");
 
-			// TODO Send Location and Rotation
-			APlayerTankSpawnPoint* SpawnPoint = PlayersSpawnPoints[Packet.PlayerIndex];
-					
-			FActorSpawnParameters SpawnParameters;
-			SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			AClientTankPawn* PlayerTank = GetWorld()->SpawnActor<AClientTankPawn>(
-				BlueprintClientTankClass,
-				SpawnPoint->GetActorLocation(),
-				SpawnPoint->GetActorRotation(),
-				SpawnParameters);
+				FVector SpawnLocation(SpawnTankData.SpawnLocation.X, SpawnTankData.SpawnLocation.Y, 0.0f);
+				FRotator SpawnRotation(0.0f, SpawnTankData.SpawnRotation, 0.0f);
+				
+				FActorSpawnParameters SpawnParameters;
+				SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				AClientTankPawn* PlayerTank = GetWorld()->SpawnActor<AClientTankPawn>(
+					BlueprintClientTankClass,
+					SpawnLocation,
+					SpawnRotation,
+					SpawnParameters);
 			
-			if (PlayerTank == nullptr)
-			{
-				UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to cast spawned tank to ClientTank class");
-				break;
+				if (PlayerTank == nullptr)
+				{
+					UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to cast spawned tank to ClientTank class");
+					continue;
+				}
+
+				Player->Tank = PlayerTank;
 			}
-
-			Player->Tank = PlayerTank;
 			
 			break;
 		}
