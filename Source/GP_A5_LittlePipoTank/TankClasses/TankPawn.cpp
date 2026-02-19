@@ -79,6 +79,7 @@ void ATankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void ATankPawn::SetPlayerTankInputs(const FPlayerTankInputs& InTankInputs)
 {
 	TankInputs = InTankInputs;
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Fire iNput {0}", TankInputs.FireInput);
 }
 
 void ATankPawn::MoveTank(float MoveInput, float DeltaTime)
