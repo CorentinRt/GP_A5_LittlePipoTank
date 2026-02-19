@@ -41,6 +41,8 @@ void ATankBullet::Destroyed()
 {
 	Super::Destroyed();
 
+	OnBulletDestroyed.Broadcast(this);
+	
 	UnregisterTickable();
 	UnregisterListener();
 }

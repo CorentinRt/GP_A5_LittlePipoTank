@@ -123,6 +123,9 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 {
 	IPhysicsTickableShared::OnTickPhysics_Blueprint_Implementation(DeltaTime);
 
+	if (IsHidden())
+		return;
+	
 	// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Tick physi tank");
 	//Move
 	MoveTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.Y, DeltaTime);
@@ -153,13 +156,15 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 		FRotator Rotation(TankShootingPoint->GetComponentRotation());
 		Rotation.Yaw += 90;
 		FActorSpawnParameters SpawnParameters;
-		AActor* Bullet = GetWorld()->SpawnActor<ATankBullet>(Location, Rotation, SpawnParameters);
+		ATankBullet* Bullet = GetWorld()->SpawnActor<ATankBullet>(Location, Rotation, SpawnParameters);
 		if (Bullet)
 		{
 			Bullet->SetInstigator(this);
 			Bullet->SetActorScale3D(Bullet->GetActorScale() * sizeOfBullet);
 			Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);	
 		}
+
+		OnSpawnBullet.Broadcast(Bullet);
 		
 		TankInputs.FireInput = false;
 	}

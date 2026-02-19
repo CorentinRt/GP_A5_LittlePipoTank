@@ -6,6 +6,7 @@
 #include "Server/Game/PlayerTankSpawnPoint.h"
 #include "Shared/NetworkProtocol.h"
 #include "Shared/NetworkProtocolHelpers.h"
+#include "TankClasses/TankBullet.h"
 #include "TankClasses/TankPawn.h"
 
 AGameModeTankServer::AGameModeTankServer()
@@ -72,6 +73,7 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 
 		GameStatePacket.OwnPlayerData.Index = LocalPlayer.PlayerIndex;
 
+		// Own Player
 		if (LocalPlayer.PlayerTanks)
 		{
 			GameStatePacket.OwnPlayerData.Location = FVector2D(LocalPlayer.PlayerTanks->GetActorLocation().X, LocalPlayer.PlayerTanks->GetActorLocation().Y);
@@ -80,6 +82,7 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 			GameStatePacket.OwnPlayerData.Velocity = FVector2D(LocalPlayer.PlayerTanks->GetVelocity().X, LocalPlayer.PlayerTanks->GetVelocity().Y);
 		}
 
+		// Other Players
 		for (FPlayerDataServer& OtherPlayer : GameStateServer.Players)
 		{
 			if (OtherPlayer.Peer == nullptr)
@@ -100,6 +103,30 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 			}
 
 			GameStatePacket.OtherPlayersStateData.Add(MoveTemp(OtherPlayerData));
+		}
+
+		// Bullets
+		for (int i = 0; i < GameStateServer.Players.Num(); ++i)
+		{
+			ATankBullet* LocalBullet = GameStateServer.AllTankBullets[i];
+			
+			if (!LocalBullet)
+			{
+				GameStateServer.AllTankBullets.RemoveAt(i);
+				--i;
+				continue;
+			}
+			
+			FGameStatePacket::BulletStateData NewBulletStateData = {};
+
+			NewBulletStateData.Index = LocalBullet->BulletIndex;
+
+			FVector BulletLocation = LocalBullet->GetActorLocation();
+			NewBulletStateData.Location = FVector2D(BulletLocation.X, BulletLocation.Y);
+			
+			NewBulletStateData.Rotation = LocalBullet->GetActorRotation().Yaw;
+
+			GameStatePacket.BulletsStateData.Add(MoveTemp(NewBulletStateData));
 		}
 		
 		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, GameStatePacket, ENET_PACKET_FLAG_RELIABLE);
@@ -336,6 +363,7 @@ bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		InPlayer.PlayerTanks = GetWorld()->SpawnActor<ATankPawn>(TankPawnClassBlueprint, SpawnParameters);
 		InPlayer.PlayerTanks->ReactOnGamePhaseChanged_Implementation(GameStateServer.CurrentGamePhase);
+		InPlayer.PlayerTanks->OnSpawnBullet.AddDynamic(this, &AGameModeTankServer::BindTankSpawnBullet);
 	}
 	
 	InPlayer.PlayerTanks->SetActorHiddenInGame(false);
@@ -447,6 +475,23 @@ void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 	}
 
 	SetServerGamePhase(ETankGamePhase::WAITING_PLAYER);
+}
+
+void AGameModeTankServer::BindTankSpawnBullet(ATankBullet* InTankBullet)
+{
+	if (!InTankBullet)
+		return;
+
+	InTankBullet->BulletIndex = GameStateServer.NextBulletIndex++;
+
+	InTankBullet->OnBulletDestroyed.AddDynamic(this, &AGameModeTankServer::BindHandleBulletDestroyed);
+	
+	GameStateServer.AllTankBullets.Add(InTankBullet);
+}
+
+void AGameModeTankServer::BindHandleBulletDestroyed(ATankBullet* InTankBullet)
+{
+	GameStateServer.AllTankBullets.Remove(InTankBullet);
 }
 
 FPlayerDataServer& AGameModeTankServer::GetAvailableNewPlayerDataOrCreate()

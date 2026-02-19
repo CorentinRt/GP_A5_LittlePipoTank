@@ -27,6 +27,8 @@ public:
 	// Sets default values for this actor's properties
 	ATankBullet();
 
+	int BulletIndex = -1;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -54,6 +56,11 @@ public:
 
 	UPROPERTY(EditAnywhere, Category= "Bullet")
 	uint8 numberOfBounces = 3;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBulletDestroyed, ATankBullet*, InBulletDestroyed);
+
+	FOnBulletDestroyed OnBulletDestroyed;
+	
 private:
 	int numberOfBouncesLeft;
 

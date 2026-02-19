@@ -7,6 +7,8 @@
 #include "Server/Game/PlayerDataServer.h"
 #include "GameStateTankServer.generated.h"
 
+class ATankBullet;
+
 /**
  * 
  */
@@ -28,4 +30,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	int PlayerCount = 0;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	TArray<TObjectPtr<ATankBullet>> AllTankBullets;
+
+	UPROPERTY()
+	int NextBulletIndex = 0;
 };

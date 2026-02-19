@@ -9,6 +9,7 @@
 #include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankServer.generated.h"
 
+class ATankBullet;
 /**
  * 
  */
@@ -62,7 +63,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	bool SpawnTankPlayer(FPlayerDataServer& InPlayer);
-
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ATankPawn> TankPawnClassBlueprint;
 	
@@ -71,6 +72,12 @@ private:
 
 	void PlayerLeft(const ENetEvent& event, int IndexToRemove);
 
+	UFUNCTION()
+	void BindTankSpawnBullet(ATankBullet* InTankBullet);
+
+	UFUNCTION()
+	void BindHandleBulletDestroyed(ATankBullet* InTankBullet);
+	
 	FPlayerDataServer& GetAvailableNewPlayerDataOrCreate();
 	
 	float CurrentAccumulatedGamePhaseTime = 0.f;

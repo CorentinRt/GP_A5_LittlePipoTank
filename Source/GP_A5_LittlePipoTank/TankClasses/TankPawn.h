@@ -14,6 +14,8 @@
 #include "Shared/Game/PhysicsTickableShared.h"
 #include "TankPawn.generated.h"
 
+class ATankBullet;
+
 UCLASS()
 class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn, public IPhysicsTickableShared, public IGamePhaseListener
 {
@@ -85,6 +87,10 @@ protected:
 	
 public:
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSpawnBullet, ATankBullet*, SpawnedTankBullet);
+
+	FOnSpawnBullet OnSpawnBullet;
+	
 	float GetHeadAimRotation() const;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
