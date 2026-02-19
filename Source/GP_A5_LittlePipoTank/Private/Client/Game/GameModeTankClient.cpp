@@ -41,6 +41,8 @@ void AGameModeTankClient::Tick(float DeltaSeconds)
 
 void AGameModeTankClient::InitGameClient()
 {
+	GetAllPlayerSpawnPoints();
+	
 	InitializeNetwork(GetServerAdressIp());
 	
 	GameStateClient.ServerPeer = ServerPeer;
@@ -56,8 +58,6 @@ void AGameModeTankClient::InitGameClient()
 	{
 		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to get Client Player Controller");
 	}
-
-	GetAllPlayerSpawnPoints();
 }
 
 void AGameModeTankClient::GamePhysicsTick(float DeltaTime)
