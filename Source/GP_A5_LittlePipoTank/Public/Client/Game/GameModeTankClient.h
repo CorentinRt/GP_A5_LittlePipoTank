@@ -57,9 +57,6 @@ protected:
 private:
 	void InterpolateGame(float DeltaTime);
 
-	// Temp For Test
-	void InterpolationClientPlayer(float DeltaTime);
-	
 	void PredictClient(float DeltaTime);
 	void SendClientPrediction();
 	void ReconciliateClient(const FGameStatePacket::OwnPlayerStateData& OwnPlayerData);
