@@ -198,6 +198,12 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 
 				if (!Player)
 				{
+					if (It->Tank)
+					{
+						GetWorld()->DestroyActor(It->Tank);
+						It->Tank = nullptr;
+					}
+					
 					It.RemoveCurrent();
 					continue;
 				}
