@@ -86,12 +86,15 @@ void AGameModeTankShared::GetAllPlayerSpawnPoints()
 
 	for (AActor* Actor : FoundActors)
 	{
-		APlayerTankSpawnPoint* SpawnPoint = Cast<APlayerTankSpawnPoint>(Actor);
-
-		if (SpawnPoint)
+		if (APlayerTankSpawnPoint* SpawnPoint = Cast<APlayerTankSpawnPoint>(Actor))
 			PlayersSpawnPoints.Add(SpawnPoint);
 	}
 
+	PlayersSpawnPoints.Sort([](const APlayerTankSpawnPoint& SpawnPointA, const APlayerTankSpawnPoint& SpawnPointB)
+	{
+		return SpawnPointA.IndexSpawn < SpawnPointB.IndexSpawn;
+	});
+	
 	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Amount of spawn points found: {0}", PlayersSpawnPoints.Num());
 }
 
