@@ -182,6 +182,7 @@ FRotator(0.f),
 FVector::One(),
 true);
 	}
+	ReceiveShoot();
 	this->Destroy();
 }
 

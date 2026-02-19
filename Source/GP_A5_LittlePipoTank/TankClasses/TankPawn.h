@@ -101,6 +101,9 @@ public:
 	
 	void TankGetShoot();
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveShoot();
+	
 	virtual void RegisterListener() override;
 	
 	virtual void UnregisterListener() override;
