@@ -159,6 +159,7 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 			Bullet->SetInstigator(this);
 			Bullet->SetActorScale3D(Bullet->GetActorScale() * sizeOfBullet);
 			Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);	
+			ReceiveShooting();
 		}
 		
 		TankInputs.FireInput = false;
@@ -183,7 +184,7 @@ FRotator(0.f),
 FVector::One(),
 true);
 	}
-	ReceiveShoot();
+	ReceiveGetShoot();
 	this->Destroy();
 }
 
