@@ -208,6 +208,26 @@ void AGameModeTankServer::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			
 			break;
 		}
+	case OpCode::C_PlayerInputs:
+		{
+			FPlayerInputsPacket PlayerInputsPacket = {};
+
+			PlayerInputsPacket.Deserialize(ByteArray, Offset);
+
+			for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+			{
+				if (LocalPlayer.Peer == Peer)
+				{
+					LocalPlayer.PlayerInputs = PlayerInputsPacket.PlayerInputs;
+
+					if (LocalPlayer.PlayerTanks)
+						LocalPlayer.PlayerTanks->SetPlayerTankInputs(LocalPlayer.PlayerInputs);
+					break;
+				}
+			}
+			
+			break;
+		}
 	}
 }
 

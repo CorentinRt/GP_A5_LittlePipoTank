@@ -48,6 +48,7 @@ void ATankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	/*
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) {
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
 			Subsystem->AddMappingContext(InputMapping, 0);
@@ -60,31 +61,12 @@ void ATankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		Input->BindAction(AimAction, ETriggerEvent::Triggered, this, &ATankPawn::Aim);
 		Input->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ATankPawn::Shoot);
 	}
+	*/
 }
 
-void ATankPawn::Move(const FInputActionValue& Value) {
-	FVector2D MovementVector = Value.Get<FVector2D>();
-	if (IsValid(Controller)) {
-		TankInputs.MoveInput = MovementVector;
-	}
-}
-
-void ATankPawn::Aim(const FInputActionValue& Value)
+void ATankPawn::SetPlayerTankInputs(const FPlayerTankInputs& InTankInputs)
 {
-	FVector2D AimVector = Value.Get<FVector2D>();
-	if (IsValid(Controller))
-	{
-		TankInputs.AimInput = AimVector;
-	}
-}
-
-void ATankPawn::Shoot(const FInputActionValue& Value)
-{
-	bool shootValue = Value.Get<bool>();
-	if (IsValid(Controller) && shootValue == true)
-	{
-		TankInputs.FireInput = true;
-	}
+	TankInputs = InTankInputs;
 }
 
 void ATankPawn::MoveTank(float MoveInput, float DeltaTime)

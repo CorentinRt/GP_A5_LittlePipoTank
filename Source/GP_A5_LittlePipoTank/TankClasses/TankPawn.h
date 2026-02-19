@@ -66,11 +66,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-protected:
-	void Move(const FInputActionValue& Value);
-	void Aim(const FInputActionValue& Value);
-	void Shoot(const FInputActionValue& Value);
+	void SetPlayerTankInputs(const FPlayerTankInputs& InTankInputs);
 
+protected:
 	void MoveTank(float MoveInput, float DeltaTime);
 
 	void RotateTank(float RotateInput, float DeltaTime);
