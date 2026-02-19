@@ -114,9 +114,7 @@ void ATankPawn::UnregisterTickable()
 void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 {
 	IPhysicsTickableShared::OnTickPhysics_Blueprint_Implementation(DeltaTime);
-
-
-	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Tick physi tank");
+	
 	//Move
 	MoveTank(TankInputs.MoveInput.Y, DeltaTime);
 

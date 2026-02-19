@@ -58,14 +58,45 @@ void AGameModeTankServer::GamePhysicsTick(float DeltaTime)
 void AGameModeTankServer::GameNetworkTick(float DeltaTime)
 {
 	Super::GameNetworkTick(DeltaTime);
-	/*
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		5.f,
-		FColor::Blue,
-		TEXT("Tick Network")
-	);
-	*/
+	
+	SendGameStatePacketToAllClients();
+}
+
+void AGameModeTankServer::SendGameStatePacketToAllClients()
+{
+	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	{
+		FGameStatePacket GameStatePacket = {};
+
+		GameStatePacket.OwnPlayerData.Index = LocalPlayer.PlayerIndex;
+
+		if (LocalPlayer.PlayerTanks)
+		{
+			GameStatePacket.OwnPlayerData.Location = FVector2D(LocalPlayer.PlayerTanks->GetActorLocation().X, LocalPlayer.PlayerTanks->GetActorLocation().Y);
+			GameStatePacket.OwnPlayerData.Rotation = LocalPlayer.PlayerTanks->GetActorRotation().Yaw;
+			GameStatePacket.OwnPlayerData.AimRotation = LocalPlayer.PlayerTanks->GetBaseAimRotation().Yaw;
+			GameStatePacket.OwnPlayerData.Velocity = FVector2D(LocalPlayer.PlayerTanks->GetVelocity().X, LocalPlayer.PlayerTanks->GetVelocity().Y);
+		}
+
+		for (FPlayerDataServer& OtherPlayer : GameStateServer.Players)
+		{
+			if (OtherPlayer.PlayerIndex == LocalPlayer.PlayerIndex)
+				continue;
+
+			FGameStatePacket::PlayerStateData OtherPlayerData = {};
+
+			OtherPlayerData.Index = OtherPlayer.PlayerIndex;
+			
+			if (OtherPlayer.PlayerTanks)
+			{
+				OtherPlayerData.Location = FVector2D(OtherPlayer.PlayerTanks->GetActorLocation().X, OtherPlayer.PlayerTanks->GetActorLocation().Y);
+				OtherPlayerData.Rotation = OtherPlayer.PlayerTanks->GetActorRotation().Yaw;
+				OtherPlayerData.AimRotation = OtherPlayer.PlayerTanks->GetBaseAimRotation().Yaw;
+			}
+
+			GameStatePacket.OtherPlayersStateData.Add(MoveTemp(OtherPlayerData));
+		}
+	}
 }
 
 ETankGamePhase AGameModeTankServer::GetCurrentGamePhase()

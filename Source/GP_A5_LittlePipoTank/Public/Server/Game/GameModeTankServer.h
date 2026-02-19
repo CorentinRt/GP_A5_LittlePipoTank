@@ -31,6 +31,8 @@ public:
 	virtual void GamePhysicsTick(float DeltaTime) override;
 	virtual void GameNetworkTick(float DeltaTime) override;
 
+	void SendGameStatePacketToAllClients();
+	
 	virtual ETankGamePhase GetCurrentGamePhase() override;
 
 	UFUNCTION(BlueprintCallable)
