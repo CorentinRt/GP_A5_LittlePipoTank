@@ -320,11 +320,6 @@ void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
 	}
 }
 
-void AGameModeTankServer::GetAllPlayerSpawnPoints()
-{
-	Super::GetAllPlayerSpawnPoints();
-}
-
 bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 {
 	if (InPlayer.PlayerIndex >= PlayersSpawnPoints.Num())
