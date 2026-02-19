@@ -156,7 +156,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			FGameStatePacket Packet = {};
 			Packet.Deserialize(ByteArray, Offset);
 
-			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received Game State");
+			// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received Game State");
 			
 			// Reconciliation
 			ReconciliateClient(Packet.OwnPlayerData);
@@ -208,6 +208,8 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			// Add players not present
 			for (auto It = Packet.Players.CreateIterator(); It; ++It)
 			{
+				// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "PlayerList Add Loop: Player Index = {0}", It->Index);
+				
 				const FPlayerDataClient* Player =  GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
 				{
 					return PlayerData.PlayerIndex == It->Index;
@@ -215,6 +217,8 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 
 				if (!Player)
 				{
+					// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "And ClientTank");
+					
 					FActorSpawnParameters SpawnParameters;
 					SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 					AClientTankPawn* PlayerTank = GetWorld()->SpawnActor<AClientTankPawn>(BlueprintClientTankClass, SpawnParameters);
@@ -321,11 +325,11 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 					true);
 
 				//Apply Own Player Lerp
-				OwnPlayerData->Tank->SetLocation(LerpLocation);
+				OwnPlayerData->Tank->SetLocation(LerpLocation, false);
 				OwnPlayerData->Tank->SetRotation(LerpRotation);
 				OwnPlayerData->Tank->SetAimRotation(LerpAimRotation);
 
-				UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Lerp Own Tank");
+				// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Lerp Own Tank");
 			}
 		}
 		
@@ -371,7 +375,7 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 
 			// Apply Lerp Values
 			// TODO Apply lerps
-			OtherPlayerData->Tank->SetLocation(LerpLocation);
+			OtherPlayerData->Tank->SetLocation(LerpLocation, false);
 			OtherPlayerData->Tank->SetRotation(LerpRotation);
 			OtherPlayerData->Tank->SetAimRotation(LerpAimRotation);
 		}

@@ -30,10 +30,10 @@ void AClientTankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AClientTankPawn::SetLocation(const FVector2D& Location)
+void AClientTankPawn::SetLocation(const FVector2D& Location, bool Sweep)
 {
 	FVector NewLocation(Location.X, Location.Y, 0.0f);
-	SetActorLocation(NewLocation, true);
+	SetActorLocation(NewLocation, Sweep);
 }
 
 void AClientTankPawn::SetRotation(const FRotator& Rotation)
