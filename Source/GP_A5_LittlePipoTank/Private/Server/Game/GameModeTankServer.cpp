@@ -335,6 +335,7 @@ bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		InPlayer.PlayerTanks = GetWorld()->SpawnActor<ATankPawn>(TankPawnClassBlueprint, SpawnParameters);
+		InPlayer.PlayerTanks->ReactOnGamePhaseChanged_Implementation(GameStateServer.CurrentGamePhase);
 	}
 	
 	InPlayer.PlayerTanks->SetActorHiddenInGame(false);

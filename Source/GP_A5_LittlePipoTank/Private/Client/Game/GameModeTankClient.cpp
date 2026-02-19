@@ -6,6 +6,7 @@
 #include "GP_A5_LittlePipoTank.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Client/ClientPlayerController.h"
+#include "Client/Game/ClientTankBullet.h"
 #include "Client/Game/ClientTankPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -165,8 +166,71 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			
 			GameStateClient.PlayersStateSnapshots.Add({
 				.OtherPlayerStates = Packet.OtherPlayersStateData,
-				.OwnPlayerState = Packet.OwnPlayerData
+				.OwnPlayerState = Packet.OwnPlayerData,
+				.BulletsStates = Packet.BulletsStateData
 			});
+
+			// Remove bullets not here anymore
+			for (auto It = GameStateClient.Bullets.CreateIterator(); It;)
+			{
+				FGameStatePacket::BulletStateData* Bullet = Packet.BulletsStateData.FindByPredicate([&](const FGameStatePacket::BulletStateData& BulletData)
+				{
+					return BulletData.Index == It->BulletIndex;
+				});
+
+				if (!Bullet)
+				{
+					if (It->Bullet)
+					{
+						GetWorld()->DestroyActor(It->Bullet);
+						It->Bullet = nullptr;
+					}
+					
+					It.RemoveCurrent();
+					continue;
+				}
+
+				++It;
+			}
+			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "S_PlayerList: Nb players after removal: {0}", GameStateClient.Players.Num());
+
+			
+			// Add bullets not present
+			for (auto It = Packet.BulletsStateData.CreateIterator(); It; ++It)
+			{
+				// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "PlayerList Add Loop: Player Index = {0}", It->Index);
+				
+				const FBulletDataClient* Bullet =  GameStateClient.Bullets.FindByPredicate([&](const FBulletDataClient& BulletData)
+				{
+					return BulletData.BulletIndex == It->Index;
+				});
+
+				if (!Bullet)
+				{
+					// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "And ClientTank");
+					FVector SpawnLocation(It->Location.X, It->Location.Y, 0.0f);
+					FRotator SpawnRotation(0.0f, It->Rotation, 0.0f);
+					
+					FActorSpawnParameters SpawnParameters;
+					SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+					AClientTankBullet* BulletActor = GetWorld()->SpawnActor<AClientTankBullet>(
+						BlueprintClientBulletClass,
+						SpawnLocation,
+						SpawnRotation,
+						SpawnParameters);
+
+					if (BulletActor == nullptr)
+					{
+						UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to cast spawned tank to ClientTank class");
+						continue;
+					}
+					
+					GameStateClient.Bullets.Add({
+						.BulletIndex = It->Index,
+						.Bullet = BulletActor,
+					});
+				}
+			}
 			
 			break;
 		}
@@ -384,8 +448,6 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 		// Do the interpolation here
 		for (const auto& FromPlayerData : FromSnapshot.OtherPlayerStates)
 		{
-			// TODO do the loop taking in to account that I have to find other player index and tank
-				
 			// check if To snapshot has a position for the same player
 			const FGameStatePacket::PlayerStateData* ToPlayerData = ToSnapshot.OtherPlayerStates.FindByPredicate([&](const FGameStatePacket::PlayerStateData& PlayerData)
 			{
@@ -394,7 +456,7 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 
 			if (!ToPlayerData) continue;
 
-			// check if To snapshot has a position for the same player
+			// check if player is in game data
 			FPlayerDataClient* OtherPlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
 			{
 				return PlayerData.PlayerIndex == FromPlayerData.Index;
@@ -422,12 +484,46 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 					true);
 
 			// Apply Lerp Values
-			// TODO Apply lerps
 			OtherPlayerData->Tank->SetLocation(LerpLocation, false);
 			OtherPlayerData->Tank->SetRotation(LerpRotation);
 			OtherPlayerData->Tank->SetAimRotation(LerpAimRotation);
 		}
 
+		// Interp Bullets
+		for (const auto& FromBulletData : FromSnapshot.BulletsStates)
+		{
+			// check if To snapshot has a position for the same player
+			const FGameStatePacket::BulletStateData* ToBulletData = ToSnapshot.BulletsStates.FindByPredicate([&](const FGameStatePacket::BulletStateData& BulletData)
+			{
+				return BulletData.Index == FromBulletData.Index;
+			});
+
+			if (!ToBulletData) continue;
+
+			// check if bullet is in game data
+			FBulletDataClient* Bullet = GameStateClient.Bullets.FindByPredicate([&](const FBulletDataClient& BulletData)
+			{
+				return BulletData.BulletIndex == FromBulletData.Index;
+			});
+
+			if (!Bullet || !Bullet->Bullet) continue;
+			
+			// Do Lerp
+			FVector2D LerpLocation = FMath::Lerp(
+				FromBulletData.Location,
+				ToBulletData->Location,
+				GameStateClient.SnapshotBufferAccumulator);
+
+			FRotator LerpRotation = UKismetMathLibrary::RLerp(
+					FRotator(0.0f, FromBulletData.Rotation, 0.0f),
+					FRotator(0.0f, ToBulletData->Rotation, 0.0f),
+					GameStateClient.SnapshotBufferAccumulator,
+					true);
+
+			// Apply Lerp Values
+			Bullet->Bullet->SetLocation(LerpLocation, false);
+			Bullet->Bullet->SetRotation(LerpRotation);
+		}
 		
 		// Look if we need to 'reset' accumulator
 		if (GameStateClient.SnapshotBufferAccumulator < 1.0f) return;
