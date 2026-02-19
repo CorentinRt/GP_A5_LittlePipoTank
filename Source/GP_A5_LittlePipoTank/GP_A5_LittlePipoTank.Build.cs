@@ -22,7 +22,8 @@ public class GP_A5_LittlePipoTank : ModuleRules
 			"GameplayStateTreeModule",
 			"UMG",
 			"Slate",
-			"ENet6Library"
+			"ENet6Library",
+			"Niagara"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

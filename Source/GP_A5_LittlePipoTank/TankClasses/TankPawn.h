@@ -8,6 +8,8 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Server/Game/GameModeTankServer.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 #include "Shared/Game/PhysicsTickableShared.h"
 #include "TankPawn.generated.h"
 
@@ -27,6 +29,8 @@ public:
 	UStaticMesh* BulletMesh;
 	UPROPERTY(EditAnywhere, Category= "Tank")
 	uint8 sizeOfBullet = 3;
+	UPROPERTY(EditAnywhere, Category="Tank")
+	class UNiagaraSystem* TankParticleExplosion;
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
