@@ -3,6 +3,7 @@
 
 #include "Shared/Game/GameModeTankShared.h"
 
+#include "GP_A5_LittlePipoTank.h"
 #include "Kismet/GameplayStatics.h"
 #include "Shared/Game/GamePhaseListener.h"
 #include "Shared/Game/PhysicsTickableShared.h"
@@ -111,6 +112,7 @@ void AGameModeTankShared::RegisterPhysicsTickable(AActor* InPhysicsTickable)
 	if (!InPhysicsTickable || !InPhysicsTickable->GetClass()->ImplementsInterface(UPhysicsTickableShared::StaticClass()))
 		return;
 
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Add to register tickable");
 	PhysicsTickables.AddUnique(InPhysicsTickable);
 }
 

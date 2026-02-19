@@ -4,6 +4,7 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "GP_A5_LittlePipoTank.h"
 #include "TankBullet.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -34,6 +35,15 @@ ATankPawn::ATankPawn()
 void ATankPawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	RegisterTickable();
+}
+
+void ATankPawn::Destroyed()
+{
+	Super::Destroyed();
+
+	UnregisterTickable();
 }
 
 // Called every frame
@@ -105,6 +115,8 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 {
 	IPhysicsTickableShared::OnTickPhysics_Blueprint_Implementation(DeltaTime);
 
+
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Tick physi tank");
 	//Move
 	MoveTank(TankInputs.MoveInput.Y, DeltaTime);
 

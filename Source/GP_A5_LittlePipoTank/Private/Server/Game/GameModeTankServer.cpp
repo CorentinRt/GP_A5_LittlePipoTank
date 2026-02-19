@@ -42,6 +42,7 @@ void AGameModeTankServer::InitGameServer()
 
 void AGameModeTankServer::GamePhysicsTick(float DeltaTime)
 {
+	Super::GamePhysicsTick(DeltaTime);
 	/*
 	GEngine->AddOnScreenDebugMessage(
 		-1,
@@ -56,6 +57,7 @@ void AGameModeTankServer::GamePhysicsTick(float DeltaTime)
 
 void AGameModeTankServer::GameNetworkTick(float DeltaTime)
 {
+	Super::GameNetworkTick(DeltaTime);
 	/*
 	GEngine->AddOnScreenDebugMessage(
 		-1,
