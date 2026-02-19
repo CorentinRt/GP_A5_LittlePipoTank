@@ -215,7 +215,16 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 
 				if (!Player)
 				{
-					AClientTankPawn* PlayerTank = GetWorld()->SpawnActor<AClientTankPawn>(BlueprintClientTankClass);
+					FActorSpawnParameters SpawnParameters;
+					SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+					AClientTankPawn* PlayerTank = GetWorld()->SpawnActor<AClientTankPawn>(BlueprintClientTankClass, SpawnParameters);
+
+					if (PlayerTank == nullptr)
+					{
+						UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to cast spawned tank to ClientTank class");
+						return;
+					}
+					
 					GameStateClient.Players.Add({
 						.PlayerIndex = It->Index,
 						.PlayerName = It->Name,
@@ -268,7 +277,8 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 		const FInterpolationSnapshot& ToSnapshot = GameStateClient.PlayersStateSnapshots[1];
 
 		// Temp for test: Own Player Interp
-		// TODO Remove Client Player Interp
+		// TODO Remove Client Player Interpsd
+		
 		{
 			// check if To snapshot has a position for the same player
 			FPlayerDataClient* OwnPlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
@@ -276,10 +286,18 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 				return PlayerData.PlayerIndex == GameStateClient.OwnPlayerIndex;
 			});
 
+			if (!OwnPlayerData)
+			{
+				UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "No Own Data");
+			}
+
+			if (!OwnPlayerData->Tank)
+			{
+				UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "No Own Tank");
+			}
+			
 			if (OwnPlayerData && OwnPlayerData->Tank)
 			{
-				
-			
 				FGameStatePacket::OwnPlayerStateData FromPlayerData = FromSnapshot.OwnPlayerState;
 				FGameStatePacket::OwnPlayerStateData ToPlayerData = ToSnapshot.OwnPlayerState;
 				
@@ -304,6 +322,8 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 				OwnPlayerData->Tank->SetLocation(LerpLocation);
 				OwnPlayerData->Tank->SetRotation(LerpRotation);
 				OwnPlayerData->Tank->SetAimRotation(LerpAimRotation);
+
+				UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Lerp Own Tank");
 			}
 		}
 		

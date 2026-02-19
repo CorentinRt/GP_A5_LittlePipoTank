@@ -35,7 +35,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetClientGamePhase(ETankGamePhase NewGamePhase);
-	
+
+	UPROPERTY()
 	FGameStateTankClient GameStateClient;
 
 	void ReceivePlayerJoinedGame();
