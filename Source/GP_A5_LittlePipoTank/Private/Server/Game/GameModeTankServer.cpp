@@ -365,7 +365,7 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 {
 	++GameStateServer.PlayerCount;
 
-	if (GameStateServer.PlayerCount >= 2)
+	if (GameStateServer.PlayerCount > 2)
 		return;
 	
 	FPlayerTankInputs PlayerInputs
@@ -420,7 +420,7 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 			FPlayerListPacket::Player PlayerListSingle
 			{
 				.Name = ListedPlayer.PlayerName,
-				.Index = LocalPlayer.PlayerIndex
+				.Index = ListedPlayer.PlayerIndex
 			};
 			
 			PlayerListPacket.Players.Add(MoveTemp(PlayerListSingle));
@@ -435,6 +435,7 @@ void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 	--GameStateServer.PlayerCount;
 	
 	GameStateServer.Players[IndexToRemove].Peer = nullptr;
+	GetWorld()->DestroyActor(GameStateServer.Players[IndexToRemove].PlayerTanks);
 
 	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
