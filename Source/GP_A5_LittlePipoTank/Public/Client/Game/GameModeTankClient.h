@@ -8,6 +8,7 @@
 #include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankClient.generated.h"
 
+class AClientPlayerController;
 class AClientTankPawn;
 /**
  * 
@@ -60,4 +61,7 @@ private:
 
 	UPROPERTY(EditAnywhere, meta=(AllowPrivateAccess = "true"))
 	TSubclassOf<AClientTankPawn> BlueprintClientTankClass;
+
+	UPROPERTY()
+	TObjectPtr<AClientPlayerController> PlayerController;
 };
