@@ -81,6 +81,8 @@ protected:
 	
 public:
 
+	float GetHeadAimRotation() const;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Speed = 600.f;
 

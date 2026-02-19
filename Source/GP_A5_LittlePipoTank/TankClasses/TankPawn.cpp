@@ -94,6 +94,11 @@ void ATankPawn::RotateTank(float RotateInput, float DeltaTime)
 	AddActorLocalRotation(RotationDelta * DeltaTime * RotateSpeed);
 }
 
+float ATankPawn::GetHeadAimRotation() const
+{
+	return TankHeadMesh->GetComponentRotation().Yaw;
+}
+
 void ATankPawn::RegisterTickable()
 {
 	GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
