@@ -106,7 +106,7 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 		}
 
 		// Bullets
-		for (int i = 0; i < GameStateServer.Players.Num(); ++i)
+		for (int i = 0; i < GameStateServer.AllTankBullets.Num(); ++i)
 		{
 			ATankBullet* LocalBullet = GameStateServer.AllTankBullets[i];
 			
