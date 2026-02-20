@@ -22,9 +22,9 @@ class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn, public IPhysicsTickable
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Category= "Tank")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Tank")
 	UStaticMeshComponent* TankHeadMesh;
-	UPROPERTY(EditAnywhere, Category= "Tank")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Tank")
 	UStaticMeshComponent* TankBodyMesh;
 	UPROPERTY(EditAnywhere, Category= "Tank")
 	USceneComponent* TankShootingPoint;

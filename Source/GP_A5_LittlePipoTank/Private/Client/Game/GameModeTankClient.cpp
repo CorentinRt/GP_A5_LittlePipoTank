@@ -15,6 +15,7 @@
 #include "Shared/LittlePipoTankGameInstance.h"
 #include "Shared/NetworkProtocol.h"
 #include "Shared/NetworkProtocolHelpers.h"
+#include "Shared/TankCustomization/PlayersTankColorData.h"
 #include "TankClasses/TankPawn.h"
 
 AGameModeTankClient::AGameModeTankClient()
@@ -371,8 +372,20 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 				}
 
 				Player->Tank = PlayerTank;
+
 				UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Spawn ClientTank Success");
+
+				if (!PlayersColorData) continue;
 				
+				if (Player->PlayerIndex >= PlayersColorData->TankColors.Num())
+				{
+					Player->Tank->SetMeshMaterial(PlayersColorData->DefaultColor);
+					
+				}
+				else
+				{
+					Player->Tank->SetMeshMaterial(PlayersColorData->TankColors[Player->PlayerIndex]);
+				}
 			}
 			
 			break;

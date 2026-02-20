@@ -8,6 +8,7 @@
 #include "Shared/Game/GameModeTankShared.h"
 #include "GameModeTankClient.generated.h"
 
+class UPlayersTankColorData;
 class AClientPlayerController;
 class AClientTankPawn;
 class AClientTankBullet;
@@ -69,4 +70,7 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<AClientPlayerController> PlayerController;
+
+	UPROPERTY(EditAnywhere, meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<UPlayersTankColorData> PlayersColorData;
 };

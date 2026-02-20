@@ -29,4 +29,7 @@ public:
 	void SetLocation(const FVector2D& Location, bool Sweep);
 	void SetRotation(const FRotator& Rotation);
 	void SetAimRotation(const FRotator& AimRotation);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetMeshMaterial(const UMaterialInterface* Material);
 };
