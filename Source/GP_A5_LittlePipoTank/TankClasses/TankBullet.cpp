@@ -65,20 +65,20 @@ void ATankBullet::OnBounce(const FHitResult& ImpactResult, const FVector& Impact
 	if (ATankPawn* HitPawn = Cast<ATankPawn>(HitActor))
 	{
 		HitPawn->TankGetShoot();
-		this->Destroy();
+		bMarkedForDestroy = true;
 		return;
 	}
 
 	if (ATankBullet* HitBulletPawn = Cast<ATankBullet>(HitActor))
 	{
 		HitBulletPawn->Destroy();
-		this->Destroy();
+		bMarkedForDestroy = true;
 		return;
 	}
 	
 	if (numberOfBouncesLeft == 0)
 	{
-		this->Destroy();
+		bMarkedForDestroy = true;
 	}
 }
 
@@ -93,6 +93,11 @@ void ATankBullet::SetBulletVelocity(const FVector& InVelocity)
 void ATankBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (bMarkedForDestroy)
+	{
+		GetWorld()->DestroyActor(this);
+	}
 }
 
 void ATankBullet::RegisterTickable()

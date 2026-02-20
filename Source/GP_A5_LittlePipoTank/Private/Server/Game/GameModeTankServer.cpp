@@ -110,23 +110,25 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 		{
 			ATankBullet* LocalBullet = GameStateServer.AllTankBullets[i];
 			
-			if (!LocalBullet)
+			if (!IsValid(LocalBullet))
 			{
 				GameStateServer.AllTankBullets.RemoveAt(i);
 				--i;
 				continue;
 			}
-			
-			FGameStatePacket::BulletStateData NewBulletStateData = {};
+			else
+			{
+				FGameStatePacket::BulletStateData NewBulletStateData = {};
 
-			NewBulletStateData.Index = LocalBullet->BulletIndex;
+				NewBulletStateData.Index = LocalBullet->BulletIndex;
 
-			FVector BulletLocation = LocalBullet->GetActorLocation();
-			NewBulletStateData.Location = FVector2D(BulletLocation.X, BulletLocation.Y);
-			
-			NewBulletStateData.Rotation = LocalBullet->GetActorRotation().Yaw;
+				FVector BulletLocation = LocalBullet->GetActorLocation();
+				NewBulletStateData.Location = FVector2D(BulletLocation.X, BulletLocation.Y);
+				
+				NewBulletStateData.Rotation = LocalBullet->GetActorRotation().Yaw;
 
-			GameStatePacket.BulletsStateData.Add(MoveTemp(NewBulletStateData));
+				GameStatePacket.BulletsStateData.Add(MoveTemp(NewBulletStateData));
+			}
 		}
 		
 		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, GameStatePacket, ENET_PACKET_FLAG_RELIABLE);
@@ -513,9 +515,16 @@ void AGameModeTankServer::BindTankSpawnBullet(ATankBullet* InTankBullet)
 
 void AGameModeTankServer::BindHandleBulletDestroyed(ATankBullet* InTankBullet)
 {
+	if (!InTankBullet)
+		return;
+	
 	InTankBullet->OnBulletDestroyed.RemoveDynamic(this, &AGameModeTankServer::BindHandleBulletDestroyed);
-	GameStateServer.AllTankBullets.Remove(InTankBullet);
-	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Remove bullet from list count = {0}", GameStateServer.AllTankBullets.Num());
+
+	if (GameStateServer.AllTankBullets.Contains(InTankBullet))
+	{
+		GameStateServer.AllTankBullets.Remove(InTankBullet);
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Remove bullet from list count = {0}", GameStateServer.AllTankBullets.Num());
+	}
 }
 
 void AGameModeTankServer::BindHandleTankDestroyed(ATankPawn* InTank)
