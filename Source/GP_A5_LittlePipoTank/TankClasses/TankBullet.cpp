@@ -93,10 +93,10 @@ void ATankBullet::SetBulletVelocity(const FVector& InVelocity)
 void ATankBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (bMarkedForDestroy)
+	
+	if (bMarkedForDestroy && !IsPendingKillPending())
 	{
-		GetWorld()->DestroyActor(this);
+		Destroy();
 	}
 }
 
@@ -124,6 +124,9 @@ void ATankBullet::UnregisterTickable()
 
 void ATankBullet::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 {
+	if (bMarkedForDestroy)
+		return;
+	
 	IPhysicsTickableShared::OnTickPhysics_Blueprint_Implementation(DeltaTime);
 
 	FVector Start = GetActorLocation();

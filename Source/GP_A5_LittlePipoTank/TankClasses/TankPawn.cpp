@@ -163,9 +163,10 @@ void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 			//Bullet->SetActorScale3D(Bullet->GetActorScale() * sizeOfBullet);
 			Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);	
 			ReceiveShooting();
+			
+			OnSpawnBullet.Broadcast(Bullet);
 		}
 
-		OnSpawnBullet.Broadcast(Bullet);
 		
 		TankInputs.FireInput = false;
 	}
