@@ -3,17 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 #include "Shared/Game/GamePhaseListener.h"
-#include "Shared/Game/PhysicsTickableShared.h"
 #include "TankBullet.generated.h"
 
 class AGameModeTankServer;
 
 UCLASS()
-class GP_A5_LITTLEPIPOTANK_API ATankBullet : public AActor, public IPhysicsTickableShared, public IGamePhaseListener
+class GP_A5_LITTLEPIPOTANK_API ATankBullet : public AActor, public IGamePhaseListener
 {
 	GENERATED_BODY()
 
@@ -46,12 +43,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-	virtual void RegisterTickable() override;
-	virtual void UnregisterTickable() override;
-	virtual void OnTickPhysics_Blueprint_Implementation(float DeltaTime) override;
+	void UpdatePhysics(float DeltaTime);
+	bool CheckBulletDestroyed();
 	
-	virtual void RegisterListener() override;
-	virtual void UnregisterListener() override;
 	virtual void ReactOnGamePhaseChanged_Implementation(ETankGamePhase InGamePhase) override;
 
 	UPROPERTY(EditAnywhere, Category= "Bullet")

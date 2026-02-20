@@ -28,9 +28,6 @@ void ATankBullet::BeginPlay()
 
 	SetBulletVelocity(GetActorForwardVector() * BulletSpeed);
 	
-	RegisterTickable();
-	RegisterListener();
-	
 	if (GetInstigator())
 	{
 		BulletMesh->IgnoreActorWhenMoving(GetInstigator(), true); //Ignore le big tank 
@@ -42,9 +39,6 @@ void ATankBullet::Destroyed()
 	Super::Destroyed();
 
 	OnBulletDestroyed.Broadcast(this);
-	
-	UnregisterTickable();
-	UnregisterListener();
 }
 
 void ATankBullet::HandleBounce(const FHitResult& Hit)
@@ -94,41 +88,13 @@ void ATankBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (bMarkedForDestroy && !IsPendingKillPending())
-	{
-		Destroy();
-	}
 }
 
-void ATankBullet::RegisterTickable()
-{
-	if (!GameMode)
-		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
-	
-	if (GameMode)
-	{
-		GameMode->RegisterPhysicsTickable(this);
-	}
-}
-
-void ATankBullet::UnregisterTickable()
-{
-	if (!GameMode)
-		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
-	
-	if (GameMode)
-	{
-		GameMode->UnregisterPhysicsTickable(this);
-	}
-}
-
-void ATankBullet::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
+void ATankBullet::UpdatePhysics(float DeltaTime)
 {
 	if (bMarkedForDestroy)
 		return;
 	
-	IPhysicsTickableShared::OnTickPhysics_Blueprint_Implementation(DeltaTime);
-
 	FVector Start = GetActorLocation();
 
 	FVector End = Start + Velocity * DeltaTime;
@@ -144,26 +110,15 @@ void ATankBullet::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
 	}
 }
 
-void ATankBullet::RegisterListener()
+bool ATankBullet::CheckBulletDestroyed()
 {
-	if (!GameMode)
-		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
-	
-	if (GameMode)
+	if (bMarkedForDestroy && !IsPendingKillPending())
 	{
-		GameMode->RegisterListener(this);
+		Destroy();
+		return true;
 	}
-}
 
-void ATankBullet::UnregisterListener()
-{
-	if (!GameMode)
-		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
-	
-	if (GameMode)
-	{
-		GameMode->UnregisterListener(this);
-	}
+	return false;
 }
 
 void ATankBullet::ReactOnGamePhaseChanged_Implementation(ETankGamePhase InGamePhase)

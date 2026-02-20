@@ -39,12 +39,18 @@ public:
 	void SetServerGamePhase(ETankGamePhase NewGamePhase);
 
 	virtual void ReactChangeGamePhase(ETankGamePhase InGamePhase) override;
+
+	void TanksReactToOnChangeGamePhase(ETankGamePhase InGamePhase);
+	void BulletsReactToOnChangeGamePhase(ETankGamePhase InGamePhase);
 	
 	UFUNCTION(BlueprintCallable)
 	void NextGamePhase();
 
 	void UpdateCurrentGamePhase(float DeltaTime);
 
+	void UpdateTanksPhysics(float DeltaTime);
+	void UpdateBulletsPhysics(float DeltaTime);
+	
 	UFUNCTION(BlueprintCallable)
 	float GetGamePhaseDuration(ETankGamePhase InGamePhase);
 	

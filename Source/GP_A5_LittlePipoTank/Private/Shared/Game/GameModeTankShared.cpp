@@ -7,7 +7,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Server/Game/PlayerTankSpawnPoint.h"
 #include "Shared/Game/GamePhaseListener.h"
-#include "Shared/Game/PhysicsTickableShared.h"
 
 AGameModeTankShared::AGameModeTankShared()
 {
@@ -19,7 +18,6 @@ void AGameModeTankShared::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UGameplayStatics::GetAllActorsWithInterface(this, UPhysicsTickableShared::StaticClass(), PhysicsTickables);
 }
 
 void AGameModeTankShared::Tick(float DeltaSeconds)
@@ -54,24 +52,7 @@ void AGameModeTankShared::UpdateCheckTickNetwork(float DeltaTime)
 
 void AGameModeTankShared::GamePhysicsTick(float DeltaTime)
 {
-	for (int i = 0; i < PhysicsTickables.Num(); ++i)
-	{
-		AActor* Tickable = PhysicsTickables[i];
-
-		if (!IsValid(Tickable))
-		{
-			PhysicsTickables.RemoveAt(i);
-			--i;
-		}
-	}
 	
-	for (AActor* Tickable : PhysicsTickables)
-	{
-		if (!IsValid(Tickable) || !Tickable->GetClass()->ImplementsInterface(UPhysicsTickableShared::StaticClass()))
-			continue;
-
-		IPhysicsTickableShared::Execute_OnTickPhysics_Blueprint(Tickable, DeltaTime);
-	}
 }
 
 void AGameModeTankShared::GameNetworkTick(float DeltaTime)
@@ -111,57 +92,6 @@ void AGameModeTankShared::GetAllPlayerSpawnPoints()
 
 void AGameModeTankShared::ReactChangeGamePhase(ETankGamePhase InGamePhase)
 {
-	for (int i = 0; i < GamePhaseListeners.Num(); ++i)
-	{
-		AActor* Listener = GamePhaseListeners[i];
-
-		if (!IsValid(Listener))
-		{
-			GamePhaseListeners.RemoveAt(i);
-			--i;
-		}
-	}
 	
-	for (AActor* GamePhaseListener : GamePhaseListeners)
-	{
-		if (!IsValid(GamePhaseListener) || !GamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
-			continue;
-
-		IGamePhaseListener::Execute_ReactOnGamePhaseChanged(GamePhaseListener, InGamePhase);
-	}
-	
-	ReactChangeGamePhase_Implementation(InGamePhase);
 }
 
-void AGameModeTankShared::RegisterListener(AActor* InGamePhaseListener)
-{
-	if (!IsValid(InGamePhaseListener) || !InGamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
-		return;
-
-	GamePhaseListeners.AddUnique(InGamePhaseListener);
-}
-
-void AGameModeTankShared::UnregisterListener(AActor* InGamePhaseListener)
-{
-	if (!IsValid(InGamePhaseListener) || !InGamePhaseListener->GetClass()->ImplementsInterface(UGamePhaseListener::StaticClass()))
-		return;
-
-	//GamePhaseListeners.Remove(InGamePhaseListener);	// en com car au cas où ça poserait des pb de mémoire pendant le parcours de la liste en shipping
-}
-
-void AGameModeTankShared::RegisterPhysicsTickable(AActor* InPhysicsTickable)
-{
-	if (!IsValid(InPhysicsTickable) || !InPhysicsTickable->GetClass()->ImplementsInterface(UPhysicsTickableShared::StaticClass()))
-		return;
-
-	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Add to register tickable");
-	PhysicsTickables.AddUnique(InPhysicsTickable);
-}
-
-void AGameModeTankShared::UnregisterPhysicsTickable(AActor* InPhysicsTickable)
-{
-	if (!IsValid(InPhysicsTickable) || !InPhysicsTickable->GetClass()->ImplementsInterface(UPhysicsTickableShared::StaticClass()))
-		return;
-
-	//PhysicsTickables.Remove(InPhysicsTickable);	// en com car au cas où ça poserait des pb de mémoire pendant le parcours de la liste en shipping
-}

@@ -53,6 +53,9 @@ void AGameModeTankServer::GamePhysicsTick(float DeltaTime)
 	*/
 
 	UpdateCurrentGamePhase(DeltaTime);
+
+	UpdateTanksPhysics(DeltaTime);
+	UpdateBulletsPhysics(DeltaTime);
 }
 
 void AGameModeTankServer::GameNetworkTick(float DeltaTime)
@@ -158,6 +161,34 @@ void AGameModeTankServer::ReactChangeGamePhase(ETankGamePhase InGamePhase)
 	}
 	
 	SendTankSpawnToAllClients();
+
+	TanksReactToOnChangeGamePhase(InGamePhase);
+	BulletsReactToOnChangeGamePhase(InGamePhase);
+}
+
+void AGameModeTankServer::TanksReactToOnChangeGamePhase(ETankGamePhase InGamePhase)
+{
+	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	{
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+
+		if (!IsValid(LocalPlayer.PlayerTanks))
+			continue;
+
+		LocalPlayer.PlayerTanks->ReactOnGamePhaseChanged_Implementation(InGamePhase);
+	}
+}
+
+void AGameModeTankServer::BulletsReactToOnChangeGamePhase(ETankGamePhase InGamePhase)
+{
+	for (ATankBullet* LocalBullet : GameStateServer.AllTankBullets)
+	{
+		if (!IsValid(LocalBullet))
+			continue;
+
+		LocalBullet->ReactOnGamePhaseChanged_Implementation(InGamePhase);
+	}
 }
 
 void AGameModeTankServer::NextGamePhase()
@@ -214,6 +245,48 @@ void AGameModeTankServer::UpdateCurrentGamePhase(float DeltaTime)
 		break;
 	default:
 		break;
+	}
+}
+
+void AGameModeTankServer::UpdateTanksPhysics(float DeltaTime)
+{
+	for (int i = 0; i < GameStateServer.Players.Num(); ++i)
+	{
+		FPlayerDataServer& LocalPlayer = GameStateServer.Players[i];
+
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+
+		if (!IsValid(LocalPlayer.PlayerTanks))
+			continue;
+
+		LocalPlayer.PlayerTanks->UpdatePhysics(DeltaTime);
+	}
+}
+
+void AGameModeTankServer::UpdateBulletsPhysics(float DeltaTime)
+{
+	for (int i = 0; i < GameStateServer.AllTankBullets.Num(); ++i)
+	{
+		ATankBullet* Bullet = GameStateServer.AllTankBullets[i];
+
+		if (!IsValid(Bullet))
+			continue;
+
+		Bullet->UpdatePhysics(DeltaTime);
+	}
+
+	for (int i = 0; i < GameStateServer.AllTankBullets.Num(); ++i)
+	{
+		ATankBullet* Bullet = GameStateServer.AllTankBullets[i];
+
+		if (!IsValid(Bullet))
+			continue;
+
+		if (Bullet->CheckBulletDestroyed())
+		{
+			--i;
+		}
 	}
 }
 

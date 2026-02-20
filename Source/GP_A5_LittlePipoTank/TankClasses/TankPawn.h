@@ -2,22 +2,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
 #include "InputMappingContext.h"
-#include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
-#include "Camera/CameraComponent.h"
 #include "Server/Game/GameModeTankServer.h"
 #include "NiagaraFunctionLibrary.h"
-#include "NiagaraComponent.h"
 #include "Shared/Game/GamePhaseListener.h"
-#include "Shared/Game/PhysicsTickableShared.h"
 #include "TankPawn.generated.h"
 
 class ATankBullet;
 
 UCLASS()
-class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn, public IPhysicsTickableShared, public IGamePhaseListener
+class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn, public IGamePhaseListener
 {
 	GENERATED_BODY()
 
@@ -101,9 +96,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RotateSpeed = 100.f;
 	
-	virtual void RegisterTickable() override;
-	virtual void UnregisterTickable() override;
-	virtual void OnTickPhysics_Blueprint_Implementation(float DeltaTime) override;
+	void UpdatePhysics(float DeltaTime);
 
 	const FPlayerTankInputs& GetTankInputs() const;
 	
@@ -114,10 +107,6 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveShooting();
-	
-	virtual void RegisterListener() override;
-	
-	virtual void UnregisterListener() override;
 
 	virtual void ReactOnGamePhaseChanged_Implementation(ETankGamePhase InGamePhase) override;
 };

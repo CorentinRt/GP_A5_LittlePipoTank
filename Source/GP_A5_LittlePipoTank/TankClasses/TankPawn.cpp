@@ -36,16 +36,11 @@ void ATankPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	RegisterTickable();
-	RegisterListener();
 }
 
 void ATankPawn::Destroyed()
 {
 	Super::Destroyed();
-
-	UnregisterTickable();
-	UnregisterListener();
 }
 
 // Called every frame
@@ -102,27 +97,8 @@ float ATankPawn::GetHeadAimRotation() const
 	return TankHeadMesh->GetComponentRotation().Yaw;
 }
 
-void ATankPawn::RegisterTickable()
+void ATankPawn::UpdatePhysics(float DeltaTime)
 {
-	GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
-	if (GameMode)
-	{
-		GameMode->RegisterPhysicsTickable(this);
-	}
-}
-
-void ATankPawn::UnregisterTickable()
-{
-	if (GameMode)
-	{
-		GameMode->UnregisterPhysicsTickable(this);
-	}
-}
-
-void ATankPawn::OnTickPhysics_Blueprint_Implementation(float DeltaTime)
-{
-	IPhysicsTickableShared::OnTickPhysics_Blueprint_Implementation(DeltaTime);
-
 	if (IsHidden())
 		return;
 	
@@ -196,28 +172,6 @@ true);
 	SetActorEnableCollision(false);
 
 	OnTankDestroyed.Broadcast(this);
-}
-
-void ATankPawn::RegisterListener()
-{
-	if (!GameMode)
-		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
-	
-	if (GameMode)
-	{
-		GameMode->RegisterListener(this);
-	}
-}
-
-void ATankPawn::UnregisterListener()
-{
-	if (!GameMode)
-		GameMode = Cast<AGameModeTankServer>(UGameplayStatics::GetGameMode(this));
-
-	if (GameMode)
-	{
-		GameMode->UnregisterListener(this);
-	}
 }
 
 void ATankPawn::ReactOnGamePhaseChanged_Implementation(ETankGamePhase InGamePhase)

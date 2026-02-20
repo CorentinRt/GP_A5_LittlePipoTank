@@ -24,7 +24,4 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ReactOnGamePhaseChanged(ETankGamePhase InGamePhase);
-
-	virtual void RegisterListener() = 0;
-	virtual void UnregisterListener() = 0;
 };

@@ -38,16 +38,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReactChangeGamePhase_Implementation(ETankGamePhase InGamePhase);	// Blueprint implementable to handle timer in BP
 
-	UFUNCTION(BlueprintCallable)
-	void RegisterListener(AActor* InGamePhaseListener);
-	UFUNCTION(BlueprintCallable)
-	void UnregisterListener(AActor* InGamePhaseListener);
-
-	UFUNCTION(BlueprintCallable)
-	void RegisterPhysicsTickable(AActor* InPhysicsTickable);
-	UFUNCTION(BlueprintCallable)
-	void UnregisterPhysicsTickable(AActor* InPhysicsTickable);
-
 
 protected:
 	virtual void SetGamePhase(ETankGamePhase& CurrentGamePhase, ETankGamePhase NewGamePhase);
@@ -59,12 +49,6 @@ protected:
 
 	float CurrentAccumulatedPhysicsTickTime = 0.f;
 	float CurrentAccumulatedNetworkTickTime = 0.f;
-
-	UPROPERTY()
-	TArray<AActor*> GamePhaseListeners;
-
-	UPROPERTY()
-	TArray<AActor*> PhysicsTickables;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
 	TArray<APlayerTankSpawnPoint*> PlayersSpawnPoints;
