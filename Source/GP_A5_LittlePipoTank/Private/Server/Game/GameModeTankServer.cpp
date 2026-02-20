@@ -152,15 +152,35 @@ void AGameModeTankServer::ReactChangeGamePhase(ETankGamePhase InGamePhase)
 {
 	Super::ReactChangeGamePhase(InGamePhase);
 
-	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	switch (InGamePhase)
 	{
-		if (LocalPlayer.Peer == nullptr)
-			continue;
+	case ETankGamePhase::WAITING_PLAYER:
+	case ETankGamePhase::PRE_GAME:
+		{
+			for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+			{
+				if (LocalPlayer.Peer == nullptr)
+					continue;
 
-		SpawnTankPlayer(LocalPlayer);
+				SpawnTankPlayer(LocalPlayer);
+			}
+			
+			SendTankSpawnToAllClients();
+			break;
+		}
+	case ETankGamePhase::IN_GAME:
+		break;
+	case ETankGamePhase::POST_GAME:
+		{
+			SaveVictoriousPlayer();
+			NotifyVictoriousPlayer();
+			break;
+		}
+	case ETankGamePhase::NONE:
+		break;
+	default:
+		break;
 	}
-	
-	SendTankSpawnToAllClients();
 
 	TanksReactToOnChangeGamePhase(InGamePhase);
 	BulletsReactToOnChangeGamePhase(InGamePhase);
@@ -228,8 +248,25 @@ void AGameModeTankServer::UpdateCurrentGamePhase(float DeltaTime)
 			CurrentAccumulatedGamePhaseTime += DeltaTime;
 		}
 		break;
-	case ETankGamePhase::PRE_GAME:
 	case ETankGamePhase::IN_GAME:
+		{
+			if (GetTanksAliveCount() <= 1)
+			{
+				NextGamePhase();
+				break;
+			}
+			
+			while (CurrentAccumulatedGamePhaseTime >= GetGamePhaseDuration(GameStateServer.CurrentGamePhase))
+			{
+				CurrentAccumulatedGamePhaseTime -= GetGamePhaseDuration(GameStateServer.CurrentGamePhase);
+				NextGamePhase();
+			}
+
+			CurrentAccumulatedGamePhaseTime += DeltaTime;
+			
+			break;
+		}
+	case ETankGamePhase::PRE_GAME:
 	case ETankGamePhase::POST_GAME:
 		{
 			while (CurrentAccumulatedGamePhaseTime >= GetGamePhaseDuration(GameStateServer.CurrentGamePhase))
@@ -464,6 +501,85 @@ bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 	InPlayer.PlayerTanks->SetActorRotation(SpawnPoint->GetActorRotation());
 	
 	return true;
+}
+
+int AGameModeTankServer::GetTanksAliveCount() const
+{
+	int Count = 0;
+	
+	for (int i = 0; i < GameStateServer.Players.Num(); ++i)
+	{
+		if (i >= PlayersSpawnPoints.Num())
+			continue;
+		
+		const FPlayerDataServer& LocalPlayer = GameStateServer.Players[i];
+
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+
+		if (!IsValid(LocalPlayer.PlayerTanks))
+			continue;
+
+		if (LocalPlayer.PlayerTanks->IsHidden())
+			continue;
+
+		++Count;
+	}
+
+	return Count;
+}
+
+void AGameModeTankServer::SaveVictoriousPlayer()
+{
+	for (int i = 0; i < GameStateServer.Players.Num(); ++i)
+	{
+		if (i >= PlayersSpawnPoints.Num())
+			continue;
+		
+		const FPlayerDataServer& LocalPlayer = GameStateServer.Players[i];
+
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+
+		if (!IsValid(LocalPlayer.PlayerTanks))
+			continue;
+
+		if (LocalPlayer.PlayerTanks->IsHidden())
+			continue;
+
+		LastVictoriousPlayerIndex = LocalPlayer.PlayerIndex;
+		return;
+	}
+}
+
+void AGameModeTankServer::NotifyVictoriousPlayer()
+{
+	OnPlayerVictory.Broadcast(GetLastVictoriousPlayerData());
+}
+
+FPlayerDataServer AGameModeTankServer::GetLastVictoriousPlayerData()
+{
+	if (LastVictoriousPlayerIndex < 0)
+		return {};
+
+	
+	for (int i = 0; i < GameStateServer.Players.Num(); ++i)
+	{
+		if (i >= PlayersSpawnPoints.Num())
+			continue;
+		
+		const FPlayerDataServer& LocalPlayer = GameStateServer.Players[i];
+
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+
+		if (LocalPlayer.PlayerIndex != LastVictoriousPlayerIndex)
+			continue;
+
+		return LocalPlayer;
+	}
+
+	return {};
 }
 
 void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayerName)

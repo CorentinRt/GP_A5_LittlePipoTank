@@ -62,6 +62,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UGamePhasesData> GamePhasesData;
 
+	UFUNCTION(BlueprintCallable)
+	FPlayerDataServer GetLastVictoriousPlayerData();
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerVictory, FPlayerDataServer, PlayerDataVictorious);
+	FOnPlayerVictory OnPlayerVictory;
+	
 protected:
 	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset, ENetPeer* Peer) override;
 	
@@ -74,6 +80,13 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ATankPawn> TankPawnClassBlueprint;
+
+	int GetTanksAliveCount() const;
+
+	void SaveVictoriousPlayer();
+
+	void NotifyVictoriousPlayer();
+
 	
 private:
 	void PlayerJoined(ENetPeer* InPeer, const FString& InPlayerName);
@@ -94,4 +107,6 @@ private:
 	FPlayerDataServer& GetAvailableNewPlayerDataOrCreate();
 	
 	float CurrentAccumulatedGamePhaseTime = 0.f;
+
+	int LastVictoriousPlayerIndex;
 };

@@ -69,6 +69,8 @@ void AGameModeTankShared::SetGamePhase(ETankGamePhase& CurrentGamePhase, ETankGa
 {
 	CurrentGamePhase = NewGamePhase;
 	ReactChangeGamePhase(NewGamePhase);
+
+	OnChangeGamePhase.Broadcast(NewGamePhase);
 }
 
 void AGameModeTankShared::GetAllPlayerSpawnPoints()

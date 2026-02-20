@@ -38,6 +38,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReactChangeGamePhase_Implementation(ETankGamePhase InGamePhase);	// Blueprint implementable to handle timer in BP
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeGamePhase, ETankGamePhase, NewGamePhase);
+	FOnChangeGamePhase OnChangeGamePhase;
 
 protected:
 	virtual void SetGamePhase(ETankGamePhase& CurrentGamePhase, ETankGamePhase NewGamePhase);
