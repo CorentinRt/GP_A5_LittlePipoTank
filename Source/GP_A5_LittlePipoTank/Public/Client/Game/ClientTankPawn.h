@@ -32,4 +32,8 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetMeshMaterial(const UMaterialInterface* Material);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ReceiveOnTankDestroy();
+
 };
