@@ -3,8 +3,6 @@
 
 #include "Shared/NetworkProtocol.h"
 
-#include "Sections/MovieScene3DPathSection.h"
-#include "Settings/EditorProjectSettings.h"
 #include "Shared/NetworkProtocolHelpers.h"
 
 void FExemplePacket::Serialize(TArray<BYTE>& ByteArray) const
