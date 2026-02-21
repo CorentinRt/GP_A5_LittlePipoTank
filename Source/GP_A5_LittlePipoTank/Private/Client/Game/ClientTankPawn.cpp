@@ -30,14 +30,14 @@ void AClientTankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AClientTankPawn::UpdatePhysics(float DeltaTime)
+void AClientTankPawn::UpdatePhysics(float DeltaTime, bool UseSweep)
 {
 	if (IsHidden())
 		return;
 	
 	// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Tick physi tank");
 	//Move
-	MoveTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.Y, DeltaTime);
+	MoveTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.Y, DeltaTime, UseSweep);
 
 	// Rotation Tank
 	RotateTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.X, DeltaTime);

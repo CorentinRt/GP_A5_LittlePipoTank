@@ -77,7 +77,7 @@ public:
 	void SetPlayerTankInputs(const FPlayerTankInputs& InTankInputs);
 	
 protected:
-	void MoveTank(float MoveInput, float DeltaTime);
+	void MoveTank(float MoveInput, float DeltaTime, bool UseSweep = true);
 
 	void RotateTank(float RotateInput, float DeltaTime);
 
@@ -104,7 +104,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RotateSpeed = 100.f;
 	
-	virtual void UpdatePhysics(float DeltaTime);
+	virtual void UpdatePhysics(float DeltaTime, bool UseSweep = true);
 
 	const FPlayerTankInputs& GetTankInputs() const;
 	

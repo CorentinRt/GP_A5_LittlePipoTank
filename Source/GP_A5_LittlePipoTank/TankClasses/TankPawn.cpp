@@ -81,13 +81,13 @@ void ATankPawn::SetPlayerTankInputs(const FPlayerTankInputs& InTankInputs)
 	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Fire iNput {0}", TankInputs.FireInput);
 }
 
-void ATankPawn::MoveTank(float MoveInput, float DeltaTime)
+void ATankPawn::MoveTank(float MoveInput, float DeltaTime, bool UseSweep)
 {
 	FVector Dir = GetActorForwardVector();
 
 	FVector LastActorLocation = GetActorLocation();
 
-	SetActorLocation(LastActorLocation + Speed * Dir * MoveInput * DeltaTime, true);
+	SetActorLocation(LastActorLocation + Speed * Dir * MoveInput * DeltaTime, UseSweep);
 }
 
 void ATankPawn::RotateTank(float RotateInput, float DeltaTime)
@@ -111,14 +111,14 @@ FVector2D ATankPawn::GetTankLocation() const
 	return {GetActorLocation().X, GetActorLocation().Y};
 }
 
-void ATankPawn::UpdatePhysics(float DeltaTime)
+void ATankPawn::UpdatePhysics(float DeltaTime, bool UseSweep)
 {
 	if (IsHidden())
 		return;
 	
 	// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Tick physi tank");
 	//Move
-	MoveTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.Y, DeltaTime);
+	MoveTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.Y, DeltaTime, UseSweep);
 
 	// Rotation Tank
 	RotateTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.X, DeltaTime);

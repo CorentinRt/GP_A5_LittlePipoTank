@@ -26,7 +26,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void UpdatePhysics(float DeltaTime) override;
+	virtual void UpdatePhysics(float DeltaTime, bool UseSweep = true) override;
 	
 	void SetLocation(const FVector2D& Location, bool Sweep);
 	void SetRotation(const FRotator& Rotation);
