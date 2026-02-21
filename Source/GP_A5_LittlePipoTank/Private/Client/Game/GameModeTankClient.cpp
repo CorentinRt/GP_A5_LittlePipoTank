@@ -635,7 +635,7 @@ void AGameModeTankClient::PredictClient(float DeltaTime)
 
 void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerStateData& OwnPlayerData)
 {
-	while (!GameStateClient.Predictions.IsEmpty() && GameStateClient.Predictions[0].PredictionIndex < OwnPlayerData.Index)
+	while (!GameStateClient.Predictions.IsEmpty() && GameStateClient.Predictions[0].PredictionIndex < OwnPlayerData.PredictionIndex)
 	{
 		GameStateClient.Predictions.RemoveAt(0);
 	}
@@ -644,7 +644,7 @@ void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerSt
 	// Get Prediction equal to index of receive index by server
 	const FPredictionSnapshot& PlayerSnapshot = GameStateClient.Predictions[0];
 
-	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "RECONCILIATION: Server Index: {0} | Client Index: {1}", OwnPlayerData.Index, PlayerSnapshot.PredictionIndex);
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "RECONCILIATION: Server Index: {0} | Client Index: {1}", OwnPlayerData.PredictionIndex, PlayerSnapshot.PredictionIndex);
 
 	FVector2D PositionDifference = (OwnPlayerData.Location - PlayerSnapshot.Location).GetAbs();
 	float RotationDifference = FMath::Abs(OwnPlayerData.Rotation - PlayerSnapshot.Rotation);
