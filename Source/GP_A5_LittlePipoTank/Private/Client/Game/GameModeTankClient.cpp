@@ -615,9 +615,9 @@ void AGameModeTankClient::PredictClient(float DeltaTime)
 		return Player.PlayerIndex == GameStateClient.OwnPlayerIndex;
 	});
 
-	if (!PlayerData) return;
+	if (!PlayerData || !PlayerData->Tank) return;
 	
-	FPlayerTankInputs ConsumedInput = PlayerController->GetTankInputs();
+	FPlayerTankInputs& ConsumedInput = PlayerController->GetTankInputs();
 	
 	PlayerData->Tank->SetPlayerTankInputs(ConsumedInput);
 	PlayerData->Tank->UpdatePhysics(DeltaTime);
