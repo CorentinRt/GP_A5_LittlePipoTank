@@ -35,8 +35,6 @@ public:
 	FPlayerTankInputs Inputs;
 	FVector2D Location;
 	float Rotation;
-	float AimRotation;
-	FVector2D Velocity;
 };
 
 USTRUCT(BlueprintType)

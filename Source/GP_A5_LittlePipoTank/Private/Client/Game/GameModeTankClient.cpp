@@ -596,10 +596,6 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 
 void AGameModeTankClient::PredictClient(float DeltaTime)
 {
-	// TODO Update Pawn physics here ?
-	// TODO Block Inputs if not in IN_GAME
-
-
 	FPlayerDataClient* PlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& Player)
 	{
 		return Player.PlayerIndex == GameStateClient.OwnPlayerIndex;
@@ -615,7 +611,8 @@ void AGameModeTankClient::PredictClient(float DeltaTime)
 	GameStateClient.Predictions.Add({
 		.PredictionIndex = GameStateClient.NextPredictionIndex,
 		.Inputs = ConsumedInput,
-		//TODO Set Position, Rotation, AimRotation, Velocity
+		.Location = PlayerData->Tank->GetTankLocation(),
+		.Rotation = PlayerData->Tank->GetTankRotation(),
 	});
 	
 	SendClientPrediction();
@@ -687,6 +684,10 @@ void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerSt
 
 	for (FPredictionSnapshot& Prediction : GameStateClient.Predictions)
 	{
-		
+		PlayerData->Tank->SetPlayerTankInputs(Prediction.Inputs);
+		PlayerData->Tank->UpdatePhysics(TickDelayPhysics, false);
+
+		Prediction.Location = PlayerData->Tank->GetTankLocation();
+		Prediction.Rotation = PlayerData->Tank->GetTankRotation();
 	}
 }
