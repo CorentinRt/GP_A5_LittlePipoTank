@@ -373,6 +373,8 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 
 				Player->Tank = PlayerTank;
 
+				Player->Tank->ReactOnGamePhaseChanged(GameStateClient.CurrentGamePhase);
+
 				UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Spawn ClientTank Success");
 
 				if (!PlayersColorData) continue;
