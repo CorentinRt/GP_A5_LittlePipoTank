@@ -10,7 +10,7 @@
 class USphereComponent;
 class AGameModeTankServer;
 
-UCLASS()
+UCLASS(BlueprintType)
 class GP_A5_LITTLEPIPOTANK_API ATankBullet : public AActor, public IGamePhaseListener
 {
 	GENERATED_BODY()
