@@ -93,6 +93,10 @@ public:
 	FOnTankDestroyed OnTankDestroyed;
 	
 	float GetHeadAimRotation() const;
+	float GetTankRotation() const;
+	FVector2D GetTankLocation() const;
+
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Speed = 600.f;

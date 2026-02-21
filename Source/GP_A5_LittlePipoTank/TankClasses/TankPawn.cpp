@@ -101,6 +101,16 @@ float ATankPawn::GetHeadAimRotation() const
 	return TankHeadMesh->GetComponentRotation().Yaw;
 }
 
+float ATankPawn::GetTankRotation() const
+{
+	return GetActorRotation().Yaw;
+}
+
+FVector2D ATankPawn::GetTankLocation() const
+{
+	return {GetActorLocation().X, GetActorLocation().Y};
+}
+
 void ATankPawn::UpdatePhysics(float DeltaTime)
 {
 	if (IsHidden())
