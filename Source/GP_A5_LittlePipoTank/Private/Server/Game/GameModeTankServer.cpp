@@ -84,6 +84,7 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 			GameStatePacket.OwnPlayerData.AimRotation = LocalPlayer.PlayerTanks->GetHeadAimRotation();
 			GameStatePacket.OwnPlayerData.Velocity = FVector2D(LocalPlayer.PlayerTanks->GetVelocity().X, LocalPlayer.PlayerTanks->GetVelocity().Y);
 			GameStatePacket.OwnPlayerData.PlayerTankInputs = LocalPlayer.LastPlayerInputs.PlayerInputs;
+			GameStatePacket.OwnPlayerData.PredictionIndex = LocalPlayer.LastPlayerInputs.PredictionIndex;
 		}
 
 		// Other Players
