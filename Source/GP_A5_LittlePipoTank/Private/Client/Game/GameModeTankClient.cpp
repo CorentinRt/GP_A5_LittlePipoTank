@@ -596,10 +596,6 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 
 void AGameModeTankClient::PredictClient(float DeltaTime)
 {
-	// TODO Update Pawn physics here ?
-	// TODO Block Inputs if not in IN_GAME
-
-
 	FPlayerDataClient* PlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& Player)
 	{
 		return Player.PlayerIndex == GameStateClient.OwnPlayerIndex;
@@ -615,7 +611,8 @@ void AGameModeTankClient::PredictClient(float DeltaTime)
 	GameStateClient.Predictions.Add({
 		.PredictionIndex = GameStateClient.NextPredictionIndex,
 		.Inputs = ConsumedInput,
-		//TODO Set Position, Rotation, AimRotation, Velocity
+		.Location = PlayerData->Tank->GetTankLocation(),
+		.Rotation = PlayerData->Tank->GetTankRotation(),
 	});
 	
 	SendClientPrediction();
@@ -645,6 +642,52 @@ void AGameModeTankClient::SendClientPrediction()
 
 void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerStateData& OwnPlayerData)
 {
-	// TODO Prep Reconciliation but need Predicted Inputs back in OwnPlayerData
-	//while (!GameStateClient.Predictions.IsEmpty() && GameStateClient.Predictions[0].PredictionIndex < OwnPlayerData)
+	while (!GameStateClient.Predictions.IsEmpty() && GameStateClient.Predictions[0].PredictionIndex < OwnPlayerData.Index)
+	{
+		GameStateClient.Predictions.RemoveAt(0);
+	}
+	if (GameStateClient.Predictions.IsEmpty()) return;
+	
+	// Get Prediction equal to index of receive index by server
+	const FPredictionSnapshot& PlayerSnapshot = GameStateClient.Predictions[0];
+
+	FVector2D PositionDifference = (OwnPlayerData.Location - PlayerSnapshot.Location).GetAbs();
+	float RotationDifference = OwnPlayerData.Rotation - PlayerSnapshot.Rotation;
+	
+	bool ShouldReconciliate =
+		PositionDifference.X > GameStateClient.PositionErrorAcceptance ||
+		PositionDifference.Y > GameStateClient.PositionErrorAcceptance ||
+		RotationDifference > GameStateClient.RotationErrorAcceptance; 
+
+	// Remove used prediction because its now outdated
+	GameStateClient.Predictions.RemoveAt(0);
+
+	//Check if we have own player data and player tank
+	FPlayerDataClient* PlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& Player)
+		{
+			return Player.PlayerIndex == GameStateClient.OwnPlayerIndex;
+		});
+
+	if (!PlayerData || !PlayerData->Tank) return;
+	
+	if (!ShouldReconciliate) return;
+
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		5.0f,
+		FColor::Purple,
+		TEXT("RECONCILIATION")
+		);
+
+	PlayerData->Tank->SetLocation(OwnPlayerData.Location, false);
+	PlayerData->Tank->SetRotation(FRotator(0.0f, OwnPlayerData.Rotation, 0.0f));
+
+	for (FPredictionSnapshot& Prediction : GameStateClient.Predictions)
+	{
+		PlayerData->Tank->SetPlayerTankInputs(Prediction.Inputs);
+		PlayerData->Tank->UpdatePhysics(TickDelayPhysics, false);
+
+		Prediction.Location = PlayerData->Tank->GetTankLocation();
+		Prediction.Rotation = PlayerData->Tank->GetTankRotation();
+	}
 }

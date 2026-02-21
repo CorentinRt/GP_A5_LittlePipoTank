@@ -35,8 +35,6 @@ public:
 	FPlayerTankInputs Inputs;
 	FVector2D Location;
 	float Rotation;
-	float AimRotation;
-	FVector2D Velocity;
 };
 
 USTRUCT(BlueprintType)
@@ -65,6 +63,8 @@ public:
 	// Client Prediction and Reconciliation
 	TArray<FPredictionSnapshot> Predictions;
 	UINT8 NextPredictionIndex = 0;
+	float PositionErrorAcceptance = 10.0f;
+	float RotationErrorAcceptance = 5.0f;
 	
 	// Game Interpolation
 	TArray<FInterpolationSnapshot> PlayersStateSnapshots;
