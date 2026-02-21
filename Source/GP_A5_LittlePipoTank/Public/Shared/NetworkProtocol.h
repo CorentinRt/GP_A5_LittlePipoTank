@@ -57,7 +57,7 @@ struct FSpawnTankPacket
 	struct TankSpawnData
 	{
 		int PlayerIndex = -1;
-		FVector2D SpawnLocation = FVector2D::ZeroVector;
+		FVector SpawnLocation = FVector::ZeroVector;
 		float SpawnRotation = 0.0f;
 	};
 

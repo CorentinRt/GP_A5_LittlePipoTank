@@ -24,6 +24,7 @@ void FSpawnTankPacket::Serialize(TArray<BYTE>& ByteArray) const
 		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalTankData.PlayerIndex);
 		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalTankData.SpawnLocation.X);
 		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalTankData.SpawnLocation.Y);
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalTankData.SpawnLocation.Z);
 		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, LocalTankData.SpawnRotation);
 	}
 }
@@ -36,9 +37,10 @@ void FSpawnTankPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::
 	{
 		FSpawnTankPacket::TankSpawnData NewTankSpawnData = {};
 		NewTankSpawnData.PlayerIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
-		FVector2D TempSpawnlocation = FVector2D::ZeroVector;
+		FVector TempSpawnlocation = FVector::ZeroVector;
 		TempSpawnlocation.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 		TempSpawnlocation.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+		TempSpawnlocation.Z = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 		NewTankSpawnData.SpawnLocation = TempSpawnlocation;
 
 		NewTankSpawnData.SpawnRotation = UNetworkProtocolHelpers::DeserializeArithmetic<float>(ByteArray, Offset);

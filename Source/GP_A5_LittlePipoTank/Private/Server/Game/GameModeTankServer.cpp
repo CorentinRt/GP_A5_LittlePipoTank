@@ -796,7 +796,7 @@ void AGameModeTankServer::SendTankSpawnToAllClients()
 			FSpawnTankPacket::TankSpawnData TankSpawnData = {};
 
 			TankSpawnData.PlayerIndex = ListedPlayer.PlayerIndex;
-			TankSpawnData.SpawnLocation = FVector2D(ListedPlayer.PlayerTanks->GetActorLocation());
+			TankSpawnData.SpawnLocation = FVector(ListedPlayer.PlayerTanks->GetActorLocation());
 			TankSpawnData.SpawnRotation = ListedPlayer.PlayerTanks->GetActorRotation().Yaw;
 			
 			SpawnTankPacket.TankSpawnsData.Add(MoveTemp(TankSpawnData));

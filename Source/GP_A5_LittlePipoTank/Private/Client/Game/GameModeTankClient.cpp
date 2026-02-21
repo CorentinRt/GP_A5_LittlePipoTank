@@ -330,7 +330,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			
 				UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Try Spawn ClientTank");
 
-				FVector SpawnLocation(SpawnTankData.SpawnLocation.X, SpawnTankData.SpawnLocation.Y, 0.0f);
+				FVector SpawnLocation(SpawnTankData.SpawnLocation.X, SpawnTankData.SpawnLocation.Y, SpawnTankData.SpawnLocation.Z);
 				FRotator SpawnRotation(0.0f, SpawnTankData.SpawnRotation, 0.0f);
 				
 				FActorSpawnParameters SpawnParameters;
