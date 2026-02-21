@@ -654,7 +654,7 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 		.OwnPlayerIndex = NewPlayerData.PlayerIndex
 	};
 	UNetworkProtocolHelpers::SendPacket(NewPlayerData.Peer, NewPlayerInitPacket, ENET_PACKET_FLAG_RELIABLE);
-
+	
 	// Player List
 	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
@@ -686,6 +686,11 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 	
 	// Send Tank Spawned
 	SendTankSpawnToAllClients();
+	
+	// Game Phase
+	FGamePhasePacket GamePhasePacket = {};
+	GamePhasePacket.GamePhase = GameStateServer.CurrentGamePhase;
+	UNetworkProtocolHelpers::SendPacket(NewPlayerData.Peer, GamePhasePacket, ENET_PACKET_FLAG_RELIABLE);
 }
 
 void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
