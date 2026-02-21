@@ -652,7 +652,7 @@ void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerSt
 	const FPredictionSnapshot& PlayerSnapshot = GameStateClient.Predictions[0];
 
 	FVector2D PositionDifference = (OwnPlayerData.Location - PlayerSnapshot.Location).GetAbs();
-	float RotationDifference = OwnPlayerData.Rotation - PlayerSnapshot.Rotation;
+	float RotationDifference = FMath::Abs(OwnPlayerData.Rotation - PlayerSnapshot.Rotation);
 	
 	bool ShouldReconciliate =
 		PositionDifference.X > GameStateClient.PositionErrorAcceptance ||
