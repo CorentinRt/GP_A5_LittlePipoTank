@@ -48,13 +48,14 @@ protected:
 	float HeadRotationSpeed = 20.f;
 	
 	FRotator TargetWorldRotation;
-
+	
+	UPROPERTY(VisibleAnywhere)
+	FPlayerTankInputs TankInputs;
 private:
 	UPROPERTY(VisibleAnywhere, Category="Tank")
 	AGameModeTankServer* GameMode;
 
-	UPROPERTY(VisibleAnywhere)
-	FPlayerTankInputs TankInputs;
+	
 
 public:
 	// Sets default values for this character's properties
@@ -99,7 +100,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RotateSpeed = 100.f;
 	
-	void UpdatePhysics(float DeltaTime);
+	virtual void UpdatePhysics(float DeltaTime);
 
 	const FPlayerTankInputs& GetTankInputs() const;
 	

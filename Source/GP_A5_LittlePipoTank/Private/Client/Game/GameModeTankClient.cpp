@@ -308,30 +308,6 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			Packet.Deserialize(ByteArray, Offset);
 
 			SetClientGamePhase(Packet.GamePhase);
-
-			switch (GameStateClient.CurrentGamePhase)
-			{
-			case ETankGamePhase::NONE:
-				{
-					break;
-				}
-			case ETankGamePhase::WAITING_PLAYER:
-				{
-					break;
-				}
-			case ETankGamePhase::PRE_GAME:
-				{
-					break;
-				}
-			case ETankGamePhase::IN_GAME:
-				{
-					break;
-				}
-			case ETankGamePhase::POST_GAME:
-				{
-					break;
-				}
-			}
 			
 			break;
 		}
@@ -429,6 +405,20 @@ void AGameModeTankClient::HandleDisconnection(const ENetEvent& event)
 	Super::HandleDisconnection(event);
 	
 	// n'est pas censé arriver sur le client
+}
+
+void AGameModeTankClient::ReactChangeGamePhase(ETankGamePhase InGamePhase)
+{
+	Super::ReactChangeGamePhase(InGamePhase);
+
+	FPlayerDataClient* PlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& Player)
+	{
+		return Player.PlayerIndex == GameStateClient.OwnPlayerIndex;
+	});
+
+	if (!PlayerData || !PlayerData->Tank) return;
+	
+	PlayerData->Tank->ReactOnGamePhaseChanged_Implementation(GameStateClient.CurrentGamePhase);
 }
 
 void AGameModeTankClient::InterpolateGame(float DeltaTime)
@@ -621,7 +611,6 @@ void AGameModeTankClient::PredictClient(float DeltaTime)
 	
 	PlayerData->Tank->SetPlayerTankInputs(ConsumedInput);
 	PlayerData->Tank->UpdatePhysics(DeltaTime);
-
 	
 	GameStateClient.Predictions.Add({
 		.PredictionIndex = GameStateClient.NextPredictionIndex,

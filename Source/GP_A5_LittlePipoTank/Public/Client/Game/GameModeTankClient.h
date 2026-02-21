@@ -55,6 +55,7 @@ protected:
 
 	virtual void HandleDisconnection(const ENetEvent& event) override;
 
+	virtual void ReactChangeGamePhase(ETankGamePhase InGamePhase) override;
 private:
 	void InterpolateGame(float DeltaTime);
 

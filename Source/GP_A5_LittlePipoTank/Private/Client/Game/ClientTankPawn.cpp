@@ -30,6 +30,31 @@ void AClientTankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void AClientTankPawn::UpdatePhysics(float DeltaTime)
+{
+	if (IsHidden())
+		return;
+	
+	// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Tick physi tank");
+	//Move
+	MoveTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.Y, DeltaTime);
+
+	// Rotation Tank
+	RotateTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.X, DeltaTime);
+	
+	//Aim Rotation
+	FRotator CurrentWorldRot = TankHeadMesh->GetComponentRotation();
+	FVector AimFVector {TankInputs.AimInput.X, TankInputs.AimInput.Y, 0.0f};
+	TargetWorldRotation =  FRotationMatrix::MakeFromX(AimFVector).Rotator();
+	FRotator SmoothedRot = FMath::RInterpTo(
+		CurrentWorldRot,
+		TargetWorldRotation,
+		DeltaTime,
+		HeadRotationSpeed
+	);
+	TankHeadMesh->SetWorldRotation(SmoothedRot);
+}
+
 void AClientTankPawn::SetLocation(const FVector2D& Location, bool Sweep)
 {
 	FVector NewLocation(Location.X, Location.Y, 0.0f);
