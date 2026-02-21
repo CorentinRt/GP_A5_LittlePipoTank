@@ -149,6 +149,7 @@ struct FGameStatePacket
 		float Rotation = 0.f;
 		float AimRotation = 0.f;
 		FVector2D Velocity = FVector2D::ZeroVector;
+		FPlayerTankInputs PlayerTankInputs;
 	};
 	
 	struct PlayerStateData

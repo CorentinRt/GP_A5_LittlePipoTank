@@ -109,4 +109,6 @@ private:
 	float CurrentAccumulatedGamePhaseTime = 0.f;
 
 	int LastVictoriousPlayerIndex;
+
+	int TargetInputBufferSize = 4;
 };

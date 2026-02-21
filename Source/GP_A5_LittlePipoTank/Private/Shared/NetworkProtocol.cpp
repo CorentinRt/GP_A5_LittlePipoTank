@@ -147,6 +147,12 @@ void FGameStatePacket::Serialize(TArray<BYTE>& ByteArray) const
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.AimRotation);
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.Velocity.X);
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.Velocity.Y);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.PlayerTankInputs.MoveInput.X);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.PlayerTankInputs.MoveInput.Y);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.PlayerTankInputs.AimInput.X);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.PlayerTankInputs.AimInput.Y);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.PlayerTankInputs.FireInput);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.PlayerTankInputs.InputIndex);
 }
 
 void FGameStatePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
@@ -211,6 +217,15 @@ void FGameStatePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::
 	FVector2D OwnPlayerVelocity = FVector2D::ZeroVector;
 	OwnPlayerVelocity.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 	OwnPlayerVelocity.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+
+	FPlayerTankInputs PlayerTankInputs = {};
+
+	PlayerTankInputs.MoveInput.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+	PlayerTankInputs.MoveInput.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+	PlayerTankInputs.AimInput.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+	PlayerTankInputs.AimInput.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+	PlayerTankInputs.FireInput = UNetworkProtocolHelpers::DeserializeArithmetic<bool>(ByteArray, Offset);
+	PlayerTankInputs.InputIndex = UNetworkProtocolHelpers::DeserializeArithmetic<UINT8>(ByteArray, Offset);
 	
 	OwnPlayerData =
 	{
@@ -218,7 +233,8 @@ void FGameStatePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::
 		.Location = OwnPlayerLocation,
 		.Rotation = OwnPlayerRotation,
 		.AimRotation = OwnPlayerAimRotation,
-		.Velocity = OwnPlayerVelocity
+		.Velocity = OwnPlayerVelocity,
+		.PlayerTankInputs = PlayerTankInputs
 	};
 }
 
@@ -272,6 +288,7 @@ void FPlayerInputsPacket::Serialize(TArray<BYTE>& ByteArray) const
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerInputs.AimInput.X);
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerInputs.AimInput.Y);
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PlayerInputs.FireInput);
+	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, PredictionIndex);
 }
 
 void FPlayerInputsPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
@@ -281,4 +298,5 @@ void FPlayerInputsPacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE
 	PlayerInputs.AimInput.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 	PlayerInputs.AimInput.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 	PlayerInputs.FireInput = UNetworkProtocolHelpers::DeserializeArithmetic<bool>(ByteArray, Offset);
+	PredictionIndex = UNetworkProtocolHelpers::DeserializeArithmetic<UINT8>(ByteArray, Offset);
 }

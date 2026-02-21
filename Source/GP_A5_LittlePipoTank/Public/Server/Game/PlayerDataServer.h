@@ -27,7 +27,13 @@ public:
 	FString PlayerName = "NULL_NAME";
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	FPlayerTankInputs PlayerInputs;
+	FPlayerTankInputs LastPlayerInputs;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	TArray<FPlayerTankInputs> InputBuffer;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	float InputBufferAdvancement = 0.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<ATankPawn> PlayerTanks = nullptr;
