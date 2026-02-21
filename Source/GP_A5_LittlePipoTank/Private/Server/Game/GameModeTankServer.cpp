@@ -83,7 +83,7 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 			GameStatePacket.OwnPlayerData.Rotation = LocalPlayer.PlayerTanks->GetActorRotation().Yaw;
 			GameStatePacket.OwnPlayerData.AimRotation = LocalPlayer.PlayerTanks->GetHeadAimRotation();
 			GameStatePacket.OwnPlayerData.Velocity = FVector2D(LocalPlayer.PlayerTanks->GetVelocity().X, LocalPlayer.PlayerTanks->GetVelocity().Y);
-			GameStatePacket.OwnPlayerData.PlayerTankInputs = LocalPlayer.LastPlayerInputs;
+			GameStatePacket.OwnPlayerData.PlayerTankInputs = LocalPlayer.LastPlayerInputs.PlayerInputs;
 		}
 
 		// Other Players
@@ -316,11 +316,11 @@ void AGameModeTankServer::UpdateTanksPhysics(float DeltaTime)
 			{
 				if (!LocalPlayer.InputBuffer.IsEmpty())
 				{
-					FPlayerTankInputs ExtractedInput = LocalPlayer.InputBuffer[0];
-					LocalPlayer.LastPlayerInputs.MoveInput = ExtractedInput.MoveInput;
-					LocalPlayer.LastPlayerInputs.AimInput = ExtractedInput.AimInput;
-					LocalPlayer.LastPlayerInputs.FireInput |= ExtractedInput.FireInput;
-					LocalPlayer.LastPlayerInputs.InputIndex = ExtractedInput.InputIndex;
+					FPlayerInputsPacket ExtractedInput = LocalPlayer.InputBuffer[0];
+					LocalPlayer.LastPlayerInputs.PlayerInputs.MoveInput = ExtractedInput.PlayerInputs.MoveInput;
+					LocalPlayer.LastPlayerInputs.PlayerInputs.AimInput = ExtractedInput.PlayerInputs.AimInput;
+					LocalPlayer.LastPlayerInputs.PlayerInputs.FireInput |= ExtractedInput.PlayerInputs.FireInput;
+					LocalPlayer.LastPlayerInputs.PredictionIndex = ExtractedInput.PredictionIndex;
 					LocalPlayer.InputBuffer.RemoveAt(0);
 				}
 				
@@ -331,7 +331,7 @@ void AGameModeTankServer::UpdateTanksPhysics(float DeltaTime)
 		if (!IsValid(LocalPlayer.PlayerTanks))
 			continue;
 
-		LocalPlayer.PlayerTanks->SetPlayerTankInputs(LocalPlayer.LastPlayerInputs);
+		LocalPlayer.PlayerTanks->SetPlayerTankInputs(LocalPlayer.LastPlayerInputs.PlayerInputs);
 		LocalPlayer.PlayerTanks->UpdatePhysics(DeltaTime);
 	}
 }
@@ -453,7 +453,7 @@ void AGameModeTankServer::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 				
 				if (LocalPlayer.Peer == Peer)
 				{
-					LocalPlayer.InputBuffer.Add(PlayerInputsPacket.PlayerInputs);
+					LocalPlayer.InputBuffer.Add(PlayerInputsPacket);
 					
 					break;
 				}
@@ -626,8 +626,7 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 	{
 		.MoveInput = FVector2D::ZeroVector,
 		.AimInput = FVector2D::ZeroVector,
-		.FireInput = false,
-		.InputIndex = 0
+		.FireInput = false
 	};
 
 	FPlayerDataServer& NewPlayerData = GetAvailableNewPlayerDataOrCreate();
@@ -638,7 +637,7 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 	}
 
 	NewPlayerData.PlayerName = InPlayerName;
-	NewPlayerData.LastPlayerInputs = PlayerInputs;
+	NewPlayerData.LastPlayerInputs.PlayerInputs = PlayerInputs;
 	NewPlayerData.Peer = InPeer;
 
 	GEngine->AddOnScreenDebugMessage(

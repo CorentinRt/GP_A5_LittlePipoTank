@@ -154,7 +154,6 @@ void FGameStatePacket::Serialize(TArray<BYTE>& ByteArray) const
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.PlayerTankInputs.AimInput.X);
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.PlayerTankInputs.AimInput.Y);
 	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.PlayerTankInputs.FireInput);
-	UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, OwnPlayerData.PlayerTankInputs.InputIndex);
 }
 
 void FGameStatePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset)
@@ -227,7 +226,6 @@ void FGameStatePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::
 	PlayerTankInputs.AimInput.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 	PlayerTankInputs.AimInput.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 	PlayerTankInputs.FireInput = UNetworkProtocolHelpers::DeserializeArithmetic<bool>(ByteArray, Offset);
-	PlayerTankInputs.InputIndex = UNetworkProtocolHelpers::DeserializeArithmetic<UINT8>(ByteArray, Offset);
 	
 	OwnPlayerData =
 	{

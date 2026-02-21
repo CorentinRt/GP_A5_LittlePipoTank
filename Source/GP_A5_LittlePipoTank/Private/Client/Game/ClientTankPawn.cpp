@@ -57,7 +57,7 @@ void AClientTankPawn::UpdatePhysics(float DeltaTime, bool UseSweep)
 
 void AClientTankPawn::SetLocation(const FVector2D& Location, bool Sweep)
 {
-	FVector NewLocation(Location.X, Location.Y, 0.0f);
+	FVector NewLocation(Location.X, Location.Y, GetActorLocation().Z);
 	SetActorLocation(NewLocation, Sweep);
 }
 

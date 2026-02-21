@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Shared/NetworkProtocol.h"
 #include "Shared/ENetWrapper/ENetPeer.h"
 #include "Shared/Game/PlayerTankInputs.h"
 //#include "TankClasses/TankPawn.h"
@@ -12,6 +13,7 @@
  * 
  */
 
+struct FPlayerInputsPacket;
 class ATankPawn;
 
 USTRUCT(BlueprintType)
@@ -26,11 +28,11 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FString PlayerName = "NULL_NAME";
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	FPlayerTankInputs LastPlayerInputs;
+	UPROPERTY()
+	FPlayerInputsPacket LastPlayerInputs;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	TArray<FPlayerTankInputs> InputBuffer;
+	UPROPERTY()
+	TArray<FPlayerInputsPacket> InputBuffer;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	float InputBufferAdvancement = 0.0f;

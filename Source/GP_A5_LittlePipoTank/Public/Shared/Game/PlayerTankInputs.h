@@ -23,6 +23,4 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category= "PlayerTankInputStruct")
 	bool FireInput = false;
-
-	UINT8 InputIndex = 0;
 };
