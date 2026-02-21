@@ -656,8 +656,8 @@ void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerSt
 	
 	bool ShouldReconciliate =
 		PositionDifference.X > GameStateClient.PositionErrorAcceptance ||
-		PositionDifference.Y > GameStateClient.PositionErrorAcceptance ||
-		RotationDifference > GameStateClient.RotationErrorAcceptance; 
+		PositionDifference.Y > GameStateClient.PositionErrorAcceptance; /*||
+		RotationDifference > GameStateClient.RotationErrorAcceptance; */
 
 	// Remove used prediction because its now outdated
 	GameStateClient.Predictions.RemoveAt(0);
