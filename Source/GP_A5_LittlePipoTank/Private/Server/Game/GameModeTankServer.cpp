@@ -320,6 +320,7 @@ void AGameModeTankServer::UpdateTanksPhysics(float DeltaTime)
 					LocalPlayer.LastPlayerInputs.MoveInput = ExtractedInput.MoveInput;
 					LocalPlayer.LastPlayerInputs.AimInput = ExtractedInput.AimInput;
 					LocalPlayer.LastPlayerInputs.FireInput |= ExtractedInput.FireInput;
+					LocalPlayer.LastPlayerInputs.InputIndex = ExtractedInput.InputIndex;
 					LocalPlayer.InputBuffer.RemoveAt(0);
 				}
 				
