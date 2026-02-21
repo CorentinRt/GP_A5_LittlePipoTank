@@ -65,6 +65,8 @@ public:
 	// Client Prediction and Reconciliation
 	TArray<FPredictionSnapshot> Predictions;
 	UINT8 NextPredictionIndex = 0;
+	float PositionErrorAcceptance = 10.0f;
+	float RotationErrorAcceptance = 5.0f;
 	
 	// Game Interpolation
 	TArray<FInterpolationSnapshot> PlayersStateSnapshots;

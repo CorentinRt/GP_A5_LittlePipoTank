@@ -646,5 +646,47 @@ void AGameModeTankClient::SendClientPrediction()
 void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerStateData& OwnPlayerData)
 {
 	// TODO Prep Reconciliation but need Predicted Inputs back in OwnPlayerData
-	//while (!GameStateClient.Predictions.IsEmpty() && GameStateClient.Predictions[0].PredictionIndex < OwnPlayerData)
+	while (!GameStateClient.Predictions.IsEmpty() && GameStateClient.Predictions[0].PredictionIndex < OwnPlayerData.Index)
+	{
+		GameStateClient.Predictions.RemoveAt(0);
+	}
+	if (GameStateClient.Predictions.IsEmpty()) return;
+
+	FPlayerDataClient* PlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& Player)
+		{
+			return Player.PlayerIndex == GameStateClient.OwnPlayerIndex;
+		});
+
+	if (!PlayerData || !PlayerData->Tank) return;
+	
+	// Get Prediction equal to index of receive index by server
+	const FPredictionSnapshot& PlayerSnapshot = GameStateClient.Predictions[0];
+
+	FVector2D PositionDifference = (OwnPlayerData.Location - PlayerSnapshot.Location).GetAbs();
+	float RotationDifference = OwnPlayerData.Rotation - PlayerSnapshot.Rotation;
+	
+	bool ShouldReconciliate =
+		PositionDifference.X > GameStateClient.PositionErrorAcceptance ||
+		PositionDifference.Y > GameStateClient.PositionErrorAcceptance ||
+		RotationDifference > GameStateClient.RotationErrorAcceptance; 
+
+	// Remove used prediction because its now outdated
+	GameStateClient.Predictions.RemoveAt(0);
+	
+	if (!ShouldReconciliate) return;
+
+	GEngine->AddOnScreenDebugMessage(
+		-1,
+		5.0f,
+		FColor::Purple,
+		TEXT("RECONCILIATION")
+		);
+
+	PlayerData->Tank->SetLocation(OwnPlayerData.Location, false);
+	PlayerData->Tank->SetRotation(FRotator(0.0f, OwnPlayerData.Rotation, 0.0f));
+
+	for (FPredictionSnapshot& Prediction : GameStateClient.Predictions)
+	{
+		
+	}
 }
