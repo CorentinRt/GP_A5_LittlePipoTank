@@ -60,7 +60,6 @@ private:
 	void InterpolateGame(float DeltaTime);
 
 	void PredictClient(float DeltaTime);
-	void SendClientPrediction();
 	void ReconciliateClient(const FGameStatePacket::OwnPlayerStateData& OwnPlayerData);
 
 	UPROPERTY(EditAnywhere, meta=(AllowPrivateAccess = "true"))
