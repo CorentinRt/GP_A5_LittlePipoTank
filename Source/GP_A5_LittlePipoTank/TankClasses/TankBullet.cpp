@@ -4,6 +4,7 @@
 #include "TankClasses/TankBullet.h"
 
 #include "TankPawn.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -12,8 +13,11 @@ ATankBullet::ATankBullet()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
+	SetRootComponent(SphereCollision);
+	
 	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletMesh"));
-	RootComponent = BulletMesh;
+	BulletMesh->SetupAttachment(SphereCollision);
 	BulletMesh->SetSimulatePhysics(false);
 	BulletMesh->SetUsingAbsoluteRotation(false);
 	//BulletMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));

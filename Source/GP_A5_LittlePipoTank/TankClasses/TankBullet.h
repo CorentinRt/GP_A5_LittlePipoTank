@@ -7,6 +7,7 @@
 #include "Shared/Game/GamePhaseListener.h"
 #include "TankBullet.generated.h"
 
+class USphereComponent;
 class AGameModeTankServer;
 
 UCLASS()
@@ -17,6 +18,9 @@ class GP_A5_LITTLEPIPOTANK_API ATankBullet : public AActor, public IGamePhaseLis
 public:
 	UPROPERTY(EditAnywhere, Category= "Bullet")
 	UStaticMeshComponent* BulletMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<USphereComponent> SphereCollision;
 	
 	UPROPERTY(EditAnywhere, Category= "Bullet")
 	float BulletSpeed = 200.f;
