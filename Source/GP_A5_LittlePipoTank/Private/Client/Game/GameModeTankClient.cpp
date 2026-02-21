@@ -163,7 +163,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Received Game State");
 			
 			// Reconciliation
-			ReconciliateClient(Packet.OwnPlayerData);
+			// ReconciliateClient(Packet.OwnPlayerData);
 			
 			GameStateClient.PlayersStateSnapshots.Add({
 				.OtherPlayerStates = Packet.OtherPlayersStateData,
@@ -656,7 +656,7 @@ void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerSt
 	
 	bool ShouldReconciliate =
 		PositionDifference.X > GameStateClient.PositionErrorAcceptance ||
-		PositionDifference.Y > GameStateClient.PositionErrorAcceptance; /*||
+		PositionDifference.Y > GameStateClient.PositionErrorAcceptance;  /*||
 		RotationDifference > GameStateClient.RotationErrorAcceptance; */
 
 	// Remove used prediction because its now outdated
