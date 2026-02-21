@@ -645,19 +645,11 @@ void AGameModeTankClient::SendClientPrediction()
 
 void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerStateData& OwnPlayerData)
 {
-	// TODO Prep Reconciliation but need Predicted Inputs back in OwnPlayerData
 	while (!GameStateClient.Predictions.IsEmpty() && GameStateClient.Predictions[0].PredictionIndex < OwnPlayerData.Index)
 	{
 		GameStateClient.Predictions.RemoveAt(0);
 	}
 	if (GameStateClient.Predictions.IsEmpty()) return;
-
-	FPlayerDataClient* PlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& Player)
-		{
-			return Player.PlayerIndex == GameStateClient.OwnPlayerIndex;
-		});
-
-	if (!PlayerData || !PlayerData->Tank) return;
 	
 	// Get Prediction equal to index of receive index by server
 	const FPredictionSnapshot& PlayerSnapshot = GameStateClient.Predictions[0];
@@ -672,6 +664,14 @@ void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerSt
 
 	// Remove used prediction because its now outdated
 	GameStateClient.Predictions.RemoveAt(0);
+
+	//Check if we have own player data and player tank
+	FPlayerDataClient* PlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& Player)
+		{
+			return Player.PlayerIndex == GameStateClient.OwnPlayerIndex;
+		});
+
+	if (!PlayerData || !PlayerData->Tank) return;
 	
 	if (!ShouldReconciliate) return;
 
