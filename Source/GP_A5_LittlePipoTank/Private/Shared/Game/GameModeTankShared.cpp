@@ -25,21 +25,15 @@ void AGameModeTankShared::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-}
-
-void AGameModeTankShared::AsyncPhysicsTickActor(float DeltaTime, float SimTime)
-{
-	Super::AsyncPhysicsTickActor(DeltaTime, SimTime);
-
 	GEngine->AddOnScreenDebugMessage(
-		-1,
-		2.f,
-		FColor::Red,
-		FString::Printf(TEXT("Delta Time physics : %f"), DeltaTime)
-	);
+			-1,
+			2.f,
+			FColor::Blue,
+			FString::Printf(TEXT("Delta Time tick : %f"), DeltaSeconds)
+		);
 	
-	UpdateCheckTickPhysics(DeltaTime);
-	UpdateCheckTickNetwork(DeltaTime);
+	UpdateCheckTickPhysics(DeltaSeconds);
+	UpdateCheckTickNetwork(DeltaSeconds);
 }
 
 void AGameModeTankShared::UpdateCheckTickPhysics(float DeltaTime)
