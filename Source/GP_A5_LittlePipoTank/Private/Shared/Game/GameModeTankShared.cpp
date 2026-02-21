@@ -11,7 +11,8 @@
 AGameModeTankShared::AGameModeTankShared()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
+	bAsyncPhysicsTickEnabled = true;
 }
 
 void AGameModeTankShared::BeginPlay()
@@ -24,8 +25,14 @@ void AGameModeTankShared::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	UpdateCheckTickPhysics(DeltaSeconds);
-	UpdateCheckTickNetwork(DeltaSeconds);
+}
+
+void AGameModeTankShared::AsyncPhysicsTickActor(float DeltaTime, float SimTime)
+{
+	Super::AsyncPhysicsTickActor(DeltaTime, SimTime);
+
+	UpdateCheckTickPhysics(DeltaTime);
+	UpdateCheckTickNetwork(DeltaTime);
 }
 
 void AGameModeTankShared::UpdateCheckTickPhysics(float DeltaTime)

@@ -24,6 +24,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void AsyncPhysicsTickActor(float DeltaTime, float SimTime) override;
+	
 	virtual void UpdateCheckTickPhysics(float DeltaTime);
 	virtual void UpdateCheckTickNetwork(float DeltaTime);
 
