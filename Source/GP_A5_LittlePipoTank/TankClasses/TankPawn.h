@@ -9,6 +9,7 @@
 #include "Shared/Game/GamePhaseListener.h"
 #include "TankPawn.generated.h"
 
+class UBoxComponent;
 class ATankBullet;
 
 UCLASS()
@@ -17,6 +18,8 @@ class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn, public IGamePhaseListen
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	TObjectPtr<UBoxComponent> TankBoxCollision;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Tank")
 	UStaticMeshComponent* TankHeadMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Tank")
