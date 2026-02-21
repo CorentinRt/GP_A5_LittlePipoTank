@@ -114,7 +114,7 @@ public:
 	void ReceiveGetShoot();
 	
 	UFUNCTION(BlueprintImplementableEvent)
-	ATankBullet* ReceiveShooting(ATankBullet* outBullet);
+	void ReceiveShooting(ATankBullet* outBullet);
 
 	virtual void ReactOnGamePhaseChanged_Implementation(ETankGamePhase InGamePhase) override;
 };

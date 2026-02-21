@@ -217,8 +217,3 @@ void ATankPawn::ReactOnGamePhaseChanged_Implementation(ETankGamePhase InGamePhas
 		break;
 	}
 }
-
-ATankBullet* ReceiveShooting(ATankBullet* outBullet)
-{
-	return outBullet;
-}
