@@ -617,7 +617,7 @@ void AGameModeTankClient::PredictClient(float DeltaTime)
 
 	if (!PlayerData || !PlayerData->Tank) return;
 	
-	FPlayerTankInputs& ConsumedInput = PlayerController->GetTankInputs();
+	const FPlayerTankInputs& ConsumedInput = PlayerController->GetTankInputs();
 	
 	PlayerData->Tank->SetPlayerTankInputs(ConsumedInput);
 	PlayerData->Tank->UpdatePhysics(DeltaTime);
