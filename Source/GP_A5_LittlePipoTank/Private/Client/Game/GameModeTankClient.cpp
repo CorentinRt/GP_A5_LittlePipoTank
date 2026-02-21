@@ -596,6 +596,12 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 
 void AGameModeTankClient::PredictClient(float DeltaTime)
 {
+	if (!PlayerController)
+	{
+		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't predict: Player controller is null.");
+		return;
+	}
+	
 	FPlayerDataClient* PlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& Player)
 	{
 		return Player.PlayerIndex == GameStateClient.OwnPlayerIndex;
@@ -603,7 +609,7 @@ void AGameModeTankClient::PredictClient(float DeltaTime)
 
 	if (!PlayerData || !PlayerData->Tank) return;
 	
-	const FPlayerTankInputs& ConsumedInput = PlayerController->GetTankInputs();
+	FPlayerTankInputs& ConsumedInput = PlayerController->GetTankInputs();
 	
 	PlayerData->Tank->SetPlayerTankInputs(ConsumedInput);
 	PlayerData->Tank->UpdatePhysics(DeltaTime);
@@ -615,21 +621,8 @@ void AGameModeTankClient::PredictClient(float DeltaTime)
 		.Rotation = PlayerData->Tank->GetTankRotation(),
 	});
 	
-	SendClientPrediction();
-}
-
-void AGameModeTankClient::SendClientPrediction()
-{
-	if (!PlayerController)
-	{
-		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Can't send inputs: Player controller is null.");
-		return;
-	}
-
-	FPlayerTankInputs& CurrentInputs = PlayerController->GetTankInputs();
-	
 	FPlayerInputsPacket InputsPacket = {
-		.PlayerInputs = CurrentInputs,
+		.PlayerInputs = ConsumedInput,
 		.PredictionIndex = GameStateClient.NextPredictionIndex
 	};
 
@@ -637,7 +630,7 @@ void AGameModeTankClient::SendClientPrediction()
 
 	GameStateClient.NextPredictionIndex++;
 
-	if (CurrentInputs.FireInput) CurrentInputs.FireInput = false;
+	if (ConsumedInput.FireInput) ConsumedInput.FireInput = false;
 }
 
 void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerStateData& OwnPlayerData)
