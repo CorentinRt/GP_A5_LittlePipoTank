@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "GP_A5_LittlePipoTank.h"
 #include "TankBullet.h"
+#include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Server/Game/GameModeTankServer.h"
@@ -16,9 +17,12 @@ ATankPawn::ATankPawn()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	TankBoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	TankBoxCollision->SetupAttachment(GetRootComponent());
+	
 	//Body
 	TankBodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyOfTank"));
-	TankBodyMesh->SetupAttachment(GetRootComponent());
+	TankBodyMesh->SetupAttachment(TankBoxCollision);
 
 	//Head
 	TankHeadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HeadOfTank"));

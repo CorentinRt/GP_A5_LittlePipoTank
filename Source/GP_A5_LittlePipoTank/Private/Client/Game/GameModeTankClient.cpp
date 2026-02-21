@@ -373,6 +373,8 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 
 				Player->Tank = PlayerTank;
 
+				Player->Tank->ReactOnGamePhaseChanged(GameStateClient.CurrentGamePhase);
+
 				UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Spawn ClientTank Success");
 
 				if (!PlayersColorData) continue;
@@ -455,55 +457,55 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 		// Temp for test: Own Player Interp
 		// TODO Remove Client Player Interpsd
 		
-		{
-			// check if To snapshot has a position for the same player
-			FPlayerDataClient* OwnPlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
-			{
-				return PlayerData.PlayerIndex == GameStateClient.OwnPlayerIndex;
-			});
-
-			if (!OwnPlayerData)
-			{
-				UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "No Own Data");
-			}
-
-			if (!OwnPlayerData->Tank)
-			{
-				UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "No Own Tank");
-			}
-			
-			if (OwnPlayerData && OwnPlayerData->Tank)
-			{
-				FGameStatePacket::OwnPlayerStateData FromPlayerData = FromSnapshot.OwnPlayerState;
-				FGameStatePacket::OwnPlayerStateData ToPlayerData = ToSnapshot.OwnPlayerState;
-				
-				// Do Lerp
-				FVector2D LerpLocation = FMath::Lerp(
-					FromPlayerData.Location,
-					ToPlayerData.Location,
-					GameStateClient.SnapshotBufferAccumulator);
-
-				FRotator LerpRotation = UKismetMathLibrary::RLerp(
-					FRotator(0.0f, FromPlayerData.Rotation, 0.0f),
-					FRotator(0.0f, ToPlayerData.Rotation, 0.0f),
-					GameStateClient.SnapshotBufferAccumulator,
-					true);
-				
-				FRotator LerpAimRotation = UKismetMathLibrary::RLerp(
-					FRotator(0.0f, FromPlayerData.AimRotation, 0.0f),
-					FRotator(0.0f, ToPlayerData.AimRotation, 0.0f),
-
-					GameStateClient.SnapshotBufferAccumulator,
-					true);
-
-				//Apply Own Player Lerp
-				OwnPlayerData->Tank->SetLocation(LerpLocation, false);
-				OwnPlayerData->Tank->SetRotation(LerpRotation);
-				OwnPlayerData->Tank->SetAimRotation(LerpAimRotation);
-
-				// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Lerp Own Tank");
-			}
-		}
+		// {
+		// 	// check if To snapshot has a position for the same player
+		// 	FPlayerDataClient* OwnPlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
+		// 	{
+		// 		return PlayerData.PlayerIndex == GameStateClient.OwnPlayerIndex;
+		// 	});
+		//
+		// 	if (!OwnPlayerData)
+		// 	{
+		// 		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "No Own Data");
+		// 	}
+		//
+		// 	if (!OwnPlayerData->Tank)
+		// 	{
+		// 		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "No Own Tank");
+		// 	}
+		// 	
+		// 	if (OwnPlayerData && OwnPlayerData->Tank)
+		// 	{
+		// 		FGameStatePacket::OwnPlayerStateData FromPlayerData = FromSnapshot.OwnPlayerState;
+		// 		FGameStatePacket::OwnPlayerStateData ToPlayerData = ToSnapshot.OwnPlayerState;
+		// 		
+		// 		// Do Lerp
+		// 		FVector2D LerpLocation = FMath::Lerp(
+		// 			FromPlayerData.Location,
+		// 			ToPlayerData.Location,
+		// 			GameStateClient.SnapshotBufferAccumulator);
+		//
+		// 		FRotator LerpRotation = UKismetMathLibrary::RLerp(
+		// 			FRotator(0.0f, FromPlayerData.Rotation, 0.0f),
+		// 			FRotator(0.0f, ToPlayerData.Rotation, 0.0f),
+		// 			GameStateClient.SnapshotBufferAccumulator,
+		// 			true);
+		// 		
+		// 		FRotator LerpAimRotation = UKismetMathLibrary::RLerp(
+		// 			FRotator(0.0f, FromPlayerData.AimRotation, 0.0f),
+		// 			FRotator(0.0f, ToPlayerData.AimRotation, 0.0f),
+		//
+		// 			GameStateClient.SnapshotBufferAccumulator,
+		// 			true);
+		//
+		// 		//Apply Own Player Lerp
+		// 		OwnPlayerData->Tank->SetLocation(LerpLocation, false);
+		// 		OwnPlayerData->Tank->SetRotation(LerpRotation);
+		// 		OwnPlayerData->Tank->SetAimRotation(LerpAimRotation);
+		//
+		// 		// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Lerp Own Tank");
+		// 	}
+		// }
 		
 		// Do the interpolation here
 		for (const auto& FromPlayerData : FromSnapshot.OtherPlayerStates)
@@ -606,10 +608,24 @@ void AGameModeTankClient::PredictClient(float DeltaTime)
 {
 	// TODO Update Pawn physics here ?
 	// TODO Block Inputs if not in IN_GAME
+
+
+	FPlayerDataClient* PlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& Player)
+	{
+		return Player.PlayerIndex == GameStateClient.OwnPlayerIndex;
+	});
+
+	if (!PlayerData) return;
+	
+	FPlayerTankInputs ConsumedInput = PlayerController->GetTankInputs();
+	
+	PlayerData->Tank->SetPlayerTankInputs(ConsumedInput);
+	PlayerData->Tank->UpdatePhysics(DeltaTime);
+
 	
 	GameStateClient.Predictions.Add({
 		.PredictionIndex = GameStateClient.NextPredictionIndex,
-		.Inputs = PlayerController->GetTankInputs(),
+		.Inputs = ConsumedInput,
 		//TODO Set Position, Rotation, AimRotation, Velocity
 	});
 	
