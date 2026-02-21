@@ -373,7 +373,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 
 				Player->Tank = PlayerTank;
 
-				Player->Tank->ReactOnGamePhaseChanged(GameStateClient.CurrentGamePhase);
+				Player->Tank->ReactOnGamePhaseChanged_Implementation(GameStateClient.CurrentGamePhase);
 
 				UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Spawn ClientTank Success");
 
