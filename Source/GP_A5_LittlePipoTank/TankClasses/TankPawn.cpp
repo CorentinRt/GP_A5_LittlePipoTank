@@ -152,7 +152,7 @@ void ATankPawn::UpdatePhysics(float DeltaTime, bool UseSweep)
 			Bullet->SetInstigator(this);
 			Bullet->SetActorScale3D(Bullet->GetActorScale() * sizeOfBullet);
 			Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);	
-			ReceiveShooting();
+			ReceiveShooting(Bullet);
 			
 			OnSpawnBullet.Broadcast(Bullet);
 		}
@@ -216,4 +216,9 @@ void ATankPawn::ReactOnGamePhaseChanged_Implementation(ETankGamePhase InGamePhas
 	default:
 		break;
 	}
+}
+
+ATankBullet* ReceiveShooting(ATankBullet* outBullet)
+{
+	return outBullet;
 }
