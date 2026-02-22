@@ -89,6 +89,8 @@ protected:
 
 	
 private:
+	void DestroyAllBullets();
+	
 	void PlayerJoined(ENetPeer* InPeer, const FString& InPlayerName);
 
 	void PlayerLeft(const ENetEvent& event, int IndexToRemove);

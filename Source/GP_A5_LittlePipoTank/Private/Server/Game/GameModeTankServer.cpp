@@ -198,6 +198,11 @@ void AGameModeTankServer::ReactChangeGamePhase(ETankGamePhase InGamePhase)
 
 	TanksReactToOnChangeGamePhase(InGamePhase);
 	BulletsReactToOnChangeGamePhase(InGamePhase);
+
+	if (GameStateServer.CurrentGamePhase == ETankGamePhase::PRE_GAME)
+	{
+		DestroyAllBullets();
+	}
 }
 
 void AGameModeTankServer::TanksReactToOnChangeGamePhase(ETankGamePhase InGamePhase)
@@ -216,8 +221,10 @@ void AGameModeTankServer::TanksReactToOnChangeGamePhase(ETankGamePhase InGamePha
 
 void AGameModeTankServer::BulletsReactToOnChangeGamePhase(ETankGamePhase InGamePhase)
 {
-	for (ATankBullet* LocalBullet : GameStateServer.AllTankBullets)
+	for (int i = 0; i < GameStateServer.AllTankBullets.Num(); ++i)
 	{
+		ATankBullet* LocalBullet = GameStateServer.AllTankBullets[i];
+		
 		if (!IsValid(LocalBullet))
 			continue;
 
@@ -601,6 +608,21 @@ void AGameModeTankServer::SaveVictoriousPlayer()
 void AGameModeTankServer::NotifyVictoriousPlayer()
 {
 	OnPlayerVictory.Broadcast(GetLastVictoriousPlayerData());
+}
+
+void AGameModeTankServer::DestroyAllBullets()
+{
+	for (int i = 0; i < GameStateServer.AllTankBullets.Num(); ++i)
+	{
+		ATankBullet* Bullet = GameStateServer.AllTankBullets[i];
+
+		if (IsValid(Bullet))
+		{
+			GetWorld()->DestroyActor(Bullet);
+		}
+	}
+
+	GameStateServer.AllTankBullets.Empty();
 }
 
 FPlayerDataServer AGameModeTankServer::GetLastVictoriousPlayerData()
