@@ -27,7 +27,7 @@ void AClientTankPawn::Tick(float DeltaTime)
 	RotationVisualError *= 0.9f;
 
 	TankBodyMeshHolder->SetRelativeLocation(LocationVisualError);
-	TankBodyMeshHolder->SetRelativeRotation(FRotator(0.0f, RotationVisualError, 0.0f));
+	// TankBodyMeshHolder->SetRelativeRotation(FRotator(0.0f, RotationVisualError, 0.0f));
 }
 
 // Called to bind functionality to input
