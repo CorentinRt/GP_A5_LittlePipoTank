@@ -36,6 +36,13 @@ void AClientTankBullet::SetLocation(const FVector& NewLocation, bool Sweep)
 
 void AClientTankBullet::SetRotation(const FRotator& NewRotation)
 {
+	float OldRotation = GetActorRotation().Yaw;
+
+	if (FMath::Abs(FMath::Abs(OldRotation) - FMath::Abs(NewRotation.Yaw)) > RotationDifferenceTresholdToCallBulletBouncedEffects)
+	{
+		ReceiveOnBulletBounced();
+	}
+	
 	SetActorRotation(NewRotation);
 }
 

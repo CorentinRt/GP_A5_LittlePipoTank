@@ -25,8 +25,14 @@ public:
 
 	void SetLocation(const FVector& NewLocation, bool Sweep);
 	void SetRotation(const FRotator& NewRotation);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ReceiveOnBulletBounced();
 	
 private:
 	UPROPERTY(EditAnywhere, Category= "Bullet")
 	UStaticMeshComponent* BulletMesh;
+
+	UPROPERTY(EditAnywhere)
+	float RotationDifferenceTresholdToCallBulletBouncedEffects = 10.f;
 };
