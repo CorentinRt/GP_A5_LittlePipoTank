@@ -14,7 +14,7 @@ void AENetClientGameMode::Tick(float DeltaSeconds)
 	RunNetwork();
 }
 
-void AENetClientGameMode::InitializeNetwork(const FString& HostName)
+void AENetClientGameMode::InitializeNetwork(const FString& HostName, int AppPort)
 {
 	// Unwrapped test
 	{
@@ -24,8 +24,7 @@ void AENetClientGameMode::InitializeNetwork(const FString& HostName)
 			UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "Failed to resolve address");
 			return;
 		}
-		serverAddress.port = 10001;
-
+		serverAddress.port = AppPort;
 		
 		if(serverAddress.type == ENET_ADDRESS_TYPE_IPV4)
 		{

@@ -13,6 +13,11 @@ const FString& ULittlePipoTankGameInstance::GetPlayerName() const
 	return PlayerName;
 }
 
+int ULittlePipoTankGameInstance::GetAppPort() const
+{
+	return AppPort;
+}
+
 void ULittlePipoTankGameInstance::SetServerIp(FString NewIp)
 {
 	ServerIp = MoveTemp(NewIp);
@@ -21,4 +26,9 @@ void ULittlePipoTankGameInstance::SetServerIp(FString NewIp)
 void ULittlePipoTankGameInstance::SetPlayerName(FString NewPlayerName)
 {
 	PlayerName = MoveTemp(NewPlayerName);
+}
+
+void ULittlePipoTankGameInstance::SetAppPort(int NewAppPort)
+{
+	AppPort = NewAppPort;
 }
