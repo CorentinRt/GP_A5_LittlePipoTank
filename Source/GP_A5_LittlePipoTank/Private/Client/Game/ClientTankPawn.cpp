@@ -37,8 +37,16 @@ void AClientTankPawn::UpdatePhysics(float DeltaTime, bool UseSweep)
 	
 	// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Tick physi tank");
 	//Move
+
+	FVector PreviousLocation = GetActorLocation();
+	
 	MoveTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.Y, DeltaTime, UseSweep);
 
+	if ((PreviousLocation - GetActorLocation()).Length() > MinDistanceToConsiderIsMoving)
+	{
+		ReceiveOnTankMoveBlueprint();
+	}
+	
 	// Rotation Tank
 	RotateTank(bBlockAllInputs ? 0.f : TankInputs.MoveInput.X, DeltaTime);
 	
@@ -58,6 +66,12 @@ void AClientTankPawn::UpdatePhysics(float DeltaTime, bool UseSweep)
 void AClientTankPawn::SetLocation(const FVector2D& Location, bool Sweep)
 {
 	FVector NewLocation(Location.X, Location.Y, GetActorLocation().Z);
+
+	if ((NewLocation - GetActorLocation()).Length() > MinDistanceToConsiderIsMoving)
+	{
+		ReceiveOnTankMoveBlueprint();
+	}
+	
 	SetActorLocation(NewLocation, Sweep);
 }
 

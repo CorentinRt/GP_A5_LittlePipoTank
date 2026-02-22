@@ -19,6 +19,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere)
+	float MinDistanceToConsiderIsMoving = 5.f;
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -38,6 +41,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ReceiveOnTankDestroy();
 
-	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ReceiveOnTankMoveBlueprint();
 
 };
