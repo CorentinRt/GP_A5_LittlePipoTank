@@ -149,6 +149,17 @@ ETankGamePhase AGameModeTankServer::GetCurrentGamePhase()
 void AGameModeTankServer::SetServerGamePhase(ETankGamePhase NewGamePhase)
 {
 	SetGamePhase(GameStateServer.CurrentGamePhase, NewGamePhase);
+
+	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
+	{
+		if (LocalPlayer.Peer == nullptr)
+			continue;
+
+		// Game Phase
+		FGamePhasePacket GamePhasePacket = {};
+		GamePhasePacket.GamePhase = GameStateServer.CurrentGamePhase;
+		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, GamePhasePacket, ENET_PACKET_FLAG_RELIABLE);
+	}
 }
 
 void AGameModeTankServer::ReactChangeGamePhase(ETankGamePhase InGamePhase)
