@@ -10,4 +10,6 @@ les phases de jeu se lance réellement quand au moins deux joueurs sont connect�
 
 Il n'y a pas d'UI de retour au menu, il faut donc redémarrer le jeu.
 
-Bon tank !
+Le jeu est jouable de 2 à 4 joueurs.
+
+Bon LittlePipoTank !
