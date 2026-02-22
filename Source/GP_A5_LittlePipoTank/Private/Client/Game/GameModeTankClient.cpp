@@ -445,59 +445,6 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 		const FInterpolationSnapshot& FromSnapshot = GameStateClient.PlayersStateSnapshots[0];
 		const FInterpolationSnapshot& ToSnapshot = GameStateClient.PlayersStateSnapshots[1];
 
-		// Temp for test: Own Player Interp
-		// TODO Remove Client Player Interpsd
-		
-		// {
-		// 	// check if To snapshot has a position for the same player
-		// 	FPlayerDataClient* OwnPlayerData = GameStateClient.Players.FindByPredicate([&](const FPlayerDataClient& PlayerData)
-		// 	{
-		// 		return PlayerData.PlayerIndex == GameStateClient.OwnPlayerIndex;
-		// 	});
-		//
-		// 	if (!OwnPlayerData)
-		// 	{
-		// 		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "No Own Data");
-		// 	}
-		//
-		// 	if (!OwnPlayerData->Tank)
-		// 	{
-		// 		UE_LOGFMT(LogGP_A5_LittlePipoTank, Error, "No Own Tank");
-		// 	}
-		// 	
-		// 	if (OwnPlayerData && OwnPlayerData->Tank)
-		// 	{
-		// 		FGameStatePacket::OwnPlayerStateData FromPlayerData = FromSnapshot.OwnPlayerState;
-		// 		FGameStatePacket::OwnPlayerStateData ToPlayerData = ToSnapshot.OwnPlayerState;
-		// 		
-		// 		// Do Lerp
-		// 		FVector2D LerpLocation = FMath::Lerp(
-		// 			FromPlayerData.Location,
-		// 			ToPlayerData.Location,
-		// 			GameStateClient.SnapshotBufferAccumulator);
-		//
-		// 		FRotator LerpRotation = UKismetMathLibrary::RLerp(
-		// 			FRotator(0.0f, FromPlayerData.Rotation, 0.0f),
-		// 			FRotator(0.0f, ToPlayerData.Rotation, 0.0f),
-		// 			GameStateClient.SnapshotBufferAccumulator,
-		// 			true);
-		// 		
-		// 		FRotator LerpAimRotation = UKismetMathLibrary::RLerp(
-		// 			FRotator(0.0f, FromPlayerData.AimRotation, 0.0f),
-		// 			FRotator(0.0f, ToPlayerData.AimRotation, 0.0f),
-		//
-		// 			GameStateClient.SnapshotBufferAccumulator,
-		// 			true);
-		//
-		// 		//Apply Own Player Lerp
-		// 		OwnPlayerData->Tank->SetLocation(LerpLocation, false);
-		// 		OwnPlayerData->Tank->SetRotation(LerpRotation);
-		// 		OwnPlayerData->Tank->SetAimRotation(LerpAimRotation);
-		//
-		// 		// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Lerp Own Tank");
-		// 	}
-		// }
-		
 		// Do the interpolation here
 		for (const auto& FromPlayerData : FromSnapshot.OtherPlayerStates)
 		{
@@ -678,7 +625,7 @@ void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerSt
 
 	// Get old pos and rotation for visual correction
 	FVector OldLocation = PlayerData->Tank->GetActorLocation();
-	FRotator OldRotation = PlayerData->Tank->GetActorRotation();
+	float OldRotation = PlayerData->Tank->GetActorRotation().Yaw;
 	
 	PlayerData->Tank->SetLocation(OwnPlayerData.Location, false);
 	PlayerData->Tank->SetRotation(FRotator(0.0f, OwnPlayerData.Rotation, 0.0f));
@@ -694,7 +641,7 @@ void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerSt
 
 	// Get new location to calculate visual error
 	FVector NewLocation = PlayerData->Tank->GetActorLocation();
-	FRotator NewRotation = PlayerData->Tank->GetActorRotation();
+	float NewRotation = PlayerData->Tank->GetActorRotation().Yaw;
 
 	PlayerData->Tank->AddVisualError(OldLocation - NewLocation, OldRotation - NewRotation);
 }
