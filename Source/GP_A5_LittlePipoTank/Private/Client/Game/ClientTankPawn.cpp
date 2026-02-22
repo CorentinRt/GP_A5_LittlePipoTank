@@ -22,6 +22,12 @@ void AClientTankPawn::BeginPlay()
 void AClientTankPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	LocationVisualError *= 0.9f;
+	RotationVisualError *= 0.9f;
+
+	TankBodyMesh->SetRelativeLocation(LocationVisualError);
+	TankBodyMesh->SetRelativeRotation(RotationVisualError);
 }
 
 // Called to bind functionality to input
@@ -70,4 +76,21 @@ void AClientTankPawn::SetAimRotation(const FRotator& AimRotation)
 {
 	TankHeadMesh->SetWorldRotation(AimRotation);
 }
+
+void AClientTankPawn::AddVisualError(const FVector& LocationError, const FRotator& RotationError)
+{
+	LocationVisualError += LocationError;
+	RotationVisualError += RotationError;
+}
+
+FVector AClientTankPawn::GetVisualLocation() const
+{
+	return GetActorLocation() + LocationVisualError;
+}
+
+FRotator AClientTankPawn::GetVisualRotation() const
+{
+	return GetActorRotation() + RotationVisualError;
+}
+
 

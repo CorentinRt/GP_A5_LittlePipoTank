@@ -20,7 +20,7 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 public:
 	
-	virtual void InitializeNetwork();
+	virtual void InitializeNetwork(int AppPort = 10001);
 
 protected:
 	

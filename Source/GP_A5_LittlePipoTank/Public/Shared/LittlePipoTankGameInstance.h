@@ -19,12 +19,19 @@ public:
 	const FString& GetServerIp() const;
 	UFUNCTION(BlueprintCallable)
 	const FString& GetPlayerName() const;
+
+	UFUNCTION(BlueprintCallable)
+	int GetAppPort() const;
 	
 	UFUNCTION(BlueprintCallable)
 	void SetServerIp(FString NewIp);
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerName(FString NewPlayerName);
+	UFUNCTION(BlueprintCallable)
+	void SetAppPort(int NewAppPort);
+	
 private:
 	FString ServerIp = "localhost";
+	int AppPort = 10001;
 	FString PlayerName = "DefaultName";
 };

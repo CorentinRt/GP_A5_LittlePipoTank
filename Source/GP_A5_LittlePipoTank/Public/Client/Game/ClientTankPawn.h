@@ -38,6 +38,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ReceiveOnTankDestroy();
 
-	
+	void AddVisualError(const FVector& LocationError, const FRotator& RotationError);
 
+	FVector GetVisualLocation() const;
+	FRotator GetVisualRotation() const;
+
+private:
+	FVector LocationVisualError;
+	FRotator RotationVisualError;
 };

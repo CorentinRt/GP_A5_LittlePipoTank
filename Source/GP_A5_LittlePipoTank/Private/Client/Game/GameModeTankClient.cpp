@@ -45,11 +45,11 @@ void AGameModeTankClient::InitGameClient()
 {
 	GetAllPlayerSpawnPoints();
 	
-	InitializeNetwork(GetServerAdressIp());
+	ULittlePipoTankGameInstance* GameInstance = Cast<ULittlePipoTankGameInstance>(GetGameInstance());
+	InitializeNetwork(GameInstance->GetServerIp(), GameInstance->GetAppPort());
 	
 	GameStateClient.ServerPeer = ServerPeer;
 
-	ULittlePipoTankGameInstance* GameInstance = Cast<ULittlePipoTankGameInstance>(GetGameInstance());
 
 	FPlayerNamePacket Packet = {.Name = GameInstance->GetPlayerName()};
 	UNetworkProtocolHelpers::SendPacket(ServerPeer, Packet, ENET_PACKET_FLAG_RELIABLE);
@@ -675,6 +675,11 @@ void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerSt
 		TEXT("RECONCILIATION")
 		);
 
+
+	// Get old pos and rotation for visual correction
+	FVector OldLocation = PlayerData->Tank->GetActorLocation();
+	FRotator OldRotation = PlayerData->Tank->GetActorRotation();
+	
 	PlayerData->Tank->SetLocation(OwnPlayerData.Location, false);
 	PlayerData->Tank->SetRotation(FRotator(0.0f, OwnPlayerData.Rotation, 0.0f));
 
@@ -686,4 +691,10 @@ void AGameModeTankClient::ReconciliateClient(const FGameStatePacket::OwnPlayerSt
 		Prediction.Location = PlayerData->Tank->GetTankLocation();
 		Prediction.Rotation = PlayerData->Tank->GetTankRotation();
 	}
+
+	// Get new location to calculate visual error
+	FVector NewLocation = PlayerData->Tank->GetActorLocation();
+	FRotator NewRotation = PlayerData->Tank->GetActorRotation();
+
+	PlayerData->Tank->AddVisualError(OldLocation - NewLocation, OldRotation - NewRotation);
 }

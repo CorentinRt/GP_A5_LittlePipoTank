@@ -12,13 +12,13 @@ void AENetServerGameMode::Tick(float DeltaSeconds)
 	RunNetwork();
 }
 
-void AENetServerGameMode::InitializeNetwork()
+void AENetServerGameMode::InitializeNetwork(int AppPort)
 {
 	//Unwrapped test
 	{
 		ENetAddress address;
 		enet_address_build_any(&address, ENET_ADDRESS_TYPE_IPV6);
-		address.port = 10001;
+		address.port = AppPort;
 
 		Host = enet_host_create(ENET_ADDRESS_TYPE_ANY, &address, 10, 0, 0, 0);
 		if (!Host)
