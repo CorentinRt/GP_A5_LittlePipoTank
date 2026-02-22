@@ -29,9 +29,9 @@ void AClientTankBullet::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AClientTankBullet::SetLocation(const FVector2D& NewLocation, bool Sweep)
+void AClientTankBullet::SetLocation(const FVector& NewLocation, bool Sweep)
 {
-	SetActorLocation(FVector(NewLocation.X, NewLocation.Y, 0), Sweep);
+	SetActorLocation(FVector(NewLocation.X, NewLocation.Y, NewLocation.Z), Sweep);
 }
 
 void AClientTankBullet::SetRotation(const FRotator& NewRotation)

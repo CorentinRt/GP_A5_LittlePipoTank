@@ -209,7 +209,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 				if (!Bullet)
 				{
 					// UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "And ClientTank");
-					FVector SpawnLocation(It->Location.X, It->Location.Y, 0.0f);
+					FVector SpawnLocation(It->Location.X, It->Location.Y, It->Location.Z);
 					FRotator SpawnRotation(0.0f, It->Rotation, 0.0f);
 					
 					FActorSpawnParameters SpawnParameters;
@@ -562,7 +562,7 @@ void AGameModeTankClient::InterpolateGame(float DeltaTime)
 			if (!Bullet || !Bullet->Bullet) continue;
 			
 			// Do Lerp
-			FVector2D LerpLocation = FMath::Lerp(
+			FVector LerpLocation = FMath::Lerp(
 				FromBulletData.Location,
 				ToBulletData->Location,
 				GameStateClient.SnapshotBufferAccumulator);

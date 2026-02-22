@@ -34,7 +34,7 @@ void ATankBullet::BeginPlay()
 	
 	if (GetInstigator())
 	{
-		BulletMesh->IgnoreActorWhenMoving(GetInstigator(), true); //Ignore le big tank 
+		SphereCollision->IgnoreActorWhenMoving(GetInstigator(), true); //Ignore le big tank 
 	}
 }
 

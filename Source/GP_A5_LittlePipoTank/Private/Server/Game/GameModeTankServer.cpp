@@ -127,8 +127,7 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 
 				NewBulletStateData.Index = LocalBullet->BulletIndex;
 
-				FVector BulletLocation = LocalBullet->GetActorLocation();
-				NewBulletStateData.Location = FVector2D(BulletLocation.X, BulletLocation.Y);
+				NewBulletStateData.Location = LocalBullet->GetActorLocation();
 				
 				NewBulletStateData.Rotation = LocalBullet->GetActorRotation().Yaw;
 

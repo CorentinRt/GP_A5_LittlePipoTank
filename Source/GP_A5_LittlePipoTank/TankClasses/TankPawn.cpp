@@ -96,6 +96,22 @@ void ATankPawn::RotateTank(float RotateInput, float DeltaTime)
 	AddActorLocalRotation(RotationDelta * DeltaTime * RotateSpeed);
 }
 
+bool ATankPawn::CanShoot() const
+{
+	if (DelayBeforeShootingAvailable <= 0.f)
+		return true;
+
+	return false;
+}
+
+void ATankPawn::UpdateShootCooldown(float DeltaTime)
+{
+	if (DelayBeforeShootingAvailable > 0.f)
+	{
+		DelayBeforeShootingAvailable -= DeltaTime;
+	}
+}
+
 float ATankPawn::GetHeadAimRotation() const
 {
 	return TankHeadMesh->GetComponentRotation().Yaw;
@@ -113,6 +129,8 @@ FVector2D ATankPawn::GetTankLocation() const
 
 void ATankPawn::UpdatePhysics(float DeltaTime, bool UseSweep)
 {
+	UpdateShootCooldown(DeltaTime);
+	
 	if (IsHidden())
 		return;
 	
@@ -142,21 +160,25 @@ void ATankPawn::UpdatePhysics(float DeltaTime, bool UseSweep)
 	
 	if(TankInputs.FireInput == true)
 	{
-		FVector Location(TankShootingPoint->GetComponentLocation());
-		FRotator Rotation(TankShootingPoint->GetComponentRotation());
-		Rotation.Yaw += 90;
-		FActorSpawnParameters SpawnParameters;
-		ATankBullet* Bullet = GetWorld()->SpawnActor<ATankBullet>(Location, Rotation, SpawnParameters);
-		if (Bullet)
+		if (CanShoot())
 		{
-			Bullet->SetInstigator(this);
-			Bullet->SetActorScale3D(Bullet->GetActorScale() * sizeOfBullet);
-			Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);	
-			ReceiveShooting(Bullet);
+			DelayBeforeShootingAvailable = CooldownBetweenEachShoot;
 			
-			OnSpawnBullet.Broadcast(Bullet);
+			FVector Location(TankShootingPoint->GetComponentLocation());
+			FRotator Rotation(TankShootingPoint->GetComponentRotation());
+			Rotation.Yaw += 90;
+			FActorSpawnParameters SpawnParameters;
+			
+			if (ATankBullet* Bullet = GetWorld()->SpawnActor<ATankBullet>(TankBulletClassBlueprint, Location, Rotation, SpawnParameters))
+			{
+				Bullet->SetInstigator(this);
+				//Bullet->SetActorScale3D(Bullet->GetActorScale() * sizeOfBullet);
+				//Bullet->GetComponentByClass<UStaticMeshComponent>()->SetStaticMesh(BulletMesh);	
+				ReceiveShooting(Bullet);
+				
+				OnSpawnBullet.Broadcast(Bullet);
+			}
 		}
-
 		
 		TankInputs.FireInput = false;
 	}

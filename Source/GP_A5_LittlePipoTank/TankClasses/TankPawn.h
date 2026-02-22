@@ -83,6 +83,19 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bBlockAllInputs = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<ATankBullet> TankBulletClassBlueprint;
+
+	UFUNCTION()
+	bool CanShoot() const;
+
+	void UpdateShootCooldown(float DeltaTime);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float CooldownBetweenEachShoot = 1.f;
+	
+	float DelayBeforeShootingAvailable = 0.f;
 	
 public:
 

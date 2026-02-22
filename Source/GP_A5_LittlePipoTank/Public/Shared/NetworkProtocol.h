@@ -165,7 +165,7 @@ struct FGameStatePacket
 	struct BulletStateData
 	{
 		int Index = -1;
-		FVector2D Location = FVector2D::ZeroVector;
+		FVector Location = FVector::ZeroVector;
 		float Rotation = 0.f;
 	};
 

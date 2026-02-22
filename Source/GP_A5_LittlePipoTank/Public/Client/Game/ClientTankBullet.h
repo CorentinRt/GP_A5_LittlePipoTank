@@ -23,7 +23,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetLocation(const FVector2D& NewLocation, bool Sweep);
+	void SetLocation(const FVector& NewLocation, bool Sweep);
 	void SetRotation(const FRotator& NewRotation);
 	
 private:

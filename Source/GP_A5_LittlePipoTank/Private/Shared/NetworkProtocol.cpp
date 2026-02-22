@@ -137,6 +137,7 @@ void FGameStatePacket::Serialize(TArray<BYTE>& ByteArray) const
 		// Location
 		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, BulletStateData.Location.X);
 		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, BulletStateData.Location.Y);
+		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, BulletStateData.Location.Z);
 		// Rotation
 		UNetworkProtocolHelpers::SerializeArithmetic(ByteArray, BulletStateData.Rotation);
 	}
@@ -190,9 +191,10 @@ void FGameStatePacket::Deserialize(const TArray<BYTE>& ByteArray, TArray<BYTE>::
 	{
 		int BulletIndex = UNetworkProtocolHelpers::DeserializeArithmetic<int>(ByteArray, Offset);
 
-		FVector2D BulletLocation = FVector2D::ZeroVector;
+		FVector BulletLocation = FVector::ZeroVector;
 		BulletLocation.X = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 		BulletLocation.Y = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
+		BulletLocation.Z = UNetworkProtocolHelpers::DeserializeArithmetic<double>(ByteArray, Offset);
 
 		float BulletRotation = UNetworkProtocolHelpers::DeserializeArithmetic<float>(ByteArray, Offset);
 		
