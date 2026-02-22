@@ -11,6 +11,7 @@
 
 class UBoxComponent;
 class ATankBullet;
+class USceneComponent;
 
 UCLASS()
 class GP_A5_LITTLEPIPOTANK_API ATankPawn : public APawn, public IGamePhaseListener
@@ -24,6 +25,8 @@ public:
 	UStaticMeshComponent* TankHeadMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Tank")
 	UStaticMeshComponent* TankBodyMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Tank")
+	USceneComponent* TankBodyMeshHolder;
 	UPROPERTY(EditAnywhere, Category= "Tank")
 	USceneComponent* TankShootingPoint;
 	UPROPERTY(EditAnywhere, Category= "Tank")

@@ -19,10 +19,13 @@ ATankPawn::ATankPawn()
 
 	TankBoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
 	TankBoxCollision->SetupAttachment(GetRootComponent());
+
+	TankBodyMeshHolder = CreateDefaultSubobject<USceneComponent>(TEXT("TankBodyMeshHolder"));
+	TankBodyMeshHolder->SetupAttachment(TankBoxCollision);
 	
 	//Body
 	TankBodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyOfTank"));
-	TankBodyMesh->SetupAttachment(TankBoxCollision);
+	TankBodyMesh->SetupAttachment(TankBodyMeshHolder);
 
 	//Head
 	TankHeadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HeadOfTank"));
