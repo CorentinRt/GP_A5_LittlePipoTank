@@ -27,7 +27,7 @@ void AClientTankPawn::Tick(float DeltaTime)
 	RotationVisualError *= 0.9f;
 
 	TankBodyMeshHolder->SetRelativeLocation(LocationVisualError);
-	TankBodyMeshHolder->SetRelativeRotation(RotationVisualError);
+	TankBodyMeshHolder->SetRelativeRotation(FRotator(0.0f, RotationVisualError, 0.0f));
 }
 
 // Called to bind functionality to input
@@ -91,20 +91,11 @@ void AClientTankPawn::SetAimRotation(const FRotator& AimRotation)
 	TankHeadMesh->SetWorldRotation(AimRotation);
 }
 
-void AClientTankPawn::AddVisualError(const FVector& LocationError, const FRotator& RotationError)
+void AClientTankPawn::AddVisualError(const FVector& LocationError, float RotationError)
 {
 	LocationVisualError += LocationError;
 	RotationVisualError += RotationError;
 }
 
-FVector AClientTankPawn::GetVisualLocation() const
-{
-	return GetActorLocation() + LocationVisualError;
-}
-
-FRotator AClientTankPawn::GetVisualRotation() const
-{
-	return GetActorRotation() + RotationVisualError;
-}
 
 

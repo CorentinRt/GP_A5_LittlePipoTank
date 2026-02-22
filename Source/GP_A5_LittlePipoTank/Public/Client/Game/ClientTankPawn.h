@@ -43,12 +43,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ReceiveOnTankMoveBlueprint();
-	void AddVisualError(const FVector& LocationError, const FRotator& RotationError);
-
-	FVector GetVisualLocation() const;
-	FRotator GetVisualRotation() const;
+	void AddVisualError(const FVector& LocationError, float RotationError);
 
 private:
 	FVector LocationVisualError;
-	FRotator RotationVisualError;
+	float RotationVisualError;
 };
