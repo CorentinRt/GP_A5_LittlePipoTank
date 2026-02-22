@@ -106,7 +106,7 @@ void AGameModeTankServer::SendGameStatePacketToAllClients()
 			{
 				OtherPlayerData.Location = FVector2D(OtherPlayer.PlayerTanks->GetActorLocation().X, OtherPlayer.PlayerTanks->GetActorLocation().Y);
 				OtherPlayerData.Rotation = OtherPlayer.PlayerTanks->GetActorRotation().Yaw;
-				OtherPlayerData.AimRotation = OtherPlayer.PlayerTanks->GetBaseAimRotation().Yaw;
+				OtherPlayerData.AimRotation = OtherPlayer.PlayerTanks->GetHeadAimRotation();
 			}
 
 			GameStatePacket.OtherPlayersStateData.Add(MoveTemp(OtherPlayerData));
@@ -255,6 +255,7 @@ void AGameModeTankServer::UpdateCurrentGamePhase(float DeltaTime)
 		{
 			if (GetTanksAliveCount() <= 1)
 			{
+				CurrentAccumulatedGamePhaseTime = 0.f;
 				NextGamePhase();
 				break;
 			}
@@ -619,9 +620,6 @@ FPlayerDataServer AGameModeTankServer::GetLastVictoriousPlayerData()
 void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayerName)
 {
 	++GameStateServer.PlayerCount;
-
-	if (GameStateServer.PlayerCount > 2)
-		return;
 	
 	FPlayerTankInputs PlayerInputs
 	{
@@ -694,6 +692,8 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 		GamePhasePacket.GamePhase = GameStateServer.CurrentGamePhase;
 		UNetworkProtocolHelpers::SendPacket(NewPlayerData.Peer, GamePhasePacket, ENET_PACKET_FLAG_RELIABLE);
 	}
+
+	UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Player count = {0}", GameStateServer.PlayerCount);
 }
 
 void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
