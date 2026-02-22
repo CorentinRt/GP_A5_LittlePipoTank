@@ -55,8 +55,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Tank")
 	AGameModeTankServer* GameMode;
 
-	
-
 public:
 	// Sets default values for this character's properties
 	ATankPawn();

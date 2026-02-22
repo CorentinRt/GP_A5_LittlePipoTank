@@ -4,6 +4,7 @@
 #include "Server/Game/GameModeTankServer.h"
 
 #include "Server/Game/PlayerTankSpawnPoint.h"
+#include "Shared/LittlePipoTankGameInstance.h"
 #include "Shared/NetworkProtocol.h"
 #include "Shared/NetworkProtocolHelpers.h"
 #include "TankClasses/TankBullet.h"
@@ -35,7 +36,8 @@ void AGameModeTankServer::InitGameServer()
 {
 	GetAllPlayerSpawnPoints();
 	
-	InitializeNetwork();
+	ULittlePipoTankGameInstance* GameInstance = Cast<ULittlePipoTankGameInstance>(GetGameInstance());
+	InitializeNetwork(GameInstance->GetAppPort());
 
 	IsServerInitialized = true;
 }
