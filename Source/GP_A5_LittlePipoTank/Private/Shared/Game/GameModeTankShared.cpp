@@ -102,6 +102,8 @@ void AGameModeTankShared::GetAllPlayerSpawnPoints()
 
 void AGameModeTankShared::ReactChangeGamePhase(ETankGamePhase InGamePhase)
 {
+	ReactChangeGamePhase_Implementation(InGamePhase);
+
 	
 }
 
