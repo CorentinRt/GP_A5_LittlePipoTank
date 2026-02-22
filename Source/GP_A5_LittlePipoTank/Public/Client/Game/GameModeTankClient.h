@@ -47,6 +47,9 @@ public:
 	
 protected:
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveOnTankJustExploded();
+	
 	FString GetServerAdressIp() const;
 
 	virtual void HandleMessage(const OpCode& OpCode, const TArray<BYTE>& ByteArray, TArray<BYTE>::SizeType& Offset, ENetPeer* Peer) override;

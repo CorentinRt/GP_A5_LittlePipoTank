@@ -384,6 +384,7 @@ void AGameModeTankClient::HandleMessage(const OpCode& OpCode, const TArray<BYTE>
 			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Try Destroy ClientTank");
 
 			Player->Tank->ReceiveOnTankDestroy();
+			ReceiveOnTankJustExploded();
 			GetWorld()->DestroyActor(Player->Tank);
 			Player->Tank = nullptr;
 			UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Destroy ClientTank Success");
