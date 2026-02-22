@@ -24,13 +24,6 @@ void AGameModeTankShared::BeginPlay()
 void AGameModeTankShared::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	GEngine->AddOnScreenDebugMessage(
-			-1,
-			2.f,
-			FColor::Blue,
-			FString::Printf(TEXT("Delta Time tick : %f"), DeltaSeconds)
-		);
 	
 	UpdateCheckTickPhysics(DeltaSeconds);
 	UpdateCheckTickNetwork(DeltaSeconds);

@@ -509,9 +509,9 @@ void AGameModeTankServer::HandleDisconnection(const ENetEvent& event)
 
 bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 {
-	if (InPlayer.PlayerIndex >= PlayersSpawnPoints.Num())
+	if (InPlayer.PlayerIndex >= PlayersSpawnPoints.Num() || InPlayer.PlayerIndex < 0)
 		return false;
-
+	
 	APlayerTankSpawnPoint* SpawnPoint = PlayersSpawnPoints[InPlayer.PlayerIndex];
 
 	if (!SpawnPoint)
@@ -524,7 +524,6 @@ bool AGameModeTankServer::SpawnTankPlayer(FPlayerDataServer& InPlayer)
 		InPlayer.PlayerTanks = GetWorld()->SpawnActor<ATankPawn>(TankPawnClassBlueprint, SpawnParameters);
 		InPlayer.PlayerTanks->ReactOnGamePhaseChanged_Implementation(GameStateServer.CurrentGamePhase);
 
-		UE_LOGFMT(LogGP_A5_LittlePipoTank, Warning, "Bind Tank Spawn Bullet");
 		InPlayer.PlayerTanks->OnSpawnBullet.AddDynamic(this, &AGameModeTankServer::BindTankSpawnBullet);
 		InPlayer.PlayerTanks->OnTankDestroyed.AddDynamic(this, &AGameModeTankServer::BindHandleTankDestroyed);
 	}
@@ -679,18 +678,21 @@ void AGameModeTankServer::PlayerJoined(ENetPeer* InPeer, const FString& InPlayer
 		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerListPacket, ENET_PACKET_FLAG_RELIABLE);
 	}
 
-	if (SpawnTankPlayer(NewPlayerData))
+	if (GameStateServer.CurrentGamePhase == ETankGamePhase::WAITING_PLAYER)
 	{
+		if (SpawnTankPlayer(NewPlayerData))
+		{
+			
+		}
 		
+		// Send Tank Spawned
+		SendTankSpawnToAllClients();
+		
+		// Game Phase
+		FGamePhasePacket GamePhasePacket = {};
+		GamePhasePacket.GamePhase = GameStateServer.CurrentGamePhase;
+		UNetworkProtocolHelpers::SendPacket(NewPlayerData.Peer, GamePhasePacket, ENET_PACKET_FLAG_RELIABLE);
 	}
-	
-	// Send Tank Spawned
-	SendTankSpawnToAllClients();
-	
-	// Game Phase
-	FGamePhasePacket GamePhasePacket = {};
-	GamePhasePacket.GamePhase = GameStateServer.CurrentGamePhase;
-	UNetworkProtocolHelpers::SendPacket(NewPlayerData.Peer, GamePhasePacket, ENET_PACKET_FLAG_RELIABLE);
 }
 
 void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
@@ -698,7 +700,12 @@ void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 	--GameStateServer.PlayerCount;
 	
 	GameStateServer.Players[IndexToRemove].Peer = nullptr;
-	GetWorld()->DestroyActor(GameStateServer.Players[IndexToRemove].PlayerTanks);
+	
+	if (GameStateServer.Players[IndexToRemove].PlayerTanks)
+	{
+		GetWorld()->DestroyActor(GameStateServer.Players[IndexToRemove].PlayerTanks);
+		GameStateServer.Players[IndexToRemove].PlayerTanks = nullptr;
+	}
 
 	for (FPlayerDataServer& LocalPlayer : GameStateServer.Players)
 	{
@@ -724,14 +731,19 @@ void AGameModeTankServer::PlayerLeft(const ENetEvent& event, int IndexToRemove)
 		UNetworkProtocolHelpers::SendPacket(LocalPlayer.Peer, PlayerListPacket, ENET_PACKET_FLAG_RELIABLE);
 	}
 
-	SetServerGamePhase(ETankGamePhase::WAITING_PLAYER);
+	if (GameStateServer.PlayerCount < 2)
+	{
+		if (GameStateServer.CurrentGamePhase != ETankGamePhase::WAITING_PLAYER)
+		{
+			SetServerGamePhase(ETankGamePhase::WAITING_PLAYER);
+		}
+	}
 }
 
 void AGameModeTankServer::BindTankSpawnBullet(ATankBullet* InTankBullet)
 {
 	if (!InTankBullet)
 		return;
-
 	
 	InTankBullet->BulletIndex = GameStateServer.NextBulletIndex++;
 
